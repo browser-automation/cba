@@ -1,0 +1,73 @@
+.navigationMain {
+	font-family: Arial, Helvetica, sans-serif;
+	padding-left:20px;
+	width:200px;
+	display: inline-table;
+}
+
+.navigationHeader {
+	position:relative;
+}
+
+
+#optionsContainer {
+	font-family: Arial, Helvetica, sans-serif;
+	display: inline-table;
+	width: 200px;
+}
+
+
+.extName {
+	display: inline-table;
+	font-size: 20px;
+}
+
+.extVer {
+	display:inline-table;
+	position:absolute;
+	bottom:0;
+	right:0;
+	font-size: 13px;
+	color: 878787;
+}
+
+#navigation {
+	list-style-type: none;
+	padding-left: 0px;
+}
+
+#navigation li {
+	padding-left: 5px;
+	padding-bottom: 3px;
+	padding-top: 3px;
+	font-size: 13px;
+	color: 878787;
+}
+
+#optionsContainer, #Privacy, #about {
+	padding-left: 30px;
+}
+
+
+.header {
+	padding-bottom:5px;
+	font-family: "Arial Narrow";
+	font-size: 20px;
+	width: 600;
+}
+.main {
+	height: 200px;
+	width: 750px;
+}
+.footer {
+	
+}
+
+#navigation:hover {
+	cursor: pointer;
+}
+
+#navigation .selected {
+	background-color: E6E6E6;
+	color: black;
+}

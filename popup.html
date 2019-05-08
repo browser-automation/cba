@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title>CBA</title>
+		<link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui-1.8.1.custom.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid.css" />
+		<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="js/jquery.tablednd.js"></script>
+		<script type="text/javascript" src="js/jquery.jqGrid.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js"></script>
+
+		<script type="text/javascript" src="popup.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+	</head>
+	<body bgcolor="#f0f0f0">
+		<div id="main">
+			<div style="display:inline-table">
+				<table id="projectsTable"></table>
+				<input type="button" value="G+" id="groupAddBtn" title="Add new group" >
+				<input type="button" value="+" id="projectAddBtn" title="Add new project" >
+				<input type="button" value="-" id="projectDeleteBtn" title="Delete">
+				<input type="button" value="Rename" id="projectRenameBtn">
+			</div>
+			
+			<div style="display:inline-table">
+				<table id="actionsTable"></table>
+			</div>
+			<div style="display:inline-table">
+				<table id="functionsTable"></table>
+			</div>
+			<div style="display:inline-table">
+				<textarea rows="3" cols="39" id="actionData"></textarea>
+			</div>
+			<div style="display:inline-block; vertical-align: top;">
+				<select id="actionEvType">
+					<option value="inject">inject</option>
+					<option value="cs-inject">cs-inject</option>
+					<option value="bg-inject">bg-inject</option>
+					<option value="bg-function">bg-function</option>
+					<option value="change">change</option>
+					<option value="check">check</option>
+					<option value="click">click</option>
+					<option value="submit-click">submit-click</option>
+					<option value="update">update</option>
+					<option value="timer">timer</option>
+					<option value="redirect">redirect</option>
+					<option value="copy">copy</option>
+					<option value="pause">pause</option>
+				</select>
+				<br>
+				<input type="text" id="actionNewValue" style="width:200px"/>
+			</div>
+				
+			
+			<div style="display:block">
+				<input type="button" value="Add" id="actionsAdd" >
+				<input type="button" value="Delete" id="actionsDelete">
+				<input type="button" value="Save" id="actionsSave">
+			</div>
+			<div style="display:block">
+				<input type="button" value="Rec" id="recordButton" >
+				<input type="button" value="stop" id="stopButton" style="width:'55px'">
+				<input type="button" value="play" id="playButton" style="width:'49px'">
+				<input type="text" id="repeat" size="1" value="1"/> times
+			</div>
+			<div style="display:block" id="helpMessage"></div>
+			<div style="position: absolute; bottom: 10px; right: 10px;">
+				
+				<a href="http://chrome-automation.com/" target="_blank" style="color:#444; text-decoration:none">
+					chrome-automation.com
+					<img src="logo.png" style="width: 50px;" />
+				</a>
+			</div>
+			
+		</div>
+	</body>
+	<script type="text/javascript" src="js/projects_table.js"></script>
+	<script type="text/javascript" src="js/actions_table.js"></script>
+	<script type="text/javascript" src="js/functions_table.js"></script>
+</html>

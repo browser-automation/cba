@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<title>Options</title>
+		<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="js/jquery.jqGrid.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js"></script>
+		<script type="text/javascript" src="js/options.js"></script>
+		<script type="text/javascript" src="popup.js"></script>
+
+		<link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui-1.8.1.custom.css" />
+		<link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid.css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<link rel="stylesheet" type="text/css" href="css/options.css" />
+	</head>
+	<body bgcolor="#f0f0f0">
+		<div class="navigationMain">
+			<div class="navigationHeader">
+				<div class="extName">
+					CBA
+				</div>
+				<div class="extVer" id="extVer">
+					v. 1.2
+				</div>
+			</div>
+			<div class="navigationLinksCont">
+				<ul id="navigation">
+					<li id="navLnk1" class="navigation">Import/export</li>
+					<li id="navLnk2" class="navigation">CBA</li>
+					<li id="navLnk3" class="navigation">funcions</li>
+				</ul>
+			</div>
+		</div>
+		<div id="optionsContainer">
+			<div id="setting1" class="settingContainer">
+				<div class="header">
+					Import/Export
+				</div>
+				<hr />
+				<div class="main">
+					<div style="display:inline-table;vertical-align: top;">
+						<table id="projectsTableExport"></table>
+			
+					</div>
+					<div style="display:inline-table">
+						<textarea id="automExport" rows="12" cols="48"></textarea>
+					</div>
+					<div style="display:block">
+						<br />
+						Import
+					</div>
+					<div style="display:block">
+						<div style="display:inline-table">
+							<textarea id="automImport" rows="10" cols="50"></textarea>
+						</div>
+						<div style="display:inline-table">
+							<table id="projectsTableImport"></table>
+						</div>
+					</div>
+					<input type="button" id="importBtn" value="Import" />
+					<script type="text/javascript" src="js/projects_table_export.js"></script>
+					<script type="text/javascript" src="js/projects_table_import.js"></script>
+				</div>
+				<div class="footer">
+					
+				</div>
+			</div>
+			
+			<div id="setting2" class="settingContainer">
+				<div class="header">
+					CBA
+				</div>
+				<hr />
+				<div class="main">
+					<!-- Write Here About part  -->
+					<div style="display:inline-table">
+						<table id="projectsTable"></table>
+						<input type="button" value="G+" id="groupAddBtn" title="Add new group" >
+						<input type="button" value="+" id="projectAddBtn" title="Add new project" >
+						<input type="button" value="-" id="projectDeleteBtn" title="Delete">
+						<input type="button" value="Rename" id="projectRenameBtn">
+					</div>
+					<div style="display:inline-table">
+						<table id="actionsTable"></table>
+					</div>
+					<div style="display:inline-table">
+						<table id="functionsTable"></table>
+					</div>
+					
+					<div style="display:inline-table">
+						<textarea rows="8" cols="87" id="actionData"></textarea>
+					</div>
+					<div style="display:inline-block; vertical-align: top;">
+						<select id="actionEvType">
+							<option value="inject">inject</option>
+							<option value="cs-inject">cs-inject</option>
+							<option value="bg-inject">bg-inject</option>
+							<option value="bg-function">bg-function</option>
+							<option value="change">change</option>
+							<option value="check">check</option>
+							<option value="click">click</option>
+							<option value="submit-click">submit-click</option>
+							<option value="update">update</option>
+							<option value="timer">timer</option>
+							<option value="redirect">redirect</option>
+							<option value="copy">copy</option>
+							<option value="pause">pause</option>
+						</select>
+						<input type="text" id="actionNewValue" style="width:600px"/>
+					</div>
+					
+					<div style="display:block">
+						<input type="button" value="Add" id="actionsAdd" >
+						<input type="button" value="Delete" id="actionsDelete">
+						<input type="button" value="Save" id="actionsSave">
+					</div>
+					<div style="display:block" id="helpMessage"></div>
+				</div>
+				<div class="footer">
+				</div>
+			</div class="settingContainer">
+			
+			<div id="setting3" class="settingContainer">
+				<div class="header">
+					Functions
+				</div>
+				<hr />
+				<div class="main">
+					<div style="display:inline-table;vertical-align: top;">
+						<input type="text" id="funcName" style="width:400px"/>
+						<br />
+						<textarea rows="13" cols="47" id="funcData"></textarea>
+						<br />
+						<select id="funcEvType">
+							<option value="inject">inject</option>
+							<option value="cs-inject">cs-inject</option>
+							<option value="bg-inject">bg-inject</option>
+							<option value="bg-function">bg-function</option>
+							<option value="change">change</option>
+							<option value="check">check</option>
+							<option value="click">click</option>
+							<option value="submit-click">submit-click</option>
+							<option value="update">update</option>
+							<option value="timer">timer</option>
+							<option value="redirect">redirect</option>
+							<option value="copy">copy</option>
+							<option value="pause">pause</option>
+						</select>
+						<input type="text" id="funcNewValue" style="width:300px"/>
+						<div style="display:block">
+							<input type="button" value="Add" id="addFunc" >
+							<input type="button" value="Delete" id="deleteFunc">
+							<input type="button" value="Save" id="saveFunc">
+						</div>
+					</div>
+					<div style="display:inline-table">
+						<table id="functionsTableEdit"></table>
+					</div>
+				</div>
+				<div class="footer">
+				</div>
+			</div>
+		</div>
+		
+		
+	</body>
+	<script type="text/javascript" src="js/projects_table.js"></script>
+	<script type="text/javascript" src="js/actions_table.js"></script>
+	<script type="text/javascript" src="js/functions_table.js"></script>
+</html>
