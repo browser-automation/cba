@@ -53,7 +53,6 @@ function recordButtonClick() {
 
 
 function stopButtonClick() {
-	//var bg = chrome.extension.getBackgroundPage();
 	writeHelpMessage("", "");
 	bg.stopButtonClick();
 	$("#recordButton").val("rec");
@@ -75,14 +74,12 @@ function playButtonClick() {
 	if ($("#playButton").val() != "play") {
 		$("#playButton").val("play");
 	}
-	//var bg = chrome.extension.getBackgroundPage();
 	bg.playButtonClick(projObj, jQuery("#projectsTable").jqGrid('getGridParam', 'selrow'), $("#repeat").val());
 	timedCount();
 }
 
 
 function popupLoad() {
-	//var bg = chrome.extension.getBackgroundPage();
 	bg.allowRec==0?$("#recordButton").val("rec"):$("#recordButton").val("recording...");
 	
 	if(bg.allowRec == 1) {
@@ -96,21 +93,13 @@ function popupLoad() {
 	
 	CSPbindings();
 	analytAllButtons();
-	
-	/*
-	window.onerror = function (errorMsg, url, lineNumber) {
-		writeHelpMessage("Error: "+errorMsg+" URL:"+url+" Line:"+lineNumber, "purple");
-	}
-	*/
 }
-
 
 function getSelectedProjectName() {
 	var gr = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
 	var projectName = jQuery("#projectsTable").jqGrid('getRowData',gr).pname;
 	return projectName;
 }
-
 
 function actionEvTypeChange() {
 	writeHelpMessage("", "");
@@ -176,8 +165,6 @@ function writeHelpMessage(helpMsg, color) {
 }
 
 function timedCount() {
-	console.log(bg);
-	
 	if(bg.lastSelectedProjectId != null) {
 		jQuery("#projectsTable").setSelection(bg.lastSelectedProjectId, true);
 	}
@@ -201,7 +188,6 @@ function timedCount() {
 	}
 }
 
-
 function CSPbindings() {
 	$("#actionEvType").change();
 	$("#groupAddBtn").click(groupAdd);
@@ -218,5 +204,3 @@ function CSPbindings() {
 	
 }
 $(document).ready(popupLoad);
-
-

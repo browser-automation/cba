@@ -49,54 +49,14 @@ $.jgrid.extend({
     }
 });
 
-//$("#projectsTable").tableDnD({ onDrop: projDrop });
-/*
-jQuery("#projectsTable").jqGrid('gridDnD', {
-	connectWith : '#projectsTable',
-	onstart : functDragStart,
-	ondrop : functDrop,
-	beforedrop : functBeforeDrop,
-	droppos : 'last'
-});
-
-function functDragStart(ev, ui) {
-	possitionOffsX = ev.pageX - 140;
-	//$(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.left -= possitionOffsX;
-	$(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.top -= 15;
-	console.log("drag start");
-}
-
-function functDrop(ev, ui, getdata) {
-	//console.log("Drop");
-}
-
-function functBeforeDrop(ev, ui, getdata, $source, $target) {
-	var targetId = $("#projectsTable .ui-state-hover")[0].id;
-	var sourceName = getdata.name;
-	
-	if((targetId == null)||(sourceName == null)) {
-		return;
-	}
-	
-	var targetName = jQuery("#projectsTable").jqGrid('getRowData',targetId).name;
-	
-}
-*/
-/*
- * Projects DND part
- */
-
-
 function projectSelected(id) {
 	if(window.location.pathname != "/options.html") {
 		bg.lastSelectedProjectId = id;
 	}
 	
-	var projectName = jQuery("#projectsTable").jqGrid('getRowData',id).name;
 	getActionsData();
 	jQuery("#actionsTable").setSelection(0, true);
 }
-
 
 /*
  * Function that makes selected row editable and saving changes and send to local storage
@@ -125,8 +85,6 @@ function projectRename() {
 		jQuery("#projectsTable").jqGrid('saveRow', projectRenameId, false, 'clientArray');
 		
 		var newName = jQuery("#projectsTable").jqGrid('getRowData',projectRenameId).pname;
-		
-		console.log(projectOldName);
 		
 		if(newName == projectOldName) {
 			return;
@@ -168,14 +126,6 @@ function projectRename() {
 				}
 			}
 		}  
-		//V7
-		/*
-		localStorage.setItem(newName, localStorage.getItem(projectOldName));
-		localStorage.removeItem(projectOldName);
-		$("#projectsTable").jqGrid("clearGridData");
-		populateProjectsTable();
-		*/
-		
 		//V8
 		localStorage.setItem("data", JSON.stringify(dataObj));
 		$("#projectsTable").jqGrid("clearGridData");
@@ -187,17 +137,6 @@ function projectRename() {
  * Deleting project
  */
 function projectDelete() {
-	// V7
-	/*
-	var gr = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-	var projectName = jQuery("#projectsTable").jqGrid('getRowData',gr).name;
-	localStorage.removeItem(projectName);
-	$("#projectsTable").jqGrid("clearGridData");
-	populateProjectsTable();
-	*/
-	
-	//V8
-	
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var selectedId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
 	
@@ -214,7 +153,6 @@ function projectDelete() {
 	var parentGroup = jQuery("#projectsTable").getNodeParent(record);
 	
 	var deletionName = "";
-	var isGroup = true;
 	
 	// In case we don't have parent object then It's mean we have selected the group (not projectd)
 	// hhere is the logic that checks that case and getting right group name
@@ -241,37 +179,13 @@ function projectDelete() {
 	localStorage.setItem("data", JSON.stringify(dataObj));
 	$("#projectsTable").jqGrid("clearGridData");
 	populateProjectsTable();
-	
-	/*
-	return;
-	
-	var gr = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-	var projectName = jQuery("#projectsTable").jqGrid('getRowData',gr).name;
-	console.log(projectName);
-	var dataObj = JSON.parse(localStorage.getItem("data"));
-	delete dataObj[projectName];
-	
-	localStorage.setItem("data", JSON.stringify(dataObj));
-	$("#projectsTable").jqGrid("clearGridData");
-	populateProjectsTable();
-	*/
 }
 
 /*
  * Adding new empty project
  */
 function projectAdd() {
-	// V7
-	/*
-	var newDate = new Date;
-	var unique = newDate.getTime() + '';
-	localStorage.setItem("record_"+unique.substring(unique.length - 5), '{"action":[]}');
-	$("#projectsTable").jqGrid("clearGridData");
-	populateProjectsTable();
-	*/
-	
 	// V8
-	//checkStorage();
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var selectedId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
 	
@@ -288,7 +202,6 @@ function projectAdd() {
 	var parentGroup = jQuery("#projectsTable").getNodeParent(record);
 	
 	var groupName = "";
-	var groupId = 1;
 	
 	// In case we don't have parent object then It's mean we have selected the group (not projectd)
 	// hhere is the logic that checks that case and getting right group name
@@ -304,7 +217,6 @@ function projectAdd() {
 	var groupOBJ = dataObj[groupName];
 	
 	var groupProjArray = groupOBJ.projects;
-	//TODO iterate here to see whether I have the project then add
 	for(i=0;i<100;i++) {
 		var allowProject = true;
 		for(j=0;j<groupProjArray.length;j++) {
@@ -317,7 +229,6 @@ function projectAdd() {
 			project["action"] = new Array();
 			project["name"] = "project"+i;
 			project["level"] = "1";
-			//project["parent"] = groupId;
 			project["isLeaf"] = true;
 			project["expanded"] = false;
 			project["loaded"] = true;
@@ -330,7 +241,6 @@ function projectAdd() {
 		}
 	}
 	groupProjArray.sort();
-	//dataObj[groupName].projects = groupProjArray;
 	localStorage.setItem("data", JSON.stringify(dataObj));
 	$("#projectsTable").jqGrid("clearGridData");
 	populateProjectsTable();
@@ -391,17 +301,6 @@ function checkStorage() {
  * function that gets all keys from local storage and populate projects grid using them
  */
 function populateProjectsTable() {
-	//V7
-	/*
-	var localStorageKeys = Object.keys(localStorage);
-	localStorageKeys.sort();
-	for(var i=0;i<localStorageKeys.length;i++) {
-		var namesJSON = {name : localStorageKeys[i]};
-		jQuery("#projectsTable").jqGrid('addRowData',i, namesJSON);
-	}
-	*/
-	// { name:"Cash", level:"0", parent:"",  isLeaf:false, expanded:false, loaded:true },
-	//V8
 	checkStorage();
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var allGroups = Object.keys(dataObj);
@@ -415,17 +314,13 @@ function populateProjectsTable() {
 	var groupId = 0;
 	
 	for(var i=0;i<allGroups.length;i++) {
-		
-		//var groupName = allGroups[i];
 		var groupOBJ = dataObj[allGroups[i]];
-		console.log(groupOBJ.name);
 		var groupJSON = {pname : groupOBJ.name, level:groupOBJ.level, parent:groupOBJ.parent, 
 						isLeaf:groupOBJ.isLeaf, expanded:groupOBJ.expanded, 
 						loaded:groupOBJ.loaded};
 		projectsArray.push(groupJSON);
 		projectId ++;
 		groupId  = projectId;
-		console.log(JSON.stringify(groupJSON));
 		var groupProjects = groupOBJ.projects;
 		groupProjects.sort();
 		for(var j=0;j<groupProjects.length;j++) {
@@ -435,28 +330,8 @@ function populateProjectsTable() {
 						loaded:projectOBJ.loaded};
 			projectsArray.push(projectJSON);
 			projectId ++;
-			console.log(JSON.stringify(projectJSON));
 		}
-		//jQuery("#projectsTable").jqGrid('addRowData',i, namesJSON);
 	}
-	
-	var mydata = [
-                { name:"Cash", level:"0", parent:"",  isLeaf:false, expanded:false, loaded:true },
-                { name:"Bank\'s",  level:"0", parent:"",  isLeaf:false, expanded:true, loaded:true },
-                { name:"Cash 1", level:"1", parent:"1", isLeaf:false, expanded:false, loaded:true },
-                { name:"Sub Cash 1",  level:"2", parent:"2", isLeaf:true,  expanded:false, loaded:true },
-                { name:"Cash 2",  level:"1", parent:"1", isLeaf:true,  expanded:false, loaded:true },
-                {  name:"Bank 1",   level:"1", parent:"2", isLeaf:true,  expanded:false, loaded:true },
-                {  name:"Bank 2", level:"1", parent:"2", isLeaf:true,  expanded:false, loaded:true },
-                {  name:"Fixed asset",  level:"0", parent:"",  isLeaf:true,  expanded:false, loaded:true }
-                ];
-                
-	var namesJSON = {name : "project0", level:"0", parent:""};
-	//projectsArray.push(namesJSON);
-	var namesJSON = {name : "project1", level:"1", parent:"1"};
-	//projectsArray.push(namesJSON);
-	
-	
 	
 	$("#projectsTable")[0].addJSONData({
     		total: 1,
@@ -466,7 +341,6 @@ function populateProjectsTable() {
 	});
 }
 
-//TODO use this function to modify other project functions
 // Function that return info regarding seleccted project
 function getSelectedProjData () {
 	var infoObj = {};
@@ -484,10 +358,7 @@ function getSelectedProjData () {
 		return null;
 	}
 	
-	
 	var parentGroup = jQuery("#projectsTable").getNodeParent(record);
-	
-	
 	// In case we don't have parent object then It's mean we have selected the group (not projectd)
 	// hhere is the logic that checks that case and getting right group name
 	if(parentGroup == null) {

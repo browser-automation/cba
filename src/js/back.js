@@ -82,10 +82,6 @@ function isFirstLoad() {
 		for(var i=0;i<localStorageKeys.length;i++) {
 			var oldObj = JSON.parse(localStorage.getItem(localStorageKeys[i]));
 			if(oldObj.action != null) {
-				//groupProjArray.push(oldObj.action);
-				console.log(groupProjArray);
-				
-				//TODO iterate here to see whether I have the project then add
 				for(i=0;i<100;i++) {
 					var allowProject = true;
 					for(j=0;j<groupProjArray.length;j++) {
@@ -104,7 +100,6 @@ function isFirstLoad() {
 						project["action"] = oldObj.action;
 						project["name"] = localStorageKeys[i];
 						project["level"] = "1";
-						//project["parent"] = groupId;
 						project["isLeaf"] = true;
 						project["expanded"] = false;
 						project["loaded"] = true;
@@ -130,17 +125,11 @@ function storeRecord(msg) {
 	
 	if(msg.evType == "facebook") { // special logic beacause of FB issue 
 		chrome.tabs.getSelected(null ,function(tab) {
-  			// Send a request to the content script.
   			currentTab = tab;
   			if(lastFacebookLink != currentTab.url) {
-				console.log(lastFacebookLink);
-				console.log(currentTab.url);
   				msg.data = currentTab.url;
   				msg.evType = "redirect";
   				pushRecord(msg);
-  			//	msg.data = "";
-  			//	msg.evType = "update";
-  			//	pushRecord(generateUpdateEvent());
   				lastFacebookLink = currentTab.url;
   				return;
   			}
@@ -148,9 +137,7 @@ function storeRecord(msg) {
   		return;
 	}
 	else if(msg.evType == "redirect"){
-		
 		pushRecord(msg);
-	//	pushRecord(generateUpdateEvent());
 		return;
 	}
 	if((lastEvType == "update") &&(msg.evType == "update")) {
@@ -160,7 +147,7 @@ function storeRecord(msg) {
 	
 	pushRecord(msg);
 }
-//Registration.getInstance().validateForm();
+
 function pushRecord(msg) {
 	console.log(msg);
 	var dataObj = JSON.parse(localStorage.getItem("data"));
@@ -172,17 +159,6 @@ function pushRecord(msg) {
 		}
 	}
 	localStorage.setItem("data", JSON.stringify(dataObj));
-	/*
-	var record = JSON.parse(localStorage.getItem("data"));
-     record[selectedProjectName].action.push(msg);
-     localStorage.setItem("data", JSON.stringify(record));
-     
-     
-     var anotherjson = JSON.parse(localStorage.getItem("data"));
-     for (var i = 0; i < anotherjson[selectedProjectName].action.length; i++) { 
-    	console.log(anotherjson[selectedProjectName].action[i]);
-	}
-	*/
 }
 
 
@@ -192,7 +168,6 @@ function generateUpdateEvent() {
 
 function storeCurrentUrl() {
 	chrome.tabs.getSelected(null ,function(tab) {
-  			// Send a request to the content script.
   			pushRecord({msgType: "RecordedEvent", "data": tab.url, "evType": 'redirect', "newValue" : ''});
 			lastFacebookLink = tab.url;
 	});
@@ -205,7 +180,6 @@ function recordButtonClick(projObj, projectId) {
 	storeCurrentUrl();
 	selectedProjObj = projObj;
 	selectedProjectId = projectId;
-	//localStorage.setItem(projectName, JSON.stringify({action: []}));
 	allowRec = 1;
 	chrome.browserAction.setBadgeText({"text":"rec"}); 
 }
@@ -236,7 +210,6 @@ function playButtonClick(projObj, currProjectId, repeatVal) {
 	}
 	
 	allowPlay = 1;
-	//clipboard = {};
 	projectRepeat = repeatVal;
 	playingProjectId = currProjectId;
 	update = false;
@@ -251,55 +224,26 @@ function playButtonClick(projObj, currProjectId, repeatVal) {
 	}
 	
 	defInstructArray = instructArray.slice(0);
-	
-//	instructArray = dataJSON[selectedProjectName].action;
-//	console.log(instructJSON.action);
-//	console.log(instructArray);
 	sendInstruction ();
-	
 }
 
 function sendInstruction () {
-	console.log(projectRepeat);
 	if(allowPlay == 0 ) {
 		return;
 	}
 	if(instructArray.length > 0) {
-	//	console.log(instruction);
 		chrome.tabs.getSelected(null ,function(tab) {
-			/*
-			if(checkUpdate != null) {
-				if(tab.status == "complete") {
-					if(instructArray[0].evType == 'update') {
-						console.log("splice unneeded update");
-						instructArray.splice(0, 1);
-					}
-				}
-			}
-			*/
 			if(tab == null) {
-				console.log("playSoon");
-				
 				setTimeout("sendInstruction();",1000);
 				return;
 			}
-			/*
-			if((tab.status == "loading")&&((instructArray[0].evType != 'redirect')||(instructArray[0].evType != 'submit-click')||(instructArray[0].evType != 'update'))) {
-				console.log("playSoon2");
-				setTimeout("sendInstruction();",1000);
-				return;
-			}
-			*/
 			chrome.browserAction.setBadgeText({"text":"play"});
 			instruction = instructArray.splice(0, 1);
-			
-			console.log(instruction);
 			
   			// Send a request to the content script.
   			playingTabId = tab.id;
   			if((instruction[0].evType == 'redirect')||(instruction[0].evType == 'submit-click')) {
   				update = true;
-  				//return;
   			}
   			else if(instruction[0].evType == 'update') {
   				update = true;
@@ -337,7 +281,6 @@ function sendInstruction () {
 			playButtonClick(selectedProjObj, playingProjectId, projectRepeat);
 		}
 		else {
-			//alert("asdasd");
 			allowPlay = 0;
 			chrome.browserAction.setBadgeText({"text":""});
 		}
@@ -345,26 +288,16 @@ function sendInstruction () {
 }
 
 function  playResponse(response) {
-	console.log("response");
 	if(response == null) {
-		console.log("play soon response");
 		setTimeout("sendInstruction();",1000);
 		return;
 	}
-	console.log(response);
 	if(response.answere == "instructOK") {
 		clipboard = response.clipboard;
 		if (update == false) {
 			sendInstruction ();
 		}
 	}
-	/*
-	else if (response.answere == "copy"){
-		//alert(response.clipboard);
-		clipboard = response.clipboard;
-		sendInstruction ();
-	}
-	*/
 }
 
 chrome.tabs.onUpdated.addListener(function( tabId , info ) {
@@ -419,9 +352,6 @@ function getPlaceHolder(pattern, value) {
 	return placeholderValue;
 }
 
-
-
-
 var defaultJSON = 
 { action: [
 { data: "body div div div div.topImagePlace div.quickReg div form table.regFormTable tbody tr td div SELECT#mygender",
@@ -449,16 +379,3 @@ newValue: "sdfgdfsgdfsg"
 }
 ]
 };
-
-/*
-localStorage.setItem("record1", JSON.stringify(defaultJSON));
-localStorage.setItem("record2", JSON.stringify(defaultJSON));
-localStorage.setItem("record3", JSON.stringify(defaultJSON));
-localStorage.setItem("record4", JSON.stringify(defaultJSON));
-localStorage.setItem("record5", JSON.stringify(defaultJSON));
-
-var localStorageKeys = Object.keys(localStorage);
-console.log(localStorageKeys);
-*/
-
-

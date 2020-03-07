@@ -1,5 +1,4 @@
 function removeCookie(pattern) {
-	var all_cookies = []; 
 	chrome.cookies.getAll({}, function(cookies) { 
 		for (var i in cookies) {
 			var patt= new RegExp(pattern);
@@ -8,24 +7,14 @@ function removeCookie(pattern) {
 			}
 		}
 		sendInstruction();
-		console.log("REMOVE");
 	});
 }
 
 function saveToClipboard(jsonData) {
-	/*
-	for (var key in jsonData) {
-		console.log(key);
-		clipboard[key] = jsonData[key];
-	}
-	*/
-	
-	//clipboard = JSON.parse(jsonData);
 	var jsonParsed = JSON.parse(jsonData);
 	for(var key in jsonParsed){
 		clipboard[key] = jsonParsed[key];
 	}
-	
 	sendInstruction();
 }
 
@@ -35,7 +24,6 @@ function removeDomainCookie(cookie) {
 }
 
 function getClipboardValue(attr) {
-	console.log(clipboard);
 	return clipboard[attr];
 }
 
@@ -45,7 +33,6 @@ function panelCreation(url) {
 			sendInstruction();
 		});
 	}
-	//sendInstruction();
 }
 
 function windowCreation(url) {
@@ -54,19 +41,15 @@ function windowCreation(url) {
 			sendInstruction();
 		});
 	}
-	//sendInstruction();
 }
-
 
 function removeCurrentWindow() {
 	chrome.windows.getCurrent(function(window) {
 		chrome.windows.remove(window.id, function(){
 			setTimeout("sendInstruction();",500);
-			//sendInstruction();
 		});
 	});
 }
-
 
 function reloadCurrentTab(){
 	chrome.tabs.getSelected(null ,function(tab) {
@@ -85,12 +68,8 @@ function reloadCurrentTab(){
 }
 
 function actionToPlay(actionInd) {
-	//sendBgInstruction = false;
 	instructArray = defInstructArray.slice(actionInd);
-	//sendInstruction();
 }
-
-
 
 function requestService(type, url, data) {
 	$.ajax({

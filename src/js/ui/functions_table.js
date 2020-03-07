@@ -67,10 +67,7 @@ function functDragStart(ev, ui) {
 }
 
 function functBeforeDrop(ev, ui, getdata, $source, $target) {
-	console.log("before:");
 	var targetId = $("#actionsTable .ui-state-hover")[0].id;
-	console.log("before:"+targetId);
-
     var projObj = getSelectedProjData ();
     
     if(projObj==null) {
@@ -110,34 +107,9 @@ function functBeforeDrop(ev, ui, getdata, $source, $target) {
 		jQuery("#actionsTable").setSelection(actionId-1, true);
 	}
 	
-    console.log(projObj);
 	ui.helper.dropped = false;
-	console.log("before:"+targetId);
 }
 
-/*
-    function functDrop (ev, ui, getdata) {
-      //  var acceptId = $(ui.draggable).attr("id");
-     //   console.log(ev);
-     //   console.log(ui);
-     //   console.log(getdata);
-    //   var dataRec = $('#functionsTable').jqGrid('getRowData',acceptId);
-      //  console.log(dataRec);
-       	//CHeck if project is selected if not dot allow to add record
-       	if(getSelectedProjectName()==null) {
-       		writeHelpMessage("Please select project", "red");
-       		$("#actionsTable").jqGrid("clearGridData");
-			return;
-       	}
-       	actionsSortStop();
-       
-		// Check if new empty row created after drag and drop
-      	if((jQuery("#actionsTable").jqGrid('getGridParam', 'records')==2)&&(jQuery("#actionsTable").jqGrid('getRowData',0).evType == "")){
-       		actionDeleteById(0);
-       	}
-        // so you have full information about dropped row
-    }
-*/
 function checkFuncStorage() {
 	
 	if((localStorage.getItem("cba-functions") == null)||(localStorage.getItem("cba-functions")==undefined)) {
@@ -156,7 +128,6 @@ function deleteFuncClick() {
 	
 	var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
 	if(gr == null) {
-		//TODO write error message
 	} else {
 		var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
 		functionsArray.splice(gr, 1);
@@ -168,7 +139,6 @@ function deleteFuncClick() {
 function saveFuncClick() {
 	var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
 	if(gr == null) {
-		//TODO write error message
 	} else {
 		var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
 		functionsArray[gr] = {name: $("#funcName").val(), data: $("#funcData").val(), evType: $("#funcEvType").val(), msgType:"apiEvent", newValue: $("#funcNewValue").val()};
@@ -177,11 +147,9 @@ function saveFuncClick() {
 	}
 }
 
-
 /*
  * Populating functions table
  */
-
 function getFunctionsData() {
 	if(window.location.pathname == "/options.html") {
 		$("#functionsTableEdit").jqGrid("clearGridData");
@@ -199,4 +167,3 @@ function getFunctionsData() {
 		
 	}
 }
-

@@ -21,10 +21,9 @@ jQuery("#actionsTable").jqGrid({
    	caption: "Actions"
 });
 
-
-
 jQuery("#actionsTable").jqGrid('sortableRows');
 var actionsQuantity = 0;
+
 /*
  * Binding event on sort stop to pass after sorting data to local storage and load grid again
  */
@@ -49,7 +48,6 @@ function actionGridLoad() {
 	 		}
 	 		
 	 	});
-        //console.log('You rolled over ' + rowId);
 	 });
 	 
 	 $("#actionsTable .jqgrow").mouseout(function(e){
@@ -69,9 +67,7 @@ function actionGridLoad() {
 	 		}
 	 		
 	 	});
-       // console.log('out ' + rowId);
 	 });
-	// $(".ui-jqgrid tr.jqgrow td").css("white-space","nowrap !important");
 }
 
 /*
@@ -92,36 +88,7 @@ function actionsSortStop() {
 	}
 	localStorage.setItem("data", JSON.stringify(dataObj));
 	getActionsData();
-	/*
-	var projectId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-	var projectKey = jQuery("#projectsTable").jqGrid('getRowData',projectId).name;
-	var projectJSON = JSON.parse(localStorage.getItem("data"));
-	projectJSON[projectKey].action = jQuery("#actionsTable").jqGrid('getRowData');
-	localStorage.setItem("data", JSON.stringify(projectJSON));
-	getActionsData(projectKey);
-	*/
 }
-
-/*
- * var projObj = getSelectedProjData ();
-	
-	if(projObj == null) {
-		writeHelpMessage("Please select a project", "red");
-		return;
-	}
-	if(projObj["isProject"] == true) {
-		var dataObj = JSON.parse(localStorage.getItem("data"));
-		var projectsArray = dataObj[projObj["group"]].projects;
-		var actions = "";
-		for(i=0;i<projectsArray.length;i++) {
-			if(projectsArray[i].name == projObj["project"]) {
-				actions = projectsArray[i].action;
-			}
-		}
-		$("#actionsTable").jqGrid("clearGridData");
-		loadActionsData(actions);
-	} 
- */
 
 /*
  * Adding new action to action grid
@@ -138,10 +105,6 @@ function actionAdd() {
 		return;
 	}
 	
-//	var projectId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-//	var projectKey = jQuery("#projectsTable").jqGrid('getRowData',projectId).name;
-//	var projectJSON = JSON.parse(localStorage.getItem("data"));
-	
 	var emptyJson = 
 	{ 	
 		data: "",
@@ -152,8 +115,6 @@ function actionAdd() {
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var projectsArray = dataObj[projObj["group"]].projects;
 	var actionId = jQuery("#actionsTable").jqGrid('getGridParam', 'selrow');
-	console.log("first");
-	console.log(actionId);
 	
 	for(i=0;i<projectsArray.length;i++) {
 		if(projectsArray[i].name == projObj["project"]) {
@@ -167,7 +128,6 @@ function actionAdd() {
 			
 		}
 	}
-	console.log(projectsArray);
 	localStorage.setItem("data", JSON.stringify(dataObj));
 	getActionsData();
 	
@@ -212,17 +172,6 @@ function actionDelete() {
 	localStorage.setItem("data", JSON.stringify(dataObj));
 	getActionsData();
 	jQuery("#actionsTable").setSelection(actionId, true);
-
-/*
-	var projectId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-	var projectKey = jQuery("#projectsTable").jqGrid('getRowData',projectId).name;
-	var projectJSON = JSON.parse(localStorage.getItem("data"));
-	projectJSON[projectKey].action.splice(actionId, 1);
-	localStorage.setItem("data", JSON.stringify(projectJSON));
-	getActionsData();
-	
-	jQuery("#actionsTable").setSelection(actionId, true);
-	*/
 }
 
 /**
@@ -249,10 +198,7 @@ function actionSave() {
 		writeHelpMessage("Please select action", "red");
 		return;
 	}
-	
 	var projObj = getSelectedProjData ();
-
-
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var projectsArray = dataObj[projObj["group"]].projects;
 	
@@ -268,32 +214,12 @@ function actionSave() {
 	getActionsData();
 	jQuery("#actionsTable").setSelection(actionId, true);
 	writeHelpMessage("Changes has been saved", "green");
-	/*
-	var projectId = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-	var projectKey = jQuery("#projectsTable").jqGrid('getRowData',projectId).name;
-	var projectJSON = JSON.parse(localStorage.getItem("data"));
-	projectJSON[projectKey].action[actionId].data = $("#actionData").val();
-	projectJSON[projectKey].action[actionId].evType = $("#actionEvType").val();
-	projectJSON[projectKey].action[actionId].msgType = "userEvent";
-	projectJSON[projectKey].action[actionId].newValue = $("#actionNewValue").val();
-	localStorage.setItem("data", JSON.stringify(projectJSON));
-	getActionsData(projectKey);
-	jQuery("#actionsTable").setSelection(actionId, true);
-	writeHelpMessage("Changes has been saved", "green");
-	*/
 }
 
 /*
  * Getting actions data using projectKey and reloading actions grid
  */
 function getActionsData() {
-	//V7
-	/*
-	var instructJSON = JSON.parse(localStorage.getItem(projectKey));
-	$("#actionsTable").jqGrid("clearGridData");
-	loadActionsData(instructJSON.action);
-	*/
-	//V8
 	$("#actionsTable").jqGrid("clearGridData");
 	var projObj = getSelectedProjData();
 	
@@ -325,7 +251,6 @@ function actionSelected(id) {
 	$("#actionEvType").change();
 	
 }
-
 
 function loadActionsData(jsonArray) {
 	actionsQuantity = jsonArray.length;

@@ -10,9 +10,6 @@ jQuery("#projectsTableImport").jqGrid({
    	caption: "Import"
 });
 
-
-
-
 function populateImportProjectsTable() {
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var localStorageKeys = Object.keys(dataObj);
