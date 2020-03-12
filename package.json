@@ -25,6 +25,7 @@
     "cba-components": "^1.0.1",
     "copy-webpack-plugin": "^5.1.1",
     "csso": "^4.0.2",
+    "puppeteer": "^2.1.1",
     "webpack": "^4.41.6"
   },
   "devDependencies": {
