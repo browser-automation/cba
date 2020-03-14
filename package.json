@@ -4,12 +4,15 @@
   "description": "",
   "main": "back.js",
   "scripts": {
-    "test": "npm run build:webpack && mocha tests/mocha.js",
-    "build": "npm run build:webpack:prod && cd dist/;zip -r ../cba.zip .;cd ..",
+    "test": "npm run build:webpack && (http-server tests/pages -s -p 3001 &  mocha tests/mocha.js)",
+    "test:pages": "http-server tests/pages -s -p 3000",
+    "posttest": "kill $(lsof -t -i:3001)",
     "import:components": "cba-components --single-bundle --prod --output dist",
-    "build:webpack": "npm run import:components && webpack --config webpack.config.js",
-    "build:webpack:watch": "npm run import:components && webpack --config webpack.config.js --watch",
-    "build:webpack:prod": "npm run import:components && webpack --config webpack.config.js --prod"
+    "build": "npm run clean && npm run build:webpack:prod && cd dist/;zip -r ../cba.zip .;cd ..",
+    "build:webpack": "npm run clean && npm run import:components && webpack --config webpack.config.js",
+    "build:webpack:watch": "npm run clean && npm run import:components && webpack --config webpack.config.js --watch",
+    "build:webpack:prod": "npm run clean && npm run import:components && webpack --config webpack.config.js --prod",
+    "clean": "rm -r dist || true"
   },
   "repository": {
     "type": "git",
@@ -29,6 +32,7 @@
     "webpack": "^4.41.6"
   },
   "devDependencies": {
+    "http-server": "^0.12.1",
     "mocha": "^7.1.0",
     "webpack-cli": "^3.3.11"
   }
