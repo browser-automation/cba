@@ -13,7 +13,7 @@ function run()
   for (const {path, name} of tests)
   {
     describe(name, () => {
-      require(`./tests/${path}`);
+      const {pageSetup} = require(`./tests/${path}`);
       before(async () =>
       {
         browser = await puppeteer.launch({headless: false, args: [
@@ -27,7 +27,8 @@ function run()
         backgroundPage = await backgroundPageTarget.page();
 
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36");
-        await page.goto("http://127.0.0.1:3001/inject");
+        await page.goto("http://127.0.0.1:3001");
+        await page.evaluate((bodyHTML) => document.body.innerHTML = bodyHTML, pageSetup.body);
       });
       after(async () =>
       {
