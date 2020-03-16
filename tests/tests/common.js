@@ -42,9 +42,15 @@ async function playTestProject()
   backgroundPage().evaluate((porjectData, projectId, repeate) => playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
 }
 
+async function getTextContent(query)
+{
+  const element = await page().$(query);
+ return page().evaluate(element => element.textContent, element);
+}
+
 async function wait(milliseconds = 200)
 {
   return page().waitFor(milliseconds);
 }
 
-module.exports = {setTestProject, playTestProject, wait};
+module.exports = {setTestProject, playTestProject, wait, getTextContent};

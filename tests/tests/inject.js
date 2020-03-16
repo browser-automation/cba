@@ -4,18 +4,40 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, setTestProject} = require("./common");
+const {playTestProject, setTestProject, getTextContent} = require("./common");
 
 const pageSetup = {
-  body: "Change me"
+  body: "<div id='changeContent'>Change me</div>"
 }
 
 it("Inject function runs specified script in the web page", async() =>
 {
-  const date = `document.body.innerHTML = "Injected text";`;
+  const newText = "Injected text";
+  const date = `document.querySelector('#changeContent').textContent = "${newText}";`;
   const evType = "inject";
   await setTestProject(date, evType, "");
   await playTestProject();
+  equal(await getTextContent("#changeContent"), newText);
+});
+
+it("cs-inject function runs specified script in content script", async() =>
+{
+  const newText = "CS injected text";
+  const date = `document.querySelector('#changeContent').textContent = "${newText}";`;
+  const evType = "cs-inject";
+  await setTestProject(date, evType, "");
+  await playTestProject();
+  equal(await getTextContent("#changeContent"), newText);
+});
+
+it("bg-inject function runs specified script in background page", async() =>
+{
+  const newText = "CS injected text";
+  const date = `document.querySelector('#changeContent').textContent = "${newText}";`;
+  const evType = "cs-inject";
+  await setTestProject(date, evType, "");
+  await playTestProject();
+  equal(await getTextContent("#changeContent"), newText);
 });
 
 module.exports = {pageSetup};
