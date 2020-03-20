@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 const extensionPath = "dist";
 const tests = [
-  {path:"inject.js", name: "TBA"}
+  {path:"actions.js", name: "TBA"}
 ];
 
 let browser;
@@ -32,7 +32,7 @@ function run()
       });
       after(async () =>
       {
-        // await browser.close();
+        await browser.close();
       })
     });
   }

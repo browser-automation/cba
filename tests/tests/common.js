@@ -48,9 +48,37 @@ async function getTextContent(query)
  return page().evaluate(element => element.textContent, element);
 }
 
+async function getBackgroundGlobalVar(name)
+{
+  return backgroundPage().evaluate((name) => window[name] , name);
+}
+
+async function addCookie(url, name, value)
+{
+  return backgroundPage().evaluate(async(url, name, value) =>
+  {
+    return new Promise((resolve) =>
+    {
+      chrome.cookies.set({url, name, value}, resolve);
+    });
+  }, url, name, value);
+}
+
+async function getCookie(url, name)
+{
+  return backgroundPage().evaluate(async(url, name) =>
+  {
+    return new Promise((resolve) =>
+    {
+      chrome.cookies.get({url, name}, resolve);
+    });
+  }, url, name);
+}
+
 async function wait(milliseconds = 200)
 {
   return page().waitFor(milliseconds);
 }
 
-module.exports = {setTestProject, playTestProject, wait, getTextContent};
+module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar, wait,
+                  getTextContent, addCookie, getCookie};
