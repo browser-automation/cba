@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 const extensionPath = "dist";
 const tests = [
-  {path:"actions.js", name: "TBA"}
+  {path:"actions.js", name: "Testing actions"}
 ];
 
 let browser;

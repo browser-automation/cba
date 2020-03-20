@@ -14,7 +14,8 @@ const pageSetup = {
     <div id='changeContent'>Change me</div>
     <input id="cba-textbox" type="text" />
     <input id="cba-checkbox" type="checkbox" />
-    <input id="cba-button" type="button" />
+    <input id="cba-click" type="checkbox" />
+    <a id="cba-redirect" href="/redirect" >redirect page</a>
   `
 }
 
@@ -63,7 +64,7 @@ it("bg-function should execute predefined function", async() =>
   notOk(await getCookie("https://www.example.com/", "cba"));
 });
 
-it("Change action updates value of an input, focuses and fires change event", async() =>
+it("Change action updates value of an input and focuses", async() =>
 {
   const newText = "Injected value";
   const id = "cba-textbox";
@@ -74,6 +75,31 @@ it("Change action updates value of an input, focuses and fires change event", as
   equal(await getValue(query), newText);
   equal(await getActiveElementId(), id);
   // TODO fix and createst for https://github.com/Manvel/cba/issues/2
+});
+
+it("Check action checks the checkbox", async() =>
+{
+  const query = "#cba-checkbox";
+  const evType = "check";
+  await setTestProject(query, evType, "");
+  await playTestProject();
+  ok(await isChecked(query));
+});
+
+it("Click action toggle the checkbox", async() =>
+{
+  const query = "#cba-click";
+  const evType = "click";
+  await setTestProject(query, evType, "");
+  await playTestProject();
+  ok(await isChecked(query));
+  await playTestProject();
+  notOk(await isChecked(query))
+});
+
+it("Update should wait for the page load before proceeding with next actions", async() =>
+{
+  
 });
 
 module.exports = {pageSetup};
