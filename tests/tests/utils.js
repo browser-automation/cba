@@ -39,18 +39,51 @@ async function playTestProject()
   };
   const projectId = "2";
   const repeate = "1";
-  backgroundPage().evaluate((porjectData, projectId, repeate) => playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
+  await backgroundPage().evaluate((porjectData, projectId, repeate) => playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
+}
+
+async function getElementAttribute(query, attribute)
+{
+  const element = await page().$(query);
+  return page().evaluate((element, attribute) => element[attribute], element, attribute);
 }
 
 async function getTextContent(query)
 {
-  const element = await page().$(query);
- return page().evaluate(element => element.textContent, element);
+  return getElementAttribute(query, "textContent");
+}
+
+async function getValue(query)
+{
+  return getElementAttribute(query, "value");
+}
+
+async function isChecked(query)
+{
+  return getElementAttribute(query, "checked");
+}
+
+async function getActiveElementId()
+{
+  return page().evaluate(() => document.activeElement.id);
 }
 
 async function getBackgroundGlobalVar(name)
 {
   return backgroundPage().evaluate((name) => window[name] , name);
+}
+
+// Usage: await setListener("#id", "change", (e) => {});
+async function setListener(query, listener, callback)
+{
+  await page().exposeFunction("onCustomEvent", (e) => {
+    callback(e);
+  });
+
+  await page().evaluate((query, listener) =>
+  {
+    document.querySelector(query).addEventListener(listener, window.onCustomEvent);
+  }, query, listener);
 }
 
 async function addCookie(url, name, value)
@@ -81,4 +114,5 @@ async function wait(milliseconds = 200)
 }
 
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar, wait,
-                  getTextContent, addCookie, getCookie};
+                  getTextContent, getValue, isChecked, addCookie, getCookie,
+                  getActiveElementId, setListener};

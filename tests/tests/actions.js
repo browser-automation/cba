@@ -4,12 +4,18 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, setTestProject, getTextContent,
-       getBackgroundGlobalVar, addCookie, getCookie, wait} = require("./common");
+const {playTestProject, setTestProject, getTextContent, getValue, isChecked,
+       getActiveElementId, setListener,
+       getBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
 const {backgroundPage} = require("../main");
 
 const pageSetup = {
-  body: "<div id='changeContent'>Change me</div>"
+  body: `
+    <div id='changeContent'>Change me</div>
+    <input id="cba-textbox" type="text" />
+    <input id="cba-checkbox" type="checkbox" />
+    <input id="cba-button" type="button" />
+  `
 }
 
 it("Inject function runs specified script in the web page", async() =>
@@ -55,6 +61,19 @@ it("bg-function should execute predefined function", async() =>
   await playTestProject();
   await wait();
   notOk(await getCookie("https://www.example.com/", "cba"));
+});
+
+it("Change action updates value of an input, focuses and fires change event", async() =>
+{
+  const newText = "Injected value";
+  const id = "cba-textbox";
+  const query = `#${id}`;
+  const evType = "change";
+  await setTestProject(query, evType, newText);
+  await playTestProject();
+  equal(await getValue(query), newText);
+  equal(await getActiveElementId(), id);
+  // TODO fix and createst for https://github.com/Manvel/cba/issues/2
 });
 
 module.exports = {pageSetup};
