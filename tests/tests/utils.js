@@ -1,6 +1,6 @@
 const {backgroundPage, page} = require("../main");
 
-async function setTestProject(data, evType, newValue)
+async function setTestProject()
 {
   const dataObj = {
     "testGroup": {
@@ -11,13 +11,7 @@ async function setTestProject(data, evType, newValue)
       "expanded": true,
       "loaded": true,
       "projects": [{
-        "action": [
-        {
-          data,
-          evType,
-          "msgType": "userEvent",
-          newValue
-        }],
+        "action": [],
         "name": "testProject",
         "level": "1",
         "isLeaf": true,
@@ -27,6 +21,23 @@ async function setTestProject(data, evType, newValue)
     }
   };
   return backgroundPage().evaluate((data) => localStorage.setItem("data", JSON.stringify(data)) , dataObj);
+}
+
+async function addTestAction(data, evType, newValue)
+{
+  const actionObj = {
+      data,
+      evType,
+      "msgType": "userEvent",
+      newValue
+  };
+
+  return backgroundPage().evaluate((actionObj) => {
+    const dataObj = JSON.parse(localStorage.getItem("data"));
+    const testProject = dataObj["testGroup"].projects[0];
+    testProject.action.push(actionObj);
+    localStorage.setItem("data", JSON.stringify(dataObj));
+  }, actionObj);
 }
 
 async function playTestProject()
@@ -113,6 +124,12 @@ async function wait(milliseconds = 200)
   return page().waitFor(milliseconds);
 }
 
+async function getPageUrl()
+{
+  return page().url();
+}
+
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar, wait,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
-                  getActiveElementId, setListener};
+                  getActiveElementId, setListener, addTestAction, getPageUrl,
+                  setPageUrl};
