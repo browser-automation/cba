@@ -16,7 +16,9 @@ const pageSetup = {
     <input id="cba-textbox" type="text" />
     <input id="cba-checkbox" type="checkbox" />
     <input id="cba-click" type="checkbox" />
-    <a id="cba-redirect" href="/redirect" >redirect page</a>
+    <form action="/redirect">
+      <input type="submit" id="cba-submit">Submit form</input>
+    </form>
   `
 }
 
@@ -106,18 +108,60 @@ it("Click action toggle the checkbox", async() =>
   notOk(await isChecked(query))
 });
 
-it("Update should wait for the page load before proceeding with next actions", async() =>
+it("submit-click should wait for the page load before proceeding with next actions", async() =>
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  const redirectPage = "/redirect";
-  const changeTextAction = `document.querySelector("${query}").textContent = "${injectText}";`;
-  await addTestAction(`window.location.pathname = "${redirectPage}";`, "inject", "");
-  await addTestAction("", "update", "");
-  await addTestAction(changeTextAction, "inject", injectText);
+  await addTestAction("#cba-submit", "submit-click", "");
+  await addTestAction(setTextContentScript(query, injectText), "inject", "");
   await playTestProject();
   await wait();
   equal(await getTextContent(query), injectText);
 });
+
+it("Update should wait for the page load before proceeding with next actions", async() =>
+{
+  const injectText = "Injected text";
+  const query = "#cba-text";
+  await addTestAction(gotoRedirectPageScript(), "inject", "");
+  await addTestAction("", "update", "");
+  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject();
+  await wait();
+  equal(await getTextContent(query), injectText);
+});
+
+it("Timer should wait for specified amount of milliseconds before proceeding with the next actions", async() =>
+{
+  const injectText = "Injected text";
+  const query = "#cba-text";
+  await addTestAction(gotoRedirectPageScript(), "inject", "");
+  await addTestAction("", "timer", "150");
+  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject();
+  await wait();
+  equal(await getTextContent(query), injectText);
+});
+
+it("Redirect should redirect to specific page and wait for page load before proceeding with the next actions", async() =>
+{
+  const injectText = "Injected text";
+  const query = "#cba-text";
+  await addTestAction("/redirect", "redirect", "");
+  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject();
+  await wait();
+  equal(await getTextContent(query), injectText);
+});
+
+function gotoRedirectPageScript()
+{
+  return `window.location.pathname = "/redirect";`
+}
+
+function setTextContentScript(query, newText)
+{
+  return `document.querySelector("${query}").textContent = "${newText}";`;
+}
 
 module.exports = {pageSetup};

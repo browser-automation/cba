@@ -131,5 +131,4 @@ async function getPageUrl()
 
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar, wait,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
-                  getActiveElementId, setListener, addTestAction, getPageUrl,
-                  setPageUrl};
+                  getActiveElementId, setListener, addTestAction, getPageUrl};
