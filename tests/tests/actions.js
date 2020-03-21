@@ -19,6 +19,8 @@ const pageSetup = {
     <form action="/redirect">
       <input type="submit" id="cba-submit">Submit form</input>
     </form>
+    <span id="cba-copy">Copy me</span>
+    <input id="cba-paste" type="text"></input>
   `
 }
 
@@ -33,9 +35,8 @@ beforeEach(async () =>
 it("Inject function runs specified script in the web page", async() =>
 {
   const newText = "Injected text";
-  const data = `document.querySelector('#changeContent').textContent = "${newText}";`;
   const evType = "inject";
-  await addTestAction(data, evType, "");
+  await addTestAction(setTextContentScript("#changeContent", newText), evType, "");
   await playTestProject();
   equal(await getTextContent("#changeContent"), newText);
 });
@@ -43,9 +44,8 @@ it("Inject function runs specified script in the web page", async() =>
 it("cs-inject function runs specified script in content script", async() =>
 {
   const newText = "CS injected text";
-  const data = `document.querySelector('#changeContent').textContent = "${newText}";`;
   const evType = "cs-inject";
-  await addTestAction(data, evType, "");
+  await addTestAction(setTextContentScript("#changeContent", newText), evType, "");
   await playTestProject();
   equal(await getTextContent("#changeContent"), newText);
 });
@@ -152,6 +152,28 @@ it("Redirect should redirect to specific page and wait for page load before proc
   await playTestProject();
   await wait();
   equal(await getTextContent(query), injectText);
+});
+
+it("Copy action should save element content into the clipboard and <$clipboard=copy> can be used to paste value", async() =>
+{
+  const pasteQuery = "#cba-paste";
+  await addTestAction("#cba-copy", "copy", "");
+  await addTestAction(pasteQuery, "change", "<$clipboard=copy>");
+  await playTestProject();
+  equal(await getValue(pasteQuery), "Copy me");
+});
+
+it("Pause action pauses the workflow until the project is played again", async() =>
+{
+  const beforePauseText = "First change";
+  const afterPauseText = "Second change";
+  await addTestAction(setTextContentScript("#changeContent", beforePauseText), "inject", "");
+  await addTestAction("", "pause", "");
+  await addTestAction(setTextContentScript("#changeContent", afterPauseText), "inject", "");
+  await playTestProject();
+  equal(await getTextContent("#changeContent"), beforePauseText);
+  await playTestProject();
+  equal(await getTextContent("#changeContent"), afterPauseText);
 });
 
 function gotoRedirectPageScript()
