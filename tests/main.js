@@ -28,20 +28,25 @@ function run()
         backgroundPage = await backgroundPageTarget.page();
 
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36");
+        await navigateToTestPage();
         await setTestPage(pageSetup);
       });
       after(async () =>
       {
-        // await browser.close();
+        await browser.close();
       })
     });
   }
 }
 
+async function navigateToTestPage()
+{
+  return page.goto(server);
+}
+
 async function setTestPage(pageSetup)
 {
-  await page.goto(server);
   return page.evaluate((bodyHTML) => document.body.innerHTML = bodyHTML, pageSetup.body);
 }
 
-module.exports = {backgroundPage: () => backgroundPage, page: () => page, run, server, setTestPage};
+module.exports = {backgroundPage: () => backgroundPage, page: () => page, run, server, setTestPage, navigateToTestPage};

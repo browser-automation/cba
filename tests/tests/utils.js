@@ -84,6 +84,11 @@ async function getBackgroundGlobalVar(name)
   return backgroundPage().evaluate((name) => window[name] , name);
 }
 
+async function resetBackgroundGlobalVar(name)
+{
+  return backgroundPage().evaluate((name) => delete window[name] , name);
+}
+
 // Usage: await setListener("#id", "change", (e) => {});
 async function setListener(query, listener, callback)
 {
@@ -129,6 +134,7 @@ async function getPageUrl()
   return page().url();
 }
 
-module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar, wait,
+module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
+                  resetBackgroundGlobalVar, wait,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl};

@@ -7,8 +7,10 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getValue, isChecked,
        getActiveElementId, setListener, getPageUrl,
-       getBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
-const {backgroundPage, server, setTestPage} = require("../main");
+       getBackgroundGlobalVar, resetBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
+const {backgroundPage, server, setTestPage, navigateToTestPage} = require("../main");
+
+const bgGlobalVarName = "cba-test";
 
 const pageSetup = {
   body: `
@@ -28,8 +30,11 @@ beforeEach(async () =>
 {
   await setTestProject();
   const pageUrl = await getPageUrl();
+  await resetBackgroundGlobalVar(bgGlobalVarName);
+
   if (path.relative(pageUrl, server) != "")
-    await setTestPage(pageSetup);
+    await navigateToTestPage();
+  await setTestPage(pageSetup);
 });
 
 it("Inject function runs specified script in the web page", async() =>
@@ -53,11 +58,11 @@ it("cs-inject function runs specified script in content script", async() =>
 it("bg-inject function runs specified script in background page", async() =>
 {
   const value = "BG injected text";
-  const data = `window.cba = "${value}";`;
+  const data = `window["${bgGlobalVarName}"] = "${value}";`;
   const evType = "bg-inject";
   await addTestAction(data, evType, "");
   await playTestProject();
-  equal(await getBackgroundGlobalVar("cba"), value);
+  equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
 });
 
 it("bg-function should execute predefined function", async() =>
@@ -85,7 +90,7 @@ it("Change action updates value of an input and focuses", async() =>
   await playTestProject();
   equal(await getValue(query), newText);
   equal(await getActiveElementId(), id);
-  // TODO fix and createst for https://github.com/Manvel/cba/issues/2
+  // TODO fix and create test for https://github.com/Manvel/cba/issues/2
 });
 
 it("Check action checks the checkbox", async() =>
@@ -176,6 +181,45 @@ it("Pause action pauses the workflow until the project is played again", async()
   equal(await getTextContent("#changeContent"), afterPauseText);
 });
 
+it("Clipboard set in inject should be accessible in cs-inject and bg-inject", async() =>
+{
+  const clipboardValue = "cba-test-value";
+  const clipboardName = "cba-test";
+  const bgGlobalVarName = "cba-bg-test";
+  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "inject", "");
+  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "cs-inject", "");
+  await addTestAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
+  await playTestProject();
+  await wait();
+  equal(await getTextContent("#changeContent"), clipboardValue);
+  equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
+});
+
+it("Clipboard set in cs-inject should be accessible in inject and bg-inject", async() =>
+{
+  const clipboardValue = "cba-test-value";
+  const clipboardName = "cba-test";
+  const bgGlobalVarName = "cba-bg-test";
+  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "cs-inject", "");
+  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
+  await addTestAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
+  await playTestProject();
+  await wait();
+  equal(await getTextContent("#changeContent"), clipboardValue);
+  equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
+});
+
+it("Clipboard set in bg-inject should be accessible in inject", async() =>
+{
+  const clipboardValue = "cba-test-value";
+  const clipboardName = "cba-test";
+  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "bg-inject", "");
+  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
+  await playTestProject();
+  await wait();
+  equal(await getTextContent("#changeContent"), clipboardValue);
+});
+
 function gotoRedirectPageScript()
 {
   return `window.location.pathname = "/redirect";`
@@ -184,6 +228,11 @@ function gotoRedirectPageScript()
 function setTextContentScript(query, newText)
 {
   return `document.querySelector("${query}").textContent = "${newText}";`;
+}
+
+function setContentFromClipboardScript(query, clipboardName)
+{
+  return `document.querySelector('${query}').textContent = clipboard["${clipboardName}"];`
 }
 
 module.exports = {pageSetup};
