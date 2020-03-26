@@ -23,6 +23,38 @@ async function setTestProject()
   return backgroundPage().evaluate((data) => localStorage.setItem("data", JSON.stringify(data)) , dataObj);
 }
 
+async function startTestRecording()
+{
+  const projectId = "testProject";
+  const projectObj = {
+    "isProject": true,
+    "project": `${projectId}`,
+    "group": "testGroup",
+  };
+  return backgroundPage().evaluate((projectObj, projectId) => recordButtonClick(projectObj, projectId) , projectObj, projectId);
+}
+
+async function stopTestRecording()
+{
+  return backgroundPage().evaluate(() => stopButtonClick());
+}
+
+async function getTestProjectActions(num, key)
+{
+  const testGroupName = "testGroup";
+  const testProjectName = "testProject";
+  return backgroundPage().evaluate((testGroupName, testProjectName, num, key) =>
+  {
+    const group = JSON.parse(localStorage.getItem("data"))[testGroupName];
+    const project = group.projects.find(({name}) => name == testProjectName);
+    const action = project.action[num];
+    if (!action)
+      return false;
+    else
+      return key ? action[key] : action;
+  }, testGroupName, testProjectName, num, key);
+}
+
 async function addTestAction(data, evType, newValue)
 {
   const actionObj = {
@@ -135,6 +167,7 @@ async function getPageUrl()
 }
 
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
-                  resetBackgroundGlobalVar, wait,
+                  resetBackgroundGlobalVar, wait, startTestRecording,
+                  stopTestRecording, getTestProjectActions,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl};

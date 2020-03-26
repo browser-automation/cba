@@ -5,10 +5,10 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, setTestProject, addTestAction, getTextContent, getValue, isChecked,
-       getActiveElementId, setListener, getPageUrl,
-       getBackgroundGlobalVar, resetBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
-const {backgroundPage, server, setTestPage, navigateToTestPage} = require("../main");
+const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
+       isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
+       resetBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
+const {server, setTestPage, navigateToTestPage} = require("../main");
 
 const bgGlobalVarName = "cba-test";
 
