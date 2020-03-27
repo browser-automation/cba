@@ -166,8 +166,15 @@ async function getPageUrl()
   return page().url();
 }
 
+async function focusAndType(query, text)
+{
+  await page().focus(query);
+  return page().keyboard.type(text);
+}
+
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
-                  getActiveElementId, setListener, addTestAction, getPageUrl};
+                  getActiveElementId, setListener, addTestAction, getPageUrl,
+                  focusAndType};

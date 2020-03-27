@@ -1,7 +1,8 @@
 const puppeteer = require("puppeteer");
 const extensionPath = "dist";
 const tests = [
-  {path:"actions.js", name: "Testing actions"}
+  {path:"actions.js", name: "Testing actions"},
+  {path:"record.js", name: "Testing recording"}
 ];
 const server = "http://127.0.0.1:3001";
 
