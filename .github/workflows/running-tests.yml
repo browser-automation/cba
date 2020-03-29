@@ -1,0 +1,23 @@
+name: CI
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on: push
+jobs:
+  run-puppeteer:
+    name: Run tests
+    # Docker container actions can only execute in the GitHub-hosted Linux environment
+    runs-on: ubuntu-latest
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      # https://github.com/actions/setup-node
+      uses: actions/setup-node@v1
+      env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+    - run: npm install
+    - name: Test Code
+      # https://github.com/mujo-code/puppeteer-headful
+      uses: mujo-code/puppeteer-headful@master
+      with:
+        args: npm test
