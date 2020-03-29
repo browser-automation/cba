@@ -17,7 +17,7 @@ jobs:
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
     - run: npm install
     - name: Test Code
-      # https://github.com/mujo-code/puppeteer-headful
-      uses: mujo-code/puppeteer-headful@master
+      # https://github.com/Manvel/puppeteer-headful
+      uses: Manvel/puppeteer-headful@master
       with:
         args: npm test
