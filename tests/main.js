@@ -20,7 +20,8 @@ function run()
       {
         browser = await puppeteer.launch({headless: false, args: [
           `--disable-extensions-except=${extensionPath}`,
-          `--load-extension=${extensionPath}`
+          `--load-extension=${extensionPath}`,
+          "--no-sandbox"
         ]});
         page = await browser.newPage();
         const extensionName = "Chromium browser automation";
