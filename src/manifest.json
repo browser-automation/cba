@@ -8,7 +8,7 @@
    },
    "content_scripts": [ {
       "all_frames": true,
-      "js": [ "js/jquery-1.7.2.min.js", "js/dom.js", "js/ui/automation-api.js" ],
+      "js": [ "js/jquery-1.7.2.min.js", "js/dom.js"],
       "matches": [ "https://*/*", "http://*/*" ],
       "run_at": "document_end"
    } ],

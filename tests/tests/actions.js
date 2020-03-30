@@ -1,6 +1,7 @@
 const assert = require("assert");
 const path = require("path");
 const equal = assert.strictEqual;
+const notEqual = assert.notStrictEqual;
 const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
@@ -218,6 +219,20 @@ it("Clipboard set in bg-inject should be accessible in inject", async() =>
   await playTestProject();
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
+});
+
+it("<$unique=> placeholder should generate random number with the specified characters length", async() =>
+{
+  const pasteQuery = "#cba-paste";
+  await addTestAction(pasteQuery, "change", "<$unique=2>");
+  await playTestProject();
+  const firstUnique = await getValue(pasteQuery);
+  equal(firstUnique.length, 2);
+  await addTestAction(pasteQuery, "change", "<$unique=2>");
+  await playTestProject();
+  const secondUnique = await getValue(pasteQuery);
+  equal(secondUnique.length, 2);
+  notEqual(firstUnique, secondUnique);
 });
 
 function gotoRedirectPageScript()

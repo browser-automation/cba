@@ -158,27 +158,26 @@ function recordExecution(recordRow, sendResponse, request){
 }
 
 function uniquePlaceholder(checkValue) {
-	var patt= /<\$unique=.*?>/;
-	var pastPatt = /<\$past>/;
-	var clipPatt = /<\$clipboard=.*?>/;
-	var uniquePlaceholder = patt.test(checkValue);
-	var pastPlaceholder = pastPatt.test(checkValue);
-	var clipPlaceholder = clipPatt.test(checkValue);
-	if(uniquePlaceholder == true) {
-		var uniquePlaceholder = patt.exec(checkValue)[0];
-		var lastIndex = uniquePlaceholder.indexOf(">");
-		var firstIndex = uniquePlaceholder.indexOf("=");
-		var placeholderLength = uniquePlaceholder.slice(firstIndex+1, lastIndex);
-		return checkValue.replace(patt, uniqueNumber(placeholderLength));
+	const patt= /<\$unique=.*?>/;
+	const pastPatt = /<\$past>/;
+	const clipPatt = /<\$clipboard=.*?>/;
+	if(patt.test(checkValue)) {
+		const uniquePlaceholder = patt.exec(checkValue)[0];
+		const lastIndex = uniquePlaceholder.indexOf(">");
+		const firstIndex = uniquePlaceholder.indexOf("=");
+    const length = uniquePlaceholder.slice(firstIndex+1, lastIndex);
+    const currentTime = new Date().getTime() + '';
+    const unique = currentTime.substring(currentTime.length - length);
+		return checkValue.replace(patt, unique);
 	}
-	else if(pastPlaceholder == true) {
+	else if(pastPatt.test(checkValue)) {
 		return clipboard["copy"];
 	}
-	else if(clipPlaceholder == true) {
-		var clipPlaceholder = clipPatt.exec(checkValue)[0];
-		var lastIndex = clipPlaceholder.indexOf(">");
-		var firstIndex = clipPlaceholder.indexOf("=");
-		var clipAttr = clipPlaceholder.slice(firstIndex+1, lastIndex);
+	else if(clipPatt.test(checkValue)) {
+		const clipPlaceholder = clipPatt.exec(checkValue)[0];
+		const lastIndex = clipPlaceholder.indexOf(">");
+		const firstIndex = clipPlaceholder.indexOf("=");
+		const clipAttr = clipPlaceholder.slice(firstIndex+1, lastIndex);
 		return checkValue.replace(clipPlaceholder, clipboard[clipAttr]);
 	}
 	else {
