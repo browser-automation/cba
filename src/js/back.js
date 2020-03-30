@@ -9,7 +9,6 @@ var instruction;
 var selectedProjectName;
 var selectedProjectId;
 var lastEvType;
-var lastFacebookLink;
 var currentTab;
 var update = false;
 var projectRepeat = 1;
@@ -34,7 +33,6 @@ isFirstLoad();
  * Function for listening to connection port and get data from content script
  */
 chrome.extension.onConnect.addListener(function(port) {
-  console.assert(port.name == "recordPort");
   port.onMessage.addListener(function(msg) {
   	if(allowRec==1) {
   		storeRecord(msg);
@@ -122,25 +120,11 @@ function isFirstLoad() {
  * Function for storing records in Local Storage
  */
 function storeRecord(msg) {
-	
-	if(msg.evType == "facebook") { // special logic beacause of FB issue 
-		chrome.tabs.getSelected(null ,function(tab) {
-  			currentTab = tab;
-  			if(lastFacebookLink != currentTab.url) {
-  				msg.data = currentTab.url;
-  				msg.evType = "redirect";
-  				pushRecord(msg);
-  				lastFacebookLink = currentTab.url;
-  				return;
-  			}
-		});
-  		return;
-	}
-	else if(msg.evType == "redirect"){
+	if(msg.evType == "redirect") {
 		pushRecord(msg);
 		return;
 	}
-	if((lastEvType == "update") &&(msg.evType == "update")) {
+	if((lastEvType == "update") && (msg.evType == "update")) {
 		return;
 	}
 	lastEvType = msg.evType;
@@ -149,7 +133,6 @@ function storeRecord(msg) {
 }
 
 function pushRecord(msg) {
-	console.log(msg);
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	var projectsArray = dataObj[selectedProjObj["group"]].projects;
 	
@@ -168,8 +151,7 @@ function generateUpdateEvent() {
 
 function storeCurrentUrl() {
 	chrome.tabs.getSelected(null ,function(tab) {
-  			pushRecord({msgType: "RecordedEvent", "data": tab.url, "evType": 'redirect', "newValue" : ''});
-			lastFacebookLink = tab.url;
+  		pushRecord({msgType: "RecordedEvent", "data": tab.url, "evType": 'redirect', "newValue" : ''});
 	});
 }
 
@@ -345,9 +327,7 @@ function getPlaceHolder(pattern, value) {
 		var clipboardValueFirstIndex = clipboardValue.indexOf("[");
 		var clipboardValueLastIndex = clipboardValue.indexOf("]");
 		var clipboardAttribute = clipboardValue.slice(clipboardValueFirstIndex+2, clipboardValueLastIndex-1);
-		console.log(clipboardAttribute);
 		placeholderValue = placeholderValue.replace(clipboardValue, getClipboardValue(clipboardAttribute));
-		console.log(placeholderValue);
 	}
 	return placeholderValue;
 }

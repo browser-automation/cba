@@ -1,8 +1,6 @@
 
 var port = chrome.extension.connect({name: "recordPort"});
 var currentResponse;
-var patt= /www.facebook.com/;
-var ifFacebook = patt.test(window.location);
 var clipboard = {};
 
 /*
@@ -14,9 +12,7 @@ $("a").live('click', function(obj) {
 			sendmsg(getPath(this), "click",'');
 		}
 		else {
-			if(ifFacebook == false) {
-				sendmsg($(this).attr('href'), "redirect", '');
-			}
+			sendmsg($(this).attr('href'), "redirect", '');
 		}
 });
 
@@ -24,44 +20,16 @@ $("a").live('click', function(obj) {
  * Event of clicking on input type submit and button
  */
 $("input[type=submit], input[type=image]").live('click', function(obj) {
-	if((ifFacebook == true)&&($(this).attr("class") == "hidden_elem")) return;
-	
-	if((ifFacebook == true)&&($(this).val() == "Post")) {
-		sendmsg(".submitBtn input", "click",'');
-		return;
-	}
-	
-	if((this == $("[value='Log In'][type='submit']")[0])&&(ifFacebook==true)) { // FB LOG IN
-		sendmsg("[value='Log In'][type='submit']", "submit-click",'');
-	}
-	else {
-		sendmsg(getPath(this), "submit-click",'');
-	}
+	sendmsg(getPath(this), "submit-click",'');
 });
 $(":button").live('click', function(obj) {
 	sendmsg(getPath(this), "click",'');
 });
 
-
-if(ifFacebook == true) {
-	sendmsg('', 'facebook', '');
-}
-
 /*
  * Event of changing textbox, passwordbox, textarea, selectbox
  */
 $("input[type=text], input[type=password], textarea, select").live('change', function(obj) {
-	if((this.title == "What's on your mind?")&&(ifFacebook == true)) {
-		var postFbMessage = "What's on your mind?";
-		sendmsg('[title="'+postFbMessage+'"]', "change", $(this).val());
-		return;
-	}
-	else if((this.title == "Write something...")&&(ifFacebook == true)) {
-		var postFbMessage = "Write something...";
-		sendmsg('[title="'+postFbMessage+'"]', "change", $(this).val());
-		return;
-	}
-	
 	sendmsg(getPath(this), "change", $(this).val());
 });
 
@@ -74,9 +42,6 @@ $("input[type=radio], input[type=checkbox]").live('change', function(obj) {
 	//sendmsg(getPath(this), "change", $(this).val());
 });
 
-function myClickTest() {
-	console.log("Fire1");
-}
 /* 
  * The function that get full path to the object
  */
