@@ -166,6 +166,7 @@ it("Copy action should save element content into the clipboard and <$clipboard=c
   await addTestAction("#cba-copy", "copy", "");
   await addTestAction(pasteQuery, "change", "<$clipboard=copy>");
   await playTestProject();
+  await wait();
   equal(await getValue(pasteQuery), "Copy me");
 });
 
