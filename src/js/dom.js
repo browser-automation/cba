@@ -1,13 +1,12 @@
 
-var port = chrome.extension.connect({name: "recordPort"});
-var currentResponse;
-var clipboard = {};
+const port = chrome.extension.connect({name: "recordPort"});
+let currentResponse;
+let clipboard = {};
 
 /*
  * Event of clicking on Hyperlink
  */
 $("a").live('click', function(obj) {
-		console.log("Clicked link");
 		if(($(this).attr('href')=="")||($(this).attr('href')=="#")||($(this).attr('href')==null)) {
 			sendmsg(getPath(this), "click",'');
 		}
@@ -65,7 +64,6 @@ function getPath(obj) {
 
 function pathReverse(rightArrowParents, obj) {
 	rightArrowParents.reverse();
-    //console.log(rightArrowParents.join(" ")+" "+this.tagName);
     var path = rightArrowParents.join(" ")+" "+obj.tagName;  // finalizing the path and adding tagname to it
     if(obj.className!="") { // Adding classname if object has one
     	path = path+"."+obj.className.replace(/ /g, ".");

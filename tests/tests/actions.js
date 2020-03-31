@@ -56,6 +56,15 @@ it("cs-inject function runs specified script in content script", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
+it("Jquery is accessible through cs-inject", async() =>
+{
+  const newText = "Jquery in CS injected text";
+  const query = "#changeContent";
+  await addTestAction(`$("${query}").text("${newText}")`, "cs-inject", "");
+  await playTestProject();
+  equal(await getTextContent(query), newText);
+});
+
 it("bg-inject function runs specified script in background page", async() =>
 {
   const value = "BG injected text";
