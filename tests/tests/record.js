@@ -64,6 +64,8 @@ it("Clicking anchor should add a redirect action", async() =>
             createAction("/redirect", "redirect"));
 });
 
+it("Clicking anchor with empty/missing href or beginning with # should add a click event");
+
 it("Clicking input[type=submit], input[type=image] should create submit-click action using target selector", async() =>
 {
   await startTestRecording();

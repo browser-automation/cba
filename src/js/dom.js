@@ -3,51 +3,59 @@ const port = chrome.extension.connect({name: "recordPort"});
 let currentResponse;
 let clipboard = {};
 
+function findClosest(query)
+{
+	return this.closest(query);
+}
+
+function actionRecorder({target, type})
+{
+	const actionToSelectors = {
+		"click": {
+			"click": ["button", "input[type='button']"],
+			"submit-click": ["input[type=submit]", "input[type=image]"],
+		},
+		"change": {
+			"change": ["input[type=text]", "input[type=password]", "textarea", "select"],
+			"check": ["input[type=radio]", "input[type=checkbox]"]
+		}
+	}
+
+	for (const actionName in actionToSelectors[type]) {
+		const queries = actionToSelectors[type][actionName];
+		const closestTargets = queries.map(findClosest.bind(target)).filter(e => e);
+		if (closestTargets.length) {
+			const closestTarget = closestTargets[0];
+			let newValue = "";
+			if (type === "change" && actionName === "change")
+				newValue = closestTarget.value;
+			return sendmsg(getPath(closestTarget), actionName, newValue)
+		}
+	}
+}
+
+document.addEventListener("click", actionRecorder);
+document.addEventListener("change", actionRecorder);
+
 /*
  * Event of clicking on Hyperlink
  */
 $("a").live('click', function(obj) {
-		if(($(this).attr('href')=="")||($(this).attr('href')=="#")||($(this).attr('href')==null)) {
-			sendmsg(getPath(this), "click",'');
-		}
-		else {
-			sendmsg($(this).attr('href'), "redirect", '');
-		}
-});
-
-/*
- * Event of clicking on input type submit and button
- */
-$("input[type=submit], input[type=image]").live('click', function(obj) {
-	sendmsg(getPath(this), "submit-click",'');
-});
-$(":button").live('click', function(obj) {
-	sendmsg(getPath(this), "click",'');
-});
-
-/*
- * Event of changing textbox, passwordbox, textarea, selectbox
- */
-$("input[type=text], input[type=password], textarea, select").live('change', function(obj) {
-	sendmsg(getPath(this), "change", $(this).val());
-});
-
-/*
- * Event of checking radio button
- */
-$("input[type=radio], input[type=checkbox]").live('change', function(obj) {
-	sendmsg(getPath(this), "check", '');
-	//TODO Find way to determine which radio button were selected nth
-	//sendmsg(getPath(this), "change", $(this).val());
+  if(($(this).attr('href')=="")||($(this).attr('href')=="#")||($(this).attr('href')==null)) {
+    sendmsg(getPath(this), "click",'');
+  }
+  else {
+    sendmsg($(this).attr('href'), "redirect", '');
+  }
 });
 
 /* 
  * The function that get full path to the object
  */
 function getPath(obj) {
-	var rightArrowParents = [];
+	const rightArrowParents = [];
     $(obj).parents().not('html').each(function() {
-        var entry = this.tagName.toLowerCase();
+        let entry = this.tagName.toLowerCase();
         if (this.className) {
             entry += "." + this.className.replace(/ /g, '.');
         }
@@ -63,15 +71,15 @@ function getPath(obj) {
 }
 
 function pathReverse(rightArrowParents, obj) {
-	rightArrowParents.reverse();
-    var path = rightArrowParents.join(" ")+" "+obj.tagName;  // finalizing the path and adding tagname to it
-    if(obj.className!="") { // Adding classname if object has one
-    	path = path+"."+obj.className.replace(/ /g, ".");
-    }
-    if(obj.id!="") {  // adding id if object has one
-    	path = "#"+obj.id;
-    }
-    return path;
+  rightArrowParents.reverse();
+  let path = rightArrowParents.join(" ")+" "+obj.tagName;  // finalizing the path and adding tagname to it
+  if(obj.className!="") { // Adding classname if object has one
+    path = path+"."+obj.className.replace(/ /g, ".");
+  }
+  if(obj.id!="") {  // adding id if object has one
+    path = "#"+obj.id;
+  }
+  return path;
 }
 
 /*
@@ -131,18 +139,16 @@ function recordExecution(recordRow, sendResponse, request){
 		return;
 	}
 	else if (recordRow.evType == "inject") {
-		var script = document.createElement('script');
-	   	script.setAttribute("type", "application/javascript");
-	  	script.textContent = recordRow.data;
-	  	script.textContent = "var clipboard="+JSON.stringify(request.clipboard)+"; "+script.textContent;
-	  	script.textContent += " var newdiv = document.createElement('div'); if(document.getElementById('grabClipboardHere')!= null) {document.getElementById('grabClipboardHere').textContent = JSON.stringify(clipboard);} else { newdiv.setAttribute('id', 'grabClipboardHere'); newdiv.textContent = JSON.stringify(clipboard); document.body.appendChild(newdiv)} document.getElementById('grabClipboardHere').style.display = 'none';";
-	   	document.documentElement.appendChild(script); // run the script
-	   	document.documentElement.removeChild(script); // clean up
-	   if(($("#grabClipboardHere").html() != "null")&&($("#grabClipboardHere").html()!=undefined)&&($("#grabClipboardHere").html()!="{} ")&&($("#grabClipboardHere").html()!="{}")) {
-	   		clipboard = JSON.parse($("#grabClipboardHere").html());
-	   }
-	   	
-	   	
+    const script = document.createElement('script');
+    script.setAttribute("type", "application/javascript");
+    script.textContent = recordRow.data;
+    script.textContent = "var clipboard="+JSON.stringify(request.clipboard)+"; "+script.textContent;
+    script.textContent += " var newdiv = document.createElement('div'); if(document.getElementById('grabClipboardHere')!= null) {document.getElementById('grabClipboardHere').textContent = JSON.stringify(clipboard);} else { newdiv.setAttribute('id', 'grabClipboardHere'); newdiv.textContent = JSON.stringify(clipboard); document.body.appendChild(newdiv)} document.getElementById('grabClipboardHere').style.display = 'none';";
+    document.documentElement.appendChild(script); // run the script
+    document.documentElement.removeChild(script); // clean up
+    if(($("#grabClipboardHere").html() != "null")&&($("#grabClipboardHere").html()!=undefined)&&($("#grabClipboardHere").html()!="{} ")&&($("#grabClipboardHere").html()!="{}")) {
+      clipboard = JSON.parse($("#grabClipboardHere").html());
+    }
 	}
 	else if (recordRow.evType == "cs-inject") {
 		eval(recordRow.data);
@@ -180,5 +186,5 @@ function uniquePlaceholder(checkValue) {
 	}
 	else {
 		return checkValue;
-	} 
+	}
 }
