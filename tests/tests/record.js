@@ -14,6 +14,8 @@ const bgGlobalVarName = "cba-test";
 const pageSetup = {
   body: `
     <a href="/redirect" />Redirect page</a>
+    <a id="cba-reference-link" href="#top" />Page top</a>
+    <a id="cba-empty-link" href="" />Empty link</a>
     <input type="submit" />
     <input type="image" />
     <input type="text" />
@@ -64,7 +66,17 @@ it("Clicking anchor should add a redirect action", async() =>
             createAction("/redirect", "redirect"));
 });
 
-it("Clicking anchor with empty/missing href or beginning with # should add a click event");
+it("Clicking anchor with empty/missing href or beginning with # should add a click event", async() =>
+{
+  await startTestRecording();
+  await page().click("a[href^='#']");
+  await page().click("a[href='']");
+  await stopTestRecording();
+  deepEqual(await getTestProjectActions(1),
+            createAction("#cba-reference-link", "click"));
+  deepEqual(await getTestProjectActions(2),
+            createAction("#cba-empty-link", "click"));
+});
 
 it("Clicking input[type=submit], input[type=image] should create submit-click action using target selector", async() =>
 {

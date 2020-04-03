@@ -8,46 +8,72 @@ function findClosest(query)
 	return this.closest(query);
 }
 
-function actionRecorder({target, type})
+function getActionDataValue(data, target)
 {
-	const actionToSelectors = {
-		"click": {
-			"click": ["button", "input[type='button']"],
-			"submit-click": ["input[type=submit]", "input[type=image]"],
-		},
-		"change": {
-			"change": ["input[type=text]", "input[type=password]", "textarea", "select"],
-			"check": ["input[type=radio]", "input[type=checkbox]"]
-		}
-	}
+	return typeof data === "function" ? data(target) : data;
+}
 
-	for (const actionName in actionToSelectors[type]) {
-		const queries = actionToSelectors[type][actionName];
+function recordAction(target,actionsData)
+{
+	for (const {queries, action, data, newValue} of actionsData) {
 		const closestTargets = queries.map(findClosest.bind(target)).filter(e => e);
 		if (closestTargets.length) {
 			const closestTarget = closestTargets[0];
-			let newValue = "";
-			if (type === "change" && actionName === "change")
-				newValue = closestTarget.value;
-			return sendmsg(getPath(closestTarget), actionName, newValue)
+			return sendmsg(getActionDataValue(data, closestTarget),
+										 action,
+										 getActionDataValue(newValue, closestTarget));
 		}
 	}
 }
 
+function actionRecorder({target, type})
+{
+	const clickActions = [{
+		queries: ["button", "input[type='button']"],
+		action: "click",
+		data: getPath,
+		newValue: ""
+	},
+	{
+		queries: ["input[type=submit]", "input[type=image]"],
+		action: "submit-click",
+		data: getPath,
+		newValue: ""
+	},
+	{
+		queries: ["a[href^='#']", "a[href='']"],
+		action: "click",
+		data: getPath,
+		newValue: ""
+	},
+	{
+		queries: ["a[href]"],
+		action: "redirect",
+		data: (closestTarget) => closestTarget.getAttribute("href"),
+		newValue: ""
+	}
+	];
+	const changeActions = [{
+		queries: ["input[type=text]", "input[type=password]", "textarea", "select"],
+		action: "change",
+		data: getPath,
+		newValue: (closestTarget) => closestTarget.value
+	},
+	{
+		queries: ["input[type=radio]", "input[type=checkbox]"],
+		action: "check",
+		data: getPath,
+		newValue: ""
+	}];
+
+	if (type === "click")
+		recordAction(target, clickActions);
+	if(type === "change")
+		recordAction(target, changeActions);
+}
+
 document.addEventListener("click", actionRecorder);
 document.addEventListener("change", actionRecorder);
-
-/*
- * Event of clicking on Hyperlink
- */
-$("a").live('click', function(obj) {
-  if(($(this).attr('href')=="")||($(this).attr('href')=="#")||($(this).attr('href')==null)) {
-    sendmsg(getPath(this), "click",'');
-  }
-  else {
-    sendmsg($(this).attr('href'), "redirect", '');
-  }
-});
 
 /* 
  * The function that get full path to the object
