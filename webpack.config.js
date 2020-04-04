@@ -6,19 +6,25 @@ const csso = require("csso");
 module.exports =
 {
   context: path.resolve(__dirname),
-  entry: "./src/js/main.js",
+  entry: {
+    "cs": "./src/js/cs/main.js"
+  },
   output: {
-    path: path.resolve('dist')
+    path: path.resolve('dist'),
+    filename: "js/[name].js"
   },
   optimization: {
     minimize: false
   },
   plugins: [
     new CopyPlugin([
-      { from: './src/css', to: "css" ,
+      { from: './src/css/*', to: "css", flatten: true,
         transform: (content) => argv.prod ? csso.minify(content).css : content},
+      { from: "./src/css/icons", to: "css/icons"},
+      { from: "./src/css/images", to: "css/images"},
       { from: "./src/*.*", flatten: true},
-      { from: "./src/js", to: "js" },
+      { from: "./src/js/*", to: "js", flatten: true },
+      { from: "./src/js/ui", to: "js/ui", flatten: true },
     ])
   ]
 };
