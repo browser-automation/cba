@@ -69,37 +69,38 @@ function actionRecorder({target, type})
 		recordAction(target, changeActions);
 }
 
-/* 
- * The function that get full path to the object
+/*
+ * The function that get css path of the DOM element
  */
-function getPath(obj) {
-	const rightArrowParents = [];
-    $(obj).parents().not('html').each(function() {
-        let entry = this.tagName.toLowerCase();
-        if (this.className) {
-            entry += "." + this.className.replace(/ /g, '.');
-        }
-        else if(this.id) {
-        	entry += "#"+this.id;
-        	rightArrowParents.push(entry);
-        	//pathReverse(rightArrowParents, obj);
-        	return false;
-        }
-        rightArrowParents.push(entry);
-    });
-    return pathReverse(rightArrowParents, obj);
-}
+function getPath(element) {
+	const path = [];
+	if (element.nodeType === Node.TEXT_NODE)
+		element = element.parentElement;
+	if (element.nodeType !== Node.ELEMENT_NODE)
+		return false;
 
-function pathReverse(rightArrowParents, obj) {
-  rightArrowParents.reverse();
-  let path = rightArrowParents.join(" ")+" "+obj.tagName;  // finalizing the path and adding tagname to it
-  if(obj.className!="") { // Adding classname if object has one
-    path = path+"."+obj.className.replace(/ /g, ".");
+	while (element && element !== document.documentElement)
+	{
+    if (element.id) {
+        path.unshift(`#${element.id}`);
+        break;
+    }
+    else {
+			let tagName = element.nodeName.toLowerCase();
+      let sibling = element;
+      let numberOfTypes = 1;
+      while (sibling = sibling.previousElementSibling) {
+        if (sibling.nodeName.toLowerCase() == tagName)
+					numberOfTypes++;
+			}
+			if (numberOfTypes != 1)
+				path.unshift(`${tagName}:nth-of-type(${numberOfTypes})`);
+			else
+				path.unshift(tagName);
+    }
+    element = element.parentElement;
   }
-  if(obj.id!="") {  // adding id if object has one
-    path = "#"+obj.id;
-  }
-  return path;
+  return path.length ? path.join(" > ") : false;
 }
 
 /*
