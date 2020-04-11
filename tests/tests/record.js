@@ -6,7 +6,8 @@ const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getPageUrl,
-       resetBackgroundGlobalVar, startTestRecording, stopTestRecording, getTestProjectActions, focusAndType, wait} = require("./utils");
+       resetBackgroundGlobalVar, startTestRecording, stopTestRecording,
+       getTestProjectActions, focusAndType, wait, getBadgeText} = require("./utils");
 const {server, setTestPage, navigateToTestPage, page} = require("../main");
 
 const bgGlobalVarName = "cba-test";
@@ -57,6 +58,14 @@ it("Starting and stoping the recording adds a redirect action", async() =>
   await stopTestRecording();
   equal(await getTestProjectActions(0, "evType"), "redirect");
   equal(await getTestProjectActions(0, "data"), `${server}/`);
+});
+
+it("Starting recording should set 'rec' badge text and stopping recording should remove it", async() =>
+{
+  await startTestRecording();
+  equal(await getBadgeText(), "rec");
+  await stopTestRecording();
+  equal(await getBadgeText(), "");
 });
 
 it("Clicking anchor should add a redirect action", async() =>

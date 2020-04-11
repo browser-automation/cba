@@ -39,20 +39,26 @@ async function stopTestRecording()
   return backgroundPage().evaluate(() => stopButtonClick());
 }
 
-async function getTestProjectActions(num, key)
+async function getProjectActions(groupName, projectName, num, key)
 {
-  const testGroupName = "testGroup";
-  const testProjectName = "testProject";
-  return backgroundPage().evaluate((testGroupName, testProjectName, num, key) =>
+  return backgroundPage().evaluate((groupName, projectName, num, key) =>
   {
-    const group = JSON.parse(localStorage.getItem("data"))[testGroupName];
-    const project = group.projects.find(({name}) => name == testProjectName);
+    const group = JSON.parse(localStorage.getItem("data"))[groupName];
+    const project = group.projects.find(({name}) => name == projectName);
+    if (num === undefined)
+      return project.action;
+
     const action = project.action[num];
     if (!action)
       return false;
     else
       return key ? action[key] : action;
-  }, testGroupName, testProjectName, num, key);
+  }, groupName, projectName, num, key);
+}
+
+async function getTestProjectActions(num, key)
+{
+  return getProjectActions("testGroup", "testProject", num, key);
 }
 
 async function addTestAction(data, evType, newValue)
@@ -121,6 +127,15 @@ async function resetBackgroundGlobalVar(name)
   return backgroundPage().evaluate((name) => delete window[name] , name);
 }
 
+async function getBadgeText()
+{
+  return backgroundPage().evaluate(() => {
+    return new Promise((response) => {
+      chrome.browserAction.getBadgeText({}, response);
+    })
+  });
+}
+
 // Usage: await setListener("#id", "change", (e) => {});
 async function setListener(query, listener, callback)
 {
@@ -174,7 +189,7 @@ async function focusAndType(query, text)
 
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
-                  stopTestRecording, getTestProjectActions,
+                  stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
-                  focusAndType};
+                  focusAndType, getBadgeText};

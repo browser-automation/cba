@@ -8,7 +8,8 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
-       resetBackgroundGlobalVar, addCookie, getCookie, wait} = require("./utils");
+       resetBackgroundGlobalVar, addCookie, getCookie, wait,
+       getBadgeText} = require("./utils");
 const {server, setTestPage, navigateToTestPage} = require("../main");
 
 const bgGlobalVarName = "cba-test";
@@ -36,6 +37,16 @@ beforeEach(async () =>
   if (path.relative(pageUrl, server) != "")
     await navigateToTestPage();
   await setTestPage(pageSetup);
+});
+
+
+it("Playing actions should add badge text 'play' to the icon.", async() =>
+{
+  await addTestAction("", "timer", "150");
+  await playTestProject();
+  equal(await getBadgeText(), "play");
+  await wait(150);
+  equal(await getBadgeText(), "");
 });
 
 it("Inject function runs specified script in the web page", async() =>
@@ -179,7 +190,7 @@ it("Copy action should save element content into the clipboard and <$clipboard=c
   equal(await getValue(pasteQuery), "Copy me");
 });
 
-it("Pause action pauses the workflow until the project is played again", async() =>
+it("Pause action pauses the workflow until the project is played again and set '||' badge text", async() =>
 {
   const beforePauseText = "First change";
   const afterPauseText = "Second change";
@@ -188,8 +199,10 @@ it("Pause action pauses the workflow until the project is played again", async()
   await addTestAction(setTextContentScript("#changeContent", afterPauseText), "inject", "");
   await playTestProject();
   equal(await getTextContent("#changeContent"), beforePauseText);
+  equal(await getBadgeText(), "||");
   await playTestProject();
   equal(await getTextContent("#changeContent"), afterPauseText);
+  equal(await getBadgeText(), "");
 });
 
 it("Clipboard set in inject should be accessible in cs-inject and bg-inject", async() =>
