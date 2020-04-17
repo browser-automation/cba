@@ -1,21 +1,26 @@
-var allowRec = 0;  //variable that allow to start recording
-var allowPlay = 0;
-var pause = 0;
-var playingProjectId;
-var instructArray;
-var defInstructArray;
-var playingTabId = 0;
-var instruction;
-var selectedProjectName;
-var selectedProjectId;
-var lastEvType;
-var currentTab;
-var update = false;
-var projectRepeat = 1;
-var clipboard = {};
-var lastSelectedProjectId;
-var selectedProjObj;
+class CBA {
+  constructor() {
+		// TODO: keep backwards compatibility with using those on top level when running bg-inject.
+    this.allowRec = 0;
+		this.allowPlay = 0;
+		this.pause = 0;
+		this.playingProjectId;
+		this.instructArray;
+		this.defInstructArray;
+		this.playingTabId = 0;
+		this.instruction;
+		this.selectedProjectName;
+		this.selectedProjectId;
+		this.lastEvType;
+		this.currentTab;
+		this.update = false;
+		this.projectRepeat = 1;
+		this.lastSelectedProjectId;
+		this.selectedProjObj;
+	}
+}
 
+const cba = new CBA();
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-32260034-1']);
@@ -34,7 +39,7 @@ isFirstLoad();
  */
 chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(function(msg) {
-  	if(allowRec==1) {
+  	if(cba.allowRec==1) {
   		storeRecord(msg);
   	}
   });
@@ -124,20 +129,20 @@ function storeRecord(msg) {
 		pushRecord(msg);
 		return;
 	}
-	if((lastEvType == "update") && (msg.evType == "update")) {
+	if((cba.lastEvType == "update") && (msg.evType == "update")) {
 		return;
 	}
-	lastEvType = msg.evType;
+	cba.lastEvType = msg.evType;
 	
 	pushRecord(msg);
 }
 
 function pushRecord(msg) {
 	var dataObj = JSON.parse(localStorage.getItem("data"));
-	var projectsArray = dataObj[selectedProjObj["group"]].projects;
+	var projectsArray = dataObj[cba.selectedProjObj["group"]].projects;
 	
 	for(i=0;i<projectsArray.length;i++) {
-		if(projectsArray[i].name == selectedProjObj["project"]) {
+		if(projectsArray[i].name == cba.selectedProjObj["project"]) {
 			projectsArray[i].action.push(msg);
 		}
 	}
@@ -160,9 +165,9 @@ function storeCurrentUrl() {
  */
 function recordButtonClick(projObj, projectId) {
 	storeCurrentUrl();
-	selectedProjObj = projObj;
-	selectedProjectId = projectId;
-	allowRec = 1;
+	cba.selectedProjObj = projObj;
+	cba.selectedProjectId = projectId;
+	cba.allowRec = 1;
 	chrome.browserAction.setBadgeText({"text":"rec"}); 
 }
 
@@ -170,9 +175,9 @@ function recordButtonClick(projObj, projectId) {
  * Function that calls after clicking on Stop button
  */
 function stopButtonClick() {
-	allowRec = 0;
-	allowPlay = 0;
-	pause = 0;
+	cba.allowRec = 0;
+	cba.allowPlay = 0;
+	cba.pause = 0;
 	chrome.browserAction.setBadgeText({"text":""}); 
 }
 
@@ -180,90 +185,94 @@ function stopButtonClick() {
  * Function that calls after clicking on Play button
  */
 function playButtonClick(projObj, currProjectId, repeatVal) {
-	if(pause == 1) {
-		pause = 0;
-		allowPlay = 1;
+	if(cba.pause == 1) {
+		cba.pause = 0;
+		cba.allowPlay = 1;
 		sendInstruction ();
 		return;
 	}
 	
-	if(clipboard == null) {
-		clipboard = {};
+	if(cba.clipboard == null) {
+		cba.clipboard = {};
 	}
 	
-	allowPlay = 1;
-	projectRepeat = repeatVal;
-	playingProjectId = currProjectId;
-	update = false;
-	selectedProjObj = projObj;
+	cba.allowPlay = 1;
+	cba.projectRepeat = repeatVal;
+	cba.playingProjectId = currProjectId;
+	cba.update = false;
+	cba.selectedProjObj = projObj;
 	var dataObj = JSON.parse(localStorage.getItem("data"));
 	
 	var projectsArray = dataObj[projObj["group"]].projects;
 	for(i=0;i<projectsArray.length;i++) {
 		if(projectsArray[i].name == projObj["project"]) {
-			instructArray = projectsArray[i].action;
+			cba.instructArray = projectsArray[i].action;
 		}
 	}
 	
-	defInstructArray = instructArray.slice(0);
+	cba.defInstructArray = cba.instructArray.slice(0);
 	sendInstruction ();
 }
 
 function sendInstruction () {
-	if(allowPlay == 0 ) {
+	if(cba.allowPlay == 0 ) {
 		return;
 	}
-	if(instructArray.length > 0) {
+	if(cba.instructArray.length > 0) {
 		chrome.tabs.getSelected(null ,function(tab) {
 			if(tab == null) {
 				setTimeout("sendInstruction();",1000);
 				return;
 			}
 			chrome.browserAction.setBadgeText({"text":"play"});
-			instruction = instructArray.splice(0, 1);
+			cba.instruction = cba.instructArray.splice(0, 1);
 			
   			// Send a request to the content script.
-  			playingTabId = tab.id;
-  			if((instruction[0].evType == 'redirect')||(instruction[0].evType == 'submit-click')) {
-  				update = true;
+  			cba.playingTabId = tab.id;
+  			if((cba.instruction[0].evType == 'redirect')||(cba.instruction[0].evType == 'submit-click')) {
+  				cba.update = true;
   			}
-  			else if(instruction[0].evType == 'update') {
-  				update = true;
+  			else if(cba.instruction[0].evType == 'update') {
+  				cba.update = true;
   				return;
   			}
-  			else if(instruction[0].evType == 'timer') {
-  				setTimeout("sendInstruction();", instruction[0].newValue);
+  			else if(cba.instruction[0].evType == 'timer') {
+  				setTimeout("sendInstruction();", cba.instruction[0].newValue);
   				return;
   			}
-  			else if(instruction[0].evType == 'bg-function') {
-  				bgFunctionParser(instruction[0].data);
+  			else if(cba.instruction[0].evType == 'bg-function') {
+  				bgFunctionParser(cba.instruction[0].data);
   				return;
   			}
-  			else if(instruction[0].evType == 'bg-inject') {
-  				var sendBgInstruction = true;
-  				eval(instruction[0].data);
+  			else if(cba.instruction[0].evType == 'bg-inject') {
+					var sendBgInstruction = true;
+					// see -> https://github.com/browser-automation/cba/issues/13
+					let clipboard = cba.clipboard;
+					eval(cba.instruction[0].data);
+					if (clipboard !== cba.clipboard)
+						cba.clipboard = clipboard;
   				if(sendBgInstruction == true) {
   					sendInstruction();
   				}
   				return;
   			}
-  			else if(instruction[0].evType == 'pause') {
-  				allowPlay = 0;
-  				pause = 1;
+  			else if(cba.instruction[0].evType == 'pause') {
+  				cba.allowPlay = 0;
+  				cba.pause = 1;
   				chrome.browserAction.setBadgeText({"text":"||"});
   				return;
   			}
   			
-  			chrome.tabs.sendRequest(tab.id, {"action": "play" ,"instruction": instruction[0], "clipboard": clipboard}, playResponse);
+  			chrome.tabs.sendRequest(tab.id, {"action": "play" ,"instruction": cba.instruction[0], "clipboard": cba.clipboard}, playResponse);
 		});
 	}
 	else {
-		if(projectRepeat > 1) {
-			projectRepeat--;
-			playButtonClick(selectedProjObj, playingProjectId, projectRepeat);
+		if(cba.projectRepeat > 1) {
+			cba.projectRepeat--;
+			playButtonClick(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
 		}
 		else {
-			allowPlay = 0;
+			cba.allowPlay = 0;
 			chrome.browserAction.setBadgeText({"text":""});
 		}
 	}
@@ -275,17 +284,17 @@ function  playResponse(response) {
 		return;
 	}
 	if(response.answere == "instructOK") {
-		clipboard = response.clipboard;
-		if (update == false) {
-			sendInstruction ();
+		cba.clipboard = response.clipboard;
+		if (cba.update == false) {
+			sendInstruction();
 		}
 	}
 }
 
 chrome.tabs.onUpdated.addListener(function( tabId , info ) {
-	if((tabId == playingTabId)&&( info.status == "complete" )&&(allowPlay==1)) {
+	if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
 		sendInstruction ();
-		update = false;
+		cba.update = false;
 	}
 });
 

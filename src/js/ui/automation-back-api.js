@@ -13,7 +13,7 @@ function removeCookie(pattern) {
 function saveToClipboard(jsonData) {
 	var jsonParsed = JSON.parse(jsonData);
 	for(var key in jsonParsed){
-		clipboard[key] = jsonParsed[key];
+		cba.clipboard[key] = jsonParsed[key];
 	}
 	sendInstruction();
 }
@@ -24,7 +24,7 @@ function removeDomainCookie(cookie) {
 }
 
 function getClipboardValue(attr) {
-	return clipboard[attr];
+	return cba.clipboard[attr];
 }
 
 function panelCreation(url) {
@@ -68,7 +68,7 @@ function reloadCurrentTab(){
 }
 
 function actionToPlay(actionInd) {
-	instructArray = defInstructArray.slice(actionInd);
+	cba.instructArray = cba.defInstructArray.slice(actionInd);
 }
 
 function requestService(type, url, data) {
@@ -77,7 +77,7 @@ function requestService(type, url, data) {
 		url : url,
 		data : data
 	}).done(function(msg) {
-		clipboard["serviceAnswer"] = msg;
+		cba.clipboard["serviceAnswer"] = msg;
 		sendInstruction();
 	});
 }

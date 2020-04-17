@@ -1,4 +1,4 @@
-var bg = chrome.extension.getBackgroundPage();
+var bg = chrome.extension.getBackgroundPage().cba;
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-32260034-1']);
