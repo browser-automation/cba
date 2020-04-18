@@ -16,8 +16,9 @@ const bgGlobalVarName = "cba-test";
 
 const pageSetup = {
   body: `
-    <div id='changeContent'>Change me</div>
+    <div id="changeContent">Change me</div>
     <input id="cba-textbox" type="text" />
+    <input id="cba-num" type="num" />
     <input id="cba-checkbox" type="checkbox" />
     <input id="cba-click" type="checkbox" />
     <form action="/redirect">
@@ -256,6 +257,39 @@ it("<$unique=> placeholder should generate random number with the specified char
   const secondUnique = await getValue(pasteQuery);
   equal(secondUnique.length, 2);
   notEqual(firstUnique, secondUnique);
+});
+
+it("Repeat option should keep repeating actions in the project", async() =>
+{
+  const query = "#cba-num";
+  const code = `
+    value = document.querySelector("${query}").value;
+    if (!value)
+      value = 1;
+    document.querySelector("${query}").value = ++value;`;
+
+  await addTestAction(code, "inject");
+  await playTestProject(4);
+  await wait();
+  equal(await getValue("#cba-num"), "5");
+});
+
+it("sendBgInstruction variable and sendInstruction() method can be used in bg-inject to stop and continue next action invocation", async() =>
+{
+  const firstActionText = "first-action-text";
+  const secondActionText = "second-action-text";
+  const bgGlobalVarName = "cba-control-instructions";
+  const code = `
+  sendBgInstruction = false;
+  setTimeout(() => {
+    window["${bgGlobalVarName}"] = "${firstActionText}";
+    sendInstruction();
+  }, 100);`;
+  await addTestAction(code, "bg-inject");
+  await addTestAction(`window["${bgGlobalVarName}"] = "${secondActionText}";`, "bg-inject");
+  await playTestProject();
+  await wait(200);
+  equal(await getBackgroundGlobalVar(bgGlobalVarName), secondActionText);
 });
 
 function gotoRedirectPageScript()

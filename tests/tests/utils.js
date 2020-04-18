@@ -78,7 +78,7 @@ async function addTestAction(data, evType, newValue)
   }, actionObj);
 }
 
-async function playTestProject()
+async function playTestProject(repeate = "1")
 {
   const porjectData = {
     isProject: true,
@@ -87,7 +87,6 @@ async function playTestProject()
     groupObj: ""
   };
   const projectId = "2";
-  const repeate = "1";
   await backgroundPage().evaluate((porjectData, projectId, repeate) => playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
 }
 

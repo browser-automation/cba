@@ -20,7 +20,11 @@ class CBA {
 	}
 }
 
-const cba = new CBA();
+window.cba = new CBA();
+//TODO: Use message passing to run the functions
+window.cba.playButtonClick = playButtonClick;
+window.cba.recordButtonClick = recordButtonClick;
+window.cba.stopButtonClick = stopButtonClick;
 
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-32260034-1']);
