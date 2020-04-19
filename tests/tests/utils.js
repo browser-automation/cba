@@ -31,12 +31,12 @@ async function startTestRecording()
     "project": `${projectId}`,
     "group": "testGroup",
   };
-  return backgroundPage().evaluate((projectObj, projectId) => recordButtonClick(projectObj, projectId) , projectObj, projectId);
+  return backgroundPage().evaluate((projectObj, projectId) => cba.recordButtonClick(projectObj, projectId) , projectObj, projectId);
 }
 
 async function stopTestRecording()
 {
-  return backgroundPage().evaluate(() => stopButtonClick());
+  return backgroundPage().evaluate(() => cba.stopButtonClick());
 }
 
 async function getProjectActions(groupName, projectName, num, key)
@@ -87,7 +87,7 @@ async function playTestProject(repeate = "1")
     groupObj: ""
   };
   const projectId = "2";
-  await backgroundPage().evaluate((porjectData, projectId, repeate) => playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
+  await backgroundPage().evaluate((porjectData, projectId, repeate) => cba.playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
 }
 
 async function getElementAttribute(query, attribute)

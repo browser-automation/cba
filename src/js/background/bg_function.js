@@ -81,3 +81,8 @@ function requestService(type, url, data) {
 		sendInstruction();
 	});
 }
+
+module.exports = {removeCookie, saveToClipboard, removeDomainCookie,
+									getClipboardValue, panelCreation, windowCreation,
+									removeCurrentWindow, reloadCurrentTab, actionToPlay,
+									requestService};

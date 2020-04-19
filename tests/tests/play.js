@@ -87,7 +87,7 @@ it("bg-inject function runs specified script in background page", async() =>
   equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
 });
 
-it("bg-function should execute predefined function", async() =>
+it("bg-function should execute predefined function and play next action when/if defined in function", async() =>
 {
   await addCookie("https://www.example.com/", "cba", "1");
   ok(await getCookie("https://www.example.com/", "cba"));
@@ -97,9 +97,13 @@ it("bg-function should execute predefined function", async() =>
   `;
   const evType = "bg-function";
   await addTestAction(data, evType, "");
+  const injectText = "Next action is played";
+  const query = "#changeContent";
+  await addTestAction(setTextContentScript(query, injectText), "inject", "");
   await playTestProject();
   await wait();
   notOk(await getCookie("https://www.example.com/", "cba"));
+  equal(await getTextContent(query), injectText);
 });
 
 it("Change action updates value of an input and focuses", async() =>
