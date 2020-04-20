@@ -1,4 +1,5 @@
 const readyFunctions = require("./bg_function");
+require("./analytics");
 
 class CBA {
   constructor() {
@@ -28,16 +29,6 @@ window.cba.playButtonClick = playButtonClick;
 window.cba.recordButtonClick = recordButtonClick;
 window.cba.stopButtonClick = stopButtonClick;
 window.sendInstruction = sendInstruction;
-
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-32260034-1']);
-_gaq.push(['_trackPageview']);
-	
-(function() {
-	var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	ga.src = 'https://ssl.google-analytics.com/ga.js';
-	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
 
 isFirstLoad();
 
@@ -154,11 +145,6 @@ function pushRecord(msg) {
 		}
 	}
 	localStorage.setItem("data", JSON.stringify(dataObj));
-}
-
-
-function generateUpdateEvent() {
-	return {msgType: "RecordedEvent", "data": '', "evType": 'update', "newValue" : ''};
 }
 
 function storeCurrentUrl() {
@@ -305,45 +291,29 @@ chrome.tabs.onUpdated.addListener(function( tabId , info ) {
 	}
 });
 
-
 function bgFunctionParser(value){
-	var funcPatt= /<\$function=.*?>/;
-	var attrPatt= /<\$attr=.*?>/g;
-	var funcPlaceholder = funcPatt.test(value);
-	var attrs = new Array();
-	if(funcPlaceholder == true) {
-		var funcName = getPlaceHolder(funcPatt, value);
-		var attrPlaceHolders = value.match(attrPatt);
-		for (var i=0; i < attrPlaceHolders.length; i++) {
-			attrs.push(getPlaceHolder(/<\$attr=.*?>/, attrPlaceHolders[i]));
-		}
-		
-		if(attrs.length == 1) {
-			readyFunctions[funcName](attrs[0]);
-		}
-		else if(attrs.length == 2) {
-			readyFunctions[funcName](attrs[0], attrs[1]);
-		}
-		else if(attrs.length == 3) {
-			readyFunctions[funcName](attrs[0], attrs[1], attrs[2]);
-		}
-		
+	const methodPattern = /<\$function=(\S*)>/;
+	const attributes = [];
+	const method = methodPattern.exec(value);
+	if(!method)
+		return false;
+
+	const functionName = method[1];
+	const attributePattern = /<\$attr=([^>]*)>/g;
+	const clipboardPattern = /clipboard\[["'](.*)["']\]/;
+	while (attribute = attributePattern.exec(value)) {
+		const clipboard = clipboardPattern.exec(attribute[1]);
+		if (clipboard)
+			attributes.push(getClipboardValue(clipboard[1]));
+		else
+			attributes.push(attribute[1]);
+	}
+
+	if(attributes.length) {
+		readyFunctions[functionName](...attributes);
 	}
 }
 
-function getPlaceHolder(pattern, value) {
-	var placeholder = pattern.exec(value)[0];
-	var lastIndex = placeholder.indexOf(">");
-	var firstIndex = placeholder.indexOf("=");
-	var placeholderValue = placeholder.slice(firstIndex+1, lastIndex);
-	var clipboardPatt= /clipboard\[.*\]/;
-	var clipboardValue = placeholderValue.match(clipboardPatt);
-	if(clipboardValue != null) {
-		clipboardValue = clipboardValue[0];
-		var clipboardValueFirstIndex = clipboardValue.indexOf("[");
-		var clipboardValueLastIndex = clipboardValue.indexOf("]");
-		var clipboardAttribute = clipboardValue.slice(clipboardValueFirstIndex+2, clipboardValueLastIndex-1);
-		placeholderValue = placeholderValue.replace(clipboardValue, getClipboardValue(clipboardAttribute));
-	}
-	return placeholderValue;
+function getClipboardValue(attr) {
+	return cba.clipboard[attr];
 }

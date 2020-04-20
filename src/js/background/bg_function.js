@@ -23,10 +23,6 @@ function removeDomainCookie(cookie) {
   chrome.cookies.remove({"url": url, "name": cookie.name}); 
 }
 
-function getClipboardValue(attr) {
-	return cba.clipboard[attr];
-}
-
 function panelCreation(url) {
 	if (url!=null) {
 		chrome.windows.create({ url: url, width: 600, height: 600, type: "panel" }, function(){
@@ -71,18 +67,7 @@ function actionToPlay(actionInd) {
 	cba.instructArray = cba.defInstructArray.slice(actionInd);
 }
 
-function requestService(type, url, data) {
-	$.ajax({
-		type : type,
-		url : url,
-		data : data
-	}).done(function(msg) {
-		cba.clipboard["serviceAnswer"] = msg;
-		sendInstruction();
-	});
-}
 
 module.exports = {removeCookie, saveToClipboard, removeDomainCookie,
-									getClipboardValue, panelCreation, windowCreation,
-									removeCurrentWindow, reloadCurrentTab, actionToPlay,
-									requestService};
+									panelCreation, windowCreation,
+									removeCurrentWindow, reloadCurrentTab, actionToPlay};

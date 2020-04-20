@@ -249,6 +249,22 @@ it("Clipboard set in bg-inject should be accessible in inject", async() =>
   equal(await getTextContent("#changeContent"), clipboardValue);
 });
 
+it("clipboard[...] set as bg-function attribute should be passed along the function call", async() =>
+{
+  await addCookie("https://www.example1.com/", "cba", "1");
+  await addCookie("https://www.example2.com/", "cba", "1");
+  ok(await getCookie("https://www.example1.com/", "cba"));
+  ok(await getCookie("https://www.example2.com/", "cba"));
+  const clipboardKey = "clip-key";
+  const clipboardValue = "example1";
+  await addTestAction(`clipboard["${clipboardKey}"] = "${clipboardValue}";`, "bg-inject", "");
+  await addTestAction(`<$function=removeCookie> <$attr=clipboard["${clipboardKey}"]>`, "bg-function", "");
+  await playTestProject();
+  await wait();
+  notOk(await getCookie("https://www.example1.com/", "cba"));
+  ok(await getCookie("https://www.example2.com/", "cba"));
+});
+
 it("<$unique=> placeholder should generate random number with the specified characters length", async() =>
 {
   const pasteQuery = "#cba-paste";
