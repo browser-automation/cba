@@ -30,8 +30,6 @@ window.cba.recordButtonClick = recordButtonClick;
 window.cba.stopButtonClick = stopButtonClick;
 window.sendInstruction = sendInstruction;
 
-isFirstLoad();
-
 /*
  * Function for listening to connection port and get data from content script
  */
@@ -47,77 +45,32 @@ chrome.extension.onConnect.addListener(function(port) {
  * check whether background page is loading for first time.
  */
 function isFirstLoad() {
-	if(localStorage.getItem("data") == null) {
-		var dataObj = {};
-		var group = {};
-		var projectsArray = new Array();
-		
-		group["name"] = "group0";
-		group["level"] = "0";
-		group["parent"] = "";
-		group["isLeaf"] = false;
-		group["expanded"] = false;
-		group["loaded"] = true;
-		
-		var project = {};
-		project["action"] = new Array();
-		project["name"] = "project";
-		project["level"] = "1";
-		//project["parent"] = "1";
-		project["isLeaf"] = true;
-		project["expanded"] = false;
-		project["loaded"] = true;
-		projectsArray.push(project);
-		
-		group["projects"] = projectsArray;
-		dataObj["group0"] = group;
-		localStorage.setItem("data", JSON.stringify(dataObj));
-		
-		var dataObj = JSON.parse(localStorage.getItem("data"));
-		var groupProjArray = dataObj["group0"].projects;
-		
-		
-		
-		var exportArray = [];
-		var localStorageKeys = Object.keys(localStorage);
-		for(var i=0;i<localStorageKeys.length;i++) {
-			var oldObj = JSON.parse(localStorage.getItem(localStorageKeys[i]));
-			if(oldObj.action != null) {
-				for(i=0;i<100;i++) {
-					var allowProject = true;
-					for(j=0;j<groupProjArray.length;j++) {
-						if(groupProjArray[j].name == localStorageKeys[i]) {
-							allowProject = false;
-						}
+	if(!localStorage.getItem("data")) {
+		const initialData = {
+			group0: {
+				expanded: false,
+				isLeaf: false,
+				level: "0",
+				loaded: true,
+				name: "group0",
+				parent: "",
+				projects: [
+					{
+						action: [],
+						expanded: false,
+						isLeaf: true,
+						level: "1",
+						loaded: true,
+						name: "project"
 					}
-					if(allowProject) {
-						var project = {};
-						for(h=0;h<oldObj.action.length;h++){
-							if(oldObj.action[h].evType == "inject") {
-								oldObj.action[h].evType = "cs-inject";
-							}
-							
-						}
-						project["action"] = oldObj.action;
-						project["name"] = localStorageKeys[i];
-						project["level"] = "1";
-						project["isLeaf"] = true;
-						project["expanded"] = false;
-						project["loaded"] = true;
-						groupProjArray.push(project);
-						
-						break;
-					}
-					else {
-						continue;
-					}
-				}
-				groupProjArray.sort();
+				]
 			}
-		}
-		localStorage.setItem("data", JSON.stringify(dataObj));
+		};
+		localStorage.setItem("data", JSON.stringify(initialData));
 	}
 }
+
+isFirstLoad();
 
 /*
  * Function for storing records in Local Storage
@@ -136,10 +89,10 @@ function storeRecord(msg) {
 }
 
 function pushRecord(msg) {
-	var dataObj = JSON.parse(localStorage.getItem("data"));
-	var projectsArray = dataObj[cba.selectedProjObj["group"]].projects;
+	const dataObj = JSON.parse(localStorage.getItem("data"));
+	const projectsArray = dataObj[cba.selectedProjObj["group"]].projects;
 	
-	for(i=0;i<projectsArray.length;i++) {
+	for(let i=0; i < projectsArray.length; i++) {
 		if(projectsArray[i].name == cba.selectedProjObj["project"]) {
 			projectsArray[i].action.push(msg);
 		}
@@ -194,10 +147,10 @@ function playButtonClick(projObj, currProjectId, repeatVal) {
 	cba.playingProjectId = currProjectId;
 	cba.update = false;
 	cba.selectedProjObj = projObj;
-	var dataObj = JSON.parse(localStorage.getItem("data"));
+	const dataObj = JSON.parse(localStorage.getItem("data"));
 	
-	var projectsArray = dataObj[projObj["group"]].projects;
-	for(i=0;i<projectsArray.length;i++) {
+	const projectsArray = dataObj[projObj["group"]].projects;
+	for(let i=0; i < projectsArray.length; i++) {
 		if(projectsArray[i].name == projObj["project"]) {
 			cba.instructArray = projectsArray[i].action;
 		}
@@ -238,7 +191,7 @@ function sendInstruction () {
   				return;
   			}
   			else if(cba.instruction[0].evType == 'bg-inject') {
-					var sendBgInstruction = true;
+					let sendBgInstruction = true;
 					// see -> https://github.com/browser-automation/cba/issues/13
 					let clipboard = cba.clipboard;
 					eval(cba.instruction[0].data);
@@ -293,14 +246,15 @@ chrome.tabs.onUpdated.addListener(function( tabId , info ) {
 
 function bgFunctionParser(value){
 	const methodPattern = /<\$function=(\S*)>/;
+	const attributePattern = /<\$attr=([^>]*)>/g;
+	const clipboardPattern = /clipboard\[["'](.*)["']\]/;
+
 	const attributes = [];
 	const method = methodPattern.exec(value);
 	if(!method)
 		return false;
 
 	const functionName = method[1];
-	const attributePattern = /<\$attr=([^>]*)>/g;
-	const clipboardPattern = /clipboard\[["'](.*)["']\]/;
 	while (attribute = attributePattern.exec(value)) {
 		const clipboard = clipboardPattern.exec(attribute[1]);
 		if (clipboard)

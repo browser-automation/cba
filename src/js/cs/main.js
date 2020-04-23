@@ -1,18 +1,19 @@
 
 require("./record");
-let currentResponse;
 let clipboard = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  console.log("here");
-	currentResponse = sendResponse;
+	const currentResponse = sendResponse;
 	if(request.action == "play") {
 		clipboard = request.clipboard;
 		if(request.instruction.evType == "timer") {
-			setTimeout("timerOkResponse()", request.instruction.newValue);
-			return;
+			setTimeout(() => {
+				currentResponse({answere: "instructOK", clipboard: clipboard})
+			}, request.instruction.newValue);
 		}
-		recordExecution(request.instruction, sendResponse, request);
+		else {
+			recordExecution(request.instruction, sendResponse, request);
+		}
 	}
 	else if(request.action == "highlight") {
 		if($(request.selector).length != 0) {
@@ -26,17 +27,13 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	}
 });
 
-function timerOkResponse() {
-	currentResponse({answere: "instructOK", clipboard: clipboard});
-}
-
 /*
  * Function for managing record type and executing some script 
  */
 function recordExecution(recordRow, sendResponse, request){
 	if(recordRow.evType == "change") {
 		$(recordRow.data).focus();
-		$(recordRow.data).val(uniquePlaceholder(recordRow.newValue));
+		$(recordRow.data).val(placeholders(recordRow.newValue));
 		$(recordRow.data).change();
 	}
 	else if ((recordRow.evType == "click")||(recordRow.evType == "submit-click")) {
@@ -73,7 +70,7 @@ function recordExecution(recordRow, sendResponse, request){
 	sendResponse({answere: "instructOK", clipboard: clipboard});
 }
 
-function uniquePlaceholder(checkValue) {
+function placeholders(checkValue) {
 	const patt= /<\$unique=.*?>/;
 	const pastPatt = /<\$past>/;
 	const clipPatt = /<\$clipboard=.*?>/;

@@ -39,6 +39,11 @@ async function stopTestRecording()
   return backgroundPage().evaluate(() => cba.stopButtonClick());
 }
 
+async function getLocalStorageData()
+{
+  return backgroundPage().evaluate(() => JSON.parse(localStorage.getItem("data")));
+}
+
 async function getProjectActions(groupName, projectName, num, key)
 {
   return backgroundPage().evaluate((groupName, projectName, num, key) =>
@@ -191,4 +196,4 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
-                  focusAndType, getBadgeText};
+                  focusAndType, getBadgeText, getLocalStorageData};
