@@ -95,10 +95,12 @@ async function playTestProject(repeate = "1")
   await backgroundPage().evaluate((porjectData, projectId, repeate) => cba.playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
 }
 
-async function getElementAttribute(query, attribute)
+async function getElementAttribute(query, ...attributes)
 {
   const element = await page().$(query);
-  return page().evaluate((element, attribute) => element[attribute], element, attribute);
+  return page().evaluate((element, attributes) => {
+    return attributes.reduce((acc, attribute) => acc[attribute] , element);
+  } , element, attributes);
 }
 
 async function getTextContent(query)
@@ -114,6 +116,11 @@ async function getValue(query)
 async function isChecked(query)
 {
   return getElementAttribute(query, "checked");
+}
+
+async function getStyle(query, style)
+{
+  return getElementAttribute(query, "style", style);
 }
 
 async function getActiveElementId()
@@ -191,9 +198,23 @@ async function focusAndType(query, text)
   return page().keyboard.type(text);
 }
 
+async function sendCurrentTabRequest(request)
+{
+  return backgroundPage().evaluate((request) => {
+    return new Promise((resp) =>
+    {
+      chrome.tabs.getSelected(null ,(tab) => {
+        chrome.tabs.sendRequest(tab.id, request);
+        resp();
+      });
+    });
+  }, request);
+}
+
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
-                  focusAndType, getBadgeText, getLocalStorageData};
+                  focusAndType, getBadgeText, getLocalStorageData,
+                  sendCurrentTabRequest, getStyle};

@@ -6,11 +6,12 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {getLocalStorageData} = require("./utils");
+const {getLocalStorageData, sendCurrentTabRequest, getStyle, getElementAttribute, wait} = require("./utils");
 const {setTestPage} = require("../main");
 
 const pageSetup = {
   body: `
+    <span id="higlight">Highlight me</span>
   `
 }
 
@@ -42,6 +43,15 @@ it("Starting the extension should set default actions", async() =>
     }
   };
   deepEqual(await getLocalStorageData(), initialData);
+});
+
+it("Sending highlight and unHighlight event should outline specific element according to selector", async() =>
+{
+  const query = "#higlight";
+  await sendCurrentTabRequest({"action": "highlight" ,"selector": query});
+  equal(await getStyle(query, "outline"), "red solid 1px");
+  await sendCurrentTabRequest({"action": "unHighlight" ,"selector": query});
+  equal(await getStyle(query, "outline"), "");
 });
 
 module.exports = {pageSetup};

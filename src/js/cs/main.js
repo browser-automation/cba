@@ -4,6 +4,7 @@ let clipboard = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	const currentResponse = sendResponse;
+	
 	if(request.action == "play") {
 		clipboard = request.clipboard;
 		if(request.instruction.evType == "timer") {
@@ -16,16 +17,22 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		}
 	}
 	else if(request.action == "highlight") {
-		if($(request.selector).length != 0) {
-			$(request.selector).css("outline", "1px solid red");
-		}
+		setHighlight(request.selector);
 	}
 	else if(request.action == "unHighlight") {
-		if($(request.selector).length != 0) {
-			$(request.selector).css("outline", "");
-		}
+		setHighlight(request.selector, false);
 	}
 });
+
+function setHighlight(query, highlight = true)
+{
+	const target = document.querySelector(query);
+	if (target) {
+		target.style["outline-style"] = highlight ? "solid" : "";
+		target.style["outline-color"] = highlight ? "red" : "";
+		target.style["outline-width"] = highlight ? "1px" : "";
+	}
+}
 
 /*
  * Function for managing record type and executing some script 
