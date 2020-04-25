@@ -46,10 +46,10 @@ function recordExecution(recordRow, sendResponse, request){
 		targetElement.dispatchEvent(event, { "bubbles": true });
 	}
 	else if ((recordRow.evType == "click")||(recordRow.evType == "submit-click")) {
-		$(recordRow.data).click();
+		document.querySelector(recordRow.data).click();
 	}
 	else if (recordRow.evType == "check") {
-		$(recordRow.data).attr('checked', true);
+		document.querySelector(recordRow.data).checked = true;
 	}
 	else if (recordRow.evType == "redirect") {
 		sendResponse({answere: "instructOK", clipboard: clipboard});
@@ -57,23 +57,36 @@ function recordExecution(recordRow, sendResponse, request){
 		return;
 	}
 	else if (recordRow.evType == "inject") {
+		const clipboardId = "grabClipboardHere";
     const script = document.createElement('script');
     script.setAttribute("type", "application/javascript");
-    script.textContent = recordRow.data;
-    script.textContent = "var clipboard="+JSON.stringify(request.clipboard)+"; "+script.textContent;
-    script.textContent += " var newdiv = document.createElement('div'); if(document.getElementById('grabClipboardHere')!= null) {document.getElementById('grabClipboardHere').textContent = JSON.stringify(clipboard);} else { newdiv.setAttribute('id', 'grabClipboardHere'); newdiv.textContent = JSON.stringify(clipboard); document.body.appendChild(newdiv)} document.getElementById('grabClipboardHere').style.display = 'none';";
+    script.textContent =  `
+			var clipboard=${JSON.stringify(request.clipboard)};
+			${recordRow.data};
+			var newdiv = document.createElement('div');
+			if(document.getElementById('${clipboardId}')!= null) {
+				document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
+			}
+			else {
+				newdiv.setAttribute('id', '${clipboardId}');
+				newdiv.textContent = JSON.stringify(clipboard);
+				document.body.appendChild(newdiv);
+			}
+			document.getElementById('${clipboardId}').style.display = 'none';`;
     document.documentElement.appendChild(script); // run the script
-    document.documentElement.removeChild(script); // clean up
-    if(($("#grabClipboardHere").html() != "null")&&($("#grabClipboardHere").html()!=undefined)&&($("#grabClipboardHere").html()!="{} ")&&($("#grabClipboardHere").html()!="{}")) {
-      clipboard = JSON.parse($("#grabClipboardHere").html());
+		document.documentElement.removeChild(script); // clean up
+		const injectedClipboard = document.querySelector(`#${clipboardId}`);
+    if(injectedClipboard) {
+      clipboard = JSON.parse(injectedClipboard.textContent);
     }
 	}
 	else if (recordRow.evType == "cs-inject") {
 		eval(recordRow.data);
 	}
 	else if (recordRow.evType == "copy") {
-		if($(recordRow.data).html()!=null) {
-			clipboard["copy"] = $(recordRow.data).html();
+		const targetElement = document.querySelector(recordRow.data);
+		if(targetElement) {
+			clipboard["copy"] = targetElement.innerHTML;
 		}
 	}
 	sendResponse({answere: "instructOK", clipboard: clipboard});
