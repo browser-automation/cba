@@ -9,7 +9,7 @@ const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
-       getBadgeText} = require("./utils");
+       getBadgeText, setListener, getSelectedValue} = require("./utils");
 const {server, setTestPage, navigateToTestPage} = require("../main");
 
 const bgGlobalVarName = "cba-test";
@@ -17,7 +17,14 @@ const bgGlobalVarName = "cba-test";
 const pageSetup = {
   body: `
     <div id="changeContent">Change me</div>
-    <input id="cba-textbox" type="text" />
+    <div id="cba-change">
+      <input id="cba-textbox" type="text" />
+      <select id="cba-selectbox">
+        <option value="1" selected>First</option>
+        <option value="2">Second</option>
+      </select>
+      <textarea id="cba-textarea"></textarea>
+    </div>
     <input id="cba-num" type="num" />
     <input id="cba-checkbox" type="checkbox" />
     <input id="cba-click" type="checkbox" />
@@ -106,17 +113,38 @@ it("bg-function should execute predefined function and play next action when/if 
   equal(await getTextContent(query), injectText);
 });
 
-it("Change action updates value of an input and focuses", async() =>
+it("Change action updates value of a textbox, focuses and fires a change event", async() =>
 {
   const newText = "Injected value";
   const id = "cba-textbox";
   const query = `#${id}`;
   const evType = "change";
   await addTestAction(query, evType, newText);
+  let changeEvent = null;
+  setListener(query, "change", (e) =>
+  {
+    changeEvent = e;
+  });
+  await wait();
   await playTestProject();
   equal(await getValue(query), newText);
   equal(await getActiveElementId(), id);
-  // TODO fix and create test for https://github.com/Manvel/cba/issues/2
+  ok(changeEvent);
+});
+
+it("Change action updates value of selectbox and textarea", async() =>
+{
+  const evType = "change";
+  const selectboxQuery = "#cba-selectbox";
+  await addTestAction(selectboxQuery, evType, "2");
+
+  const newText = "Injected value";
+  const textareaQuery = "#cba-textarea";
+  await addTestAction(textareaQuery, evType, newText);
+  
+  await playTestProject();
+  equal(await getSelectedValue(selectboxQuery), "2");
+  equal(await getValue(textareaQuery), newText);
 });
 
 it("Check action checks the checkbox", async() =>

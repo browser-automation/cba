@@ -113,6 +113,14 @@ async function getValue(query)
   return getElementAttribute(query, "value");
 }
 
+async function getSelectedValue(query)
+{
+  const element = await page().$(query);
+  return page().evaluate((element) => {
+    return element.selectedOptions[0].value;;
+  } , element);
+}
+
 async function isChecked(query)
 {
   return getElementAttribute(query, "checked");
@@ -217,4 +225,4 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
-                  sendCurrentTabRequest, getStyle};
+                  sendCurrentTabRequest, getStyle, getSelectedValue};

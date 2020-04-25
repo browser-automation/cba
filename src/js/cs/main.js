@@ -39,9 +39,11 @@ function setHighlight(query, highlight = true)
  */
 function recordExecution(recordRow, sendResponse, request){
 	if(recordRow.evType == "change") {
-		$(recordRow.data).focus();
-		$(recordRow.data).val(placeholders(recordRow.newValue));
-		$(recordRow.data).change();
+		const targetElement = document.querySelector(recordRow.data);
+		targetElement.focus();
+		targetElement.value = placeholders(recordRow.newValue);
+		const event = new Event("change");
+		targetElement.dispatchEvent(event, { "bubbles": true });
 	}
 	else if ((recordRow.evType == "click")||(recordRow.evType == "submit-click")) {
 		$(recordRow.data).click();
