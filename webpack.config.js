@@ -26,6 +26,8 @@ module.exports =
       { from: "./src/*.*", flatten: true},
       { from: "./src/js/*", to: "js", flatten: true },
       { from: "./src/js/ui", to: "js/ui", flatten: true },
+      {from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
+      to: "js" },
     ])
   ]
 };

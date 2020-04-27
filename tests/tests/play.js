@@ -9,7 +9,8 @@ const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
-       getBadgeText, setListener, getSelectedValue} = require("./utils");
+       getBadgeText, setListener, getSelectedValue, resetClipboardValue,
+       isElementExist} = require("./utils");
 const {server, setTestPage, navigateToTestPage} = require("../main");
 
 const bgGlobalVarName = "cba-test";
@@ -41,12 +42,12 @@ beforeEach(async () =>
   await setTestProject();
   const pageUrl = await getPageUrl();
   await resetBackgroundGlobalVar(bgGlobalVarName);
+  await resetClipboardValue();
 
   if (path.relative(pageUrl, server) != "")
     await navigateToTestPage();
   await setTestPage(pageSetup);
 });
-
 
 it("Playing actions should add badge text 'play' to the icon.", async() =>
 {
@@ -111,6 +112,33 @@ it("bg-function should execute predefined function and play next action when/if 
   await wait();
   notOk(await getCookie("https://www.example.com/", "cba"));
   equal(await getTextContent(query), injectText);
+});
+
+it("bg-function saveToClipboard should save JSON data into the clipboard", async() =>
+{
+  const clipboardObject = `{"key1": "value1", "key2": "value2"}`;
+  const data = `
+<$function=saveToClipboard>
+<$attr=${clipboardObject}>
+  `;
+  await addTestAction(data, "bg-function", "");
+  await addTestAction(`window["${bgGlobalVarName}"] = clipboard;`, "bg-inject", "");
+  await playTestProject();
+  await wait();
+  deepEqual(await getBackgroundGlobalVar(bgGlobalVarName), JSON.parse(clipboardObject));
+});
+
+it("bg-function reloadCurrentTab(without attributes test) should reload current tab", async() =>
+{
+  const query = "#defaultContent";
+  const newText = "New default text";
+  await addTestAction(`<$function=reloadCurrentTab>`, "bg-function", "");
+  await addTestAction("", "update", "");
+  await addTestAction(setTextContentScript(query, newText), "inject", "");
+  await playTestProject();
+  await wait();
+  notOk(await isElementExist("#changeContent"));
+  equal(await getTextContent(query), newText);
 });
 
 it("Change action updates value of a textbox, focuses and fires a change event", async() =>
@@ -338,6 +366,23 @@ it("sendBgInstruction variable and sendInstruction() method can be used in bg-in
   await playTestProject();
   await wait(200);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), secondActionText);
+});
+
+it("actionToPlay can be used in bg-inject to Jump to another action", async() =>
+{
+  const query = "#changeContent";
+  const firstInjectedText = "First Injected Text"; 
+  const secondInjectedText = "Second Injected Text"; 
+  const jumpToAction = 3;
+  const lastActionText = "Last action has been played";
+  await addTestAction(setTextContentScript(query, firstInjectedText), "inject");
+  await addTestAction(`actionToPlay(${jumpToAction});`, "bg-inject");
+  await addTestAction(setTextContentScript(query, secondInjectedText), "inject");
+  await addTestAction(`window["${bgGlobalVarName}"] = "${lastActionText}";`, "bg-inject", "");
+  await playTestProject();
+  await wait();
+  equal(await getTextContent(query), firstInjectedText);
+  equal(await getBackgroundGlobalVar(bgGlobalVarName), lastActionText);
 });
 
 function gotoRedirectPageScript()

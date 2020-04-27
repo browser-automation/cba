@@ -1,73 +1,44 @@
-function removeCookie(pattern) {
-	chrome.cookies.getAll({}, function(cookies) { 
-		for (var i in cookies) {
-			var patt= new RegExp(pattern);
-			if(patt.test(cookies[i].domain)) {
-	 			removeDomainCookie(cookies[i]);
-			}
+async function removeCookie(pattern) {
+	const cookies = await browser.cookies.getAll({});
+	for (const cookie of cookies) {
+		if(new RegExp(pattern).test(cookie.domain)) {
+			const url = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path; 
+  		await browser.cookies.remove({"url": url, "name": cookie.name});
 		}
-		sendInstruction();
-	});
+	}
 }
 
 function saveToClipboard(jsonData) {
-	var jsonParsed = JSON.parse(jsonData);
-	for(var key in jsonParsed){
+	const jsonParsed = JSON.parse(jsonData);
+	for(const key in jsonParsed){
 		cba.clipboard[key] = jsonParsed[key];
 	}
-	sendInstruction();
 }
 
-function removeDomainCookie(cookie) {
-  var url = "http" + (cookie.secure ? "s" : "") + "://" + cookie.domain + cookie.path; 
-  chrome.cookies.remove({"url": url, "name": cookie.name}); 
+async function panelCreation(url) {
+	if (!url)
+		return false;
+	
+	await browser.windows.create({url, width: 600, height: 600, type: "panel"});
 }
 
-function panelCreation(url) {
-	if (url!=null) {
-		chrome.windows.create({ url: url, width: 600, height: 600, type: "panel" }, function(){
-			sendInstruction();
-		});
-	}
+async function windowCreation(url) {
+	if (!url)
+		return false;
+	
+	await browser.windows.create({url});
 }
 
-function windowCreation(url) {
-	if (url!=null) {
-		chrome.windows.create({ url: url}, function(){
-			sendInstruction();
-		});
-	}
+async function removeCurrentWindow() {
+	const {id} = await browser.windows.getCurrent();
+	await browser.windows.remove(id);
 }
 
-function removeCurrentWindow() {
-	chrome.windows.getCurrent(function(window) {
-		chrome.windows.remove(window.id, function(){
-			setTimeout("sendInstruction();",500);
-		});
-	});
+async function reloadCurrentTab(){
+	const {id} = await browser.tabs.query({active: true});
+	await browser.tabs.reload(id);
 }
 
-function reloadCurrentTab(){
-	chrome.tabs.getSelected(null ,function(tab) {
-		chrome.tabs.reload(tab.id, function(){
-			sendInstruction();
-		});
-	});
-}
-
-function reloadCurrentTab(){
-	chrome.tabs.getSelected(null ,function(tab) {
-		chrome.tabs.reload(tab.id, function(){
-			sendInstruction();
-		});
-	});
-}
-
-function actionToPlay(actionInd) {
-	cba.instructArray = cba.defInstructArray.slice(actionInd);
-}
-
-
-module.exports = {removeCookie, saveToClipboard, removeDomainCookie,
+module.exports = {removeCookie, saveToClipboard,
 									panelCreation, windowCreation,
-									removeCurrentWindow, reloadCurrentTab, actionToPlay};
+									removeCurrentWindow, reloadCurrentTab};

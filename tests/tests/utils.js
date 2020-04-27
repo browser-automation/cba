@@ -126,6 +126,11 @@ async function isChecked(query)
   return getElementAttribute(query, "checked");
 }
 
+async function isElementExist(query)
+{
+  return page().$(query);
+}
+
 async function getStyle(query, style)
 {
   return getElementAttribute(query, "style", style);
@@ -144,6 +149,11 @@ async function getBackgroundGlobalVar(name)
 async function resetBackgroundGlobalVar(name)
 {
   return backgroundPage().evaluate((name) => delete window[name] , name);
+}
+
+async function resetClipboardValue()
+{
+  return backgroundPage().evaluate(() => cba.clipboard = {});
 }
 
 async function getBadgeText()
@@ -225,4 +235,5 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   getTextContent, getValue, isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
-                  sendCurrentTabRequest, getStyle, getSelectedValue};
+                  sendCurrentTabRequest, getStyle, getSelectedValue,
+                  resetClipboardValue, isElementExist};
