@@ -1,73 +1,85 @@
 const readyFunctions = require("./bg_function");
 
-function sendInstruction () {
+function sendInstruction() {
 	if(cba.allowPlay == 0 ) {
 		return;
 	}
-	if(cba.instructArray.length > 0) {
+	if(cba.instructArray.length) {
 		chrome.tabs.getSelected(null ,function(tab) {
-			if(tab == null) {
-				setTimeout(sendInstruction,1000);
+			if(!tab) {
+				setTimeout(sendInstruction, 1000);
 				return;
 			}
 			chrome.browserAction.setBadgeText({"text":"play"});
-			cba.instruction = cba.instructArray.splice(0, 1);
-			
-  			// Send a request to the content script.
-  			cba.playingTabId = tab.id;
-  			if((cba.instruction[0].evType == 'redirect')||(cba.instruction[0].evType == 'submit-click')) {
-  				cba.update = true;
-  			}
-  			else if(cba.instruction[0].evType == 'update') {
-  				cba.update = true;
-  				return;
-  			}
-  			else if(cba.instruction[0].evType == 'timer') {
-  				setTimeout(sendInstruction, cba.instruction[0].newValue);
-  				return;
-  			}
-  			else if(cba.instruction[0].evType == 'bg-function') {
-  				bgFunctionParser(cba.instruction[0].data);
-  				return;
-  			}
-  			else if(cba.instruction[0].evType == 'bg-inject') {
-          const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
+			const [instruction] = cba.instructArray.splice(0, 1);
+			const {evType, data} = instruction;
+			// Send a request to content script.
+			cba.playingTabId = tab.id;  // TODO: Do we need this?
+
+			switch (evType) {
+				case "redirect":
+				case "submit-click": {
+					cba.update = true;
+					messageContentScript(instruction, cba.clipboard);
+					break;
+				}
+				case "update": {
+					cba.update = true;
+					break;
+				}
+				case "timer": {
+					setTimeout(sendInstruction, instruction.newValue);
+					break;
+				}
+				case "bg-function": {
+					bgFunctionParser(data);
+					break;
+				}
+				case "bg-inject": {
+					const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
 					let sendBgInstruction = true;
 					// see -> https://github.com/browser-automation/cba/issues/13
           let clipboard = cba.clipboard;
-          eval(cba.instruction[0].data);
+          eval(data);
 					if (clipboard !== cba.clipboard)
 						cba.clipboard = clipboard;
   				if(sendBgInstruction == true) {
   					sendInstruction();
   				}
-  				return;
-  			}
-  			else if(cba.instruction[0].evType == 'pause') {
-  				cba.allowPlay = 0;
+					break;
+				}
+				case "pause": {
+					cba.allowPlay = 0;
   				cba.pause = 1;
   				chrome.browserAction.setBadgeText({"text":"||"});
-  				return;
-  			}
-  			
-  			chrome.tabs.sendRequest(tab.id, {"action": "play" ,"instruction": cba.instruction[0], "clipboard": cba.clipboard}, playResponse);
+					break;
+				}
+				default: {
+					messageContentScript(instruction, cba.clipboard);
+					break;
+				}
+			}
 		});
 	}
-	else {
-		if(cba.projectRepeat > 1) {
-			cba.projectRepeat--;
-			cba.playButtonClick(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
-		}
-		else {
-			cba.allowPlay = 0;
-			chrome.browserAction.setBadgeText({"text":""});
-		}
+	else if(cba.projectRepeat > 1) {
+		cba.projectRepeat--;
+		cba.playButtonClick(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
 	}
+	else {
+		cba.allowPlay = 0;
+		chrome.browserAction.setBadgeText({"text": ""});
+	}
+}
+
+function messageContentScript(instruction, clipboard)
+{
+	const options = {"action": "play" ,instruction, clipboard};
+	chrome.tabs.sendRequest(cba.playingTabId, options, playResponse);
 }
 
 function playResponse(response) {
 	if(response == null) {
-		setTimeout(sendInstruction,1000);
+		setTimeout(sendInstruction, 1000);
 		return;
 	}
 	if(response.answere == "instructOK") {

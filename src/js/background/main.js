@@ -112,7 +112,7 @@ function playButtonClick(projObj, currProjectId, repeatVal) {
 	if(cba.pause == 1) {
 		cba.pause = 0;
 		cba.allowPlay = 1;
-		sendInstruction ();
+		sendInstruction();
 		return;
 	}
 	
