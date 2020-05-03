@@ -35,7 +35,7 @@ async function removeCurrentWindow() {
 }
 
 async function reloadCurrentTab(){
-	const {id} = await browser.tabs.query({active: true});
+	const {id} = (await browser.tabs.query({active: true}))[0];
 	await browser.tabs.reload(id);
 }
 

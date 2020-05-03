@@ -1,13 +1,13 @@
 const readyFunctions = require("./bg_function");
 
-function sendInstruction() {
+function playNextAction() {
 	if(cba.allowPlay == 0 ) {
 		return;
 	}
 	if(cba.instructArray.length) {
 		chrome.tabs.getSelected(null ,function(tab) {
 			if(!tab) {
-				setTimeout(sendInstruction, 1000);
+				setTimeout(playNextAction, 1000);
 				return;
 			}
 			chrome.browserAction.setBadgeText({"text":"play"});
@@ -28,7 +28,7 @@ function sendInstruction() {
 					break;
 				}
 				case "timer": {
-					setTimeout(sendInstruction, instruction.newValue);
+					setTimeout(playNextAction, instruction.newValue);
 					break;
 				}
 				case "bg-function": {
@@ -36,6 +36,7 @@ function sendInstruction() {
 					break;
 				}
 				case "bg-inject": {
+					const sendInstruction = () => playNextAction();
 					const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
 					let sendBgInstruction = true;
 					// see -> https://github.com/browser-automation/cba/issues/13
@@ -44,7 +45,7 @@ function sendInstruction() {
 					if (clipboard !== cba.clipboard)
 						cba.clipboard = clipboard;
   				if(sendBgInstruction == true) {
-  					sendInstruction();
+  					playNextAction();
   				}
 					break;
 				}
@@ -79,13 +80,13 @@ function messageContentScript(instruction, clipboard)
 
 function playResponse(response) {
 	if(response == null) {
-		setTimeout(sendInstruction, 1000);
+		setTimeout(playNextAction, 1000);
 		return;
 	}
 	if(response.answere == "instructOK") {
 		cba.clipboard = response.clipboard;
 		if (cba.update == false) {
-			sendInstruction();
+			playNextAction();
 		}
 	}
 }
@@ -115,11 +116,11 @@ async function bgFunctionParser(value){
   else {
     await readyFunctions[functionName]();
   }
-  sendInstruction();
+  playNextAction();
 }
 
 function getClipboardValue(attr) {
 	return cba.clipboard[attr];
 }
 
-module.exports = {sendInstruction};
+module.exports = {playNextAction};

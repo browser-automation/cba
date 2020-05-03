@@ -17,16 +17,44 @@ class CBA {
 		this.selectedProjObj;
   }
 
-  play() {
-    // TBA
+  setProject(projObj, currProjectId, repeatVal) {
+    if(this.pause == 1) {
+      this.pause = 0;
+      this.allowPlay = 1;
+      return;
+    }
+
+    if(this.clipboard == null) {
+      this.clipboard = {};
+    }
+
+    this.allowPlay = 1;
+    this.projectRepeat = repeatVal;
+    this.playingProjectId = currProjectId;
+    this.update = false;
+    this.selectedProjObj = projObj;
+    const dataObj = JSON.parse(localStorage.getItem("data"));
+
+    const projectsArray = dataObj[projObj["group"]].projects;
+    for(let i=0; i < projectsArray.length; i++) {
+      if(projectsArray[i].name == projObj["project"]) {
+        this.instructArray = projectsArray[i].action;
+      }
+    }
+
+    this.defInstructArray = this.instructArray.slice(0);
   }
 
   stop() {
-    // TBA
+    this.allowRec = 0;
+    this.allowPlay = 0;
+    this.pause = 0;
   }
 
-  record() {
-    // TBA
+  record(projObj, projectId) {
+    this.selectedProjObj = projObj;
+    this.selectedProjectId = projectId;
+    this.allowRec = 1;
   }
 
   setInstructionArray(arr)

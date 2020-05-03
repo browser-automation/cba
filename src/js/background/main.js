@@ -1,6 +1,6 @@
 require("./analytics");
 const {CBA} = require("./CBA");
-const {sendInstruction} = require("./execution");
+const {playNextAction} = require("./actions");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -69,7 +69,7 @@ function storeRecord(msg) {
 function pushRecord(msg) {
 	const dataObj = JSON.parse(localStorage.getItem("data"));
 	const projectsArray = dataObj[cba.selectedProjObj["group"]].projects;
-	
+
 	for(let i=0; i < projectsArray.length; i++) {
 		if(projectsArray[i].name == cba.selectedProjObj["project"]) {
 			projectsArray[i].action.push(msg);
@@ -78,69 +78,39 @@ function pushRecord(msg) {
 	localStorage.setItem("data", JSON.stringify(dataObj));
 }
 
-function storeCurrentUrl() {
-	chrome.tabs.getSelected(null ,function(tab) {
-  		pushRecord({msgType: "RecordedEvent", "data": tab.url, "evType": 'redirect', "newValue" : ''});
-	});
+async function storeCurrentUrl() {
+	const {url} = (await browser.tabs.query({active: true}))[0];
+	storeRecord({msgType: "RecordedEvent", "data": url, "evType": 'redirect', "newValue" : ''});
 }
 
 /*
  * Function that calls after clicking on record button
  */
-function recordButtonClick(projObj, projectId) {
-	storeCurrentUrl();
-	cba.selectedProjObj = projObj;
-	cba.selectedProjectId = projectId;
-	cba.allowRec = 1;
-	chrome.browserAction.setBadgeText({"text":"rec"}); 
+async function recordButtonClick(projObj, projectId) {
+	cba.record(projObj, projectId);
+	await storeCurrentUrl();
+	chrome.browserAction.setBadgeText({"text": "rec"});
 }
 
 /*
  * Function that calls after clicking on Stop button
  */
 function stopButtonClick() {
-	cba.allowRec = 0;
-	cba.allowPlay = 0;
-	cba.pause = 0;
-	chrome.browserAction.setBadgeText({"text":""}); 
+	cba.stop();
+	chrome.browserAction.setBadgeText({"text": ""});
 }
 
 /*
  * Function that calls after clicking on Play button
  */
 function playButtonClick(projObj, currProjectId, repeatVal) {
-	if(cba.pause == 1) {
-		cba.pause = 0;
-		cba.allowPlay = 1;
-		sendInstruction();
-		return;
-	}
-	
-	if(cba.clipboard == null) {
-		cba.clipboard = {};
-	}
-	
-	cba.allowPlay = 1;
-	cba.projectRepeat = repeatVal;
-	cba.playingProjectId = currProjectId;
-	cba.update = false;
-	cba.selectedProjObj = projObj;
-	const dataObj = JSON.parse(localStorage.getItem("data"));
-	
-	const projectsArray = dataObj[projObj["group"]].projects;
-	for(let i=0; i < projectsArray.length; i++) {
-		if(projectsArray[i].name == projObj["project"]) {
-			cba.instructArray = projectsArray[i].action;
-		}
-	}
-	
-	cba.defInstructArray = cba.instructArray.slice(0);
-	sendInstruction();
+	cba.setProject(projObj, currProjectId, repeatVal);
+	playNextAction();
 }
 
 chrome.tabs.onUpdated.addListener(function( tabId , info ) {
 	if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
-		sendInstruction ();
+		playNextAction();
 		cba.update = false;
 	}
 });

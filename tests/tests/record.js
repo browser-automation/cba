@@ -42,7 +42,6 @@ const pageSetup = {
 
 beforeEach(async () =>
 {
-  await startTestRecording();
   await setTestProject();
   const pageUrl = await getPageUrl();
   await resetBackgroundGlobalVar(bgGlobalVarName);
