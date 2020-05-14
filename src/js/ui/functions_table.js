@@ -2,49 +2,49 @@ var funcDefaultWidth = window.location.pathname != "/options.html"?100:150;
 var funcDefaultHeight = window.location.pathname != "/options.html"?170:250;
 
 jQuery("#functionsTable").jqGrid({
-	datatype: "local",
-	onSelectRow: actionSelected,
-   	colNames:['data', 'event', 'value', 'name'],
-   	colModel:[
-   		{name:'data',index:'data', hidden:true},
-   		{name:'evType',index:'evType', hidden:true},
-   		{name:'newValue',index:'newValue', hidden:true},
-   		{name:'name',index:'name', width:funcDefaultWidth}
-   	],
-   	height: funcDefaultHeight,
-   	multiselect: false,
-   	hidegrid: false,
-   	caption: "Functions"
+  datatype: "local",
+  onSelectRow: actionSelected,
+     colNames:['data', 'event', 'value', 'name'],
+     colModel:[
+       {name:'data',index:'data', hidden:true},
+       {name:'evType',index:'evType', hidden:true},
+       {name:'newValue',index:'newValue', hidden:true},
+       {name:'name',index:'name', width:funcDefaultWidth}
+     ],
+     height: funcDefaultHeight,
+     multiselect: false,
+     hidegrid: false,
+     caption: "Functions"
 });
 
 if(window.location.pathname == "/options.html") {
-	$("#addFunc").click(addFuncClick);
-	$("#deleteFunc").click(deleteFuncClick);
-	$("#saveFunc").click(saveFuncClick);
-	
-	jQuery("#functionsTableEdit").jqGrid({
-		datatype: "local",
-		onSelectRow: funcEditSelected,
-	   	colNames:['data', 'event', 'value', 'name'],
-	   	colModel:[
-	   		{name:'data',index:'data', hidden:true},
-	   		{name:'evType',index:'evType', hidden:true},
-	   		{name:'newValue',index:'newValue', hidden:true},
-	   		{name:'name',index:'name', width:funcDefaultWidth}
-	   	],
-	   	height: funcDefaultHeight,
-	   	multiselect: false,
-	   	hidegrid: false,
-	   	caption: "Functions"
-	});
+  $("#addFunc").click(addFuncClick);
+  $("#deleteFunc").click(deleteFuncClick);
+  $("#saveFunc").click(saveFuncClick);
+  
+  jQuery("#functionsTableEdit").jqGrid({
+    datatype: "local",
+    onSelectRow: funcEditSelected,
+       colNames:['data', 'event', 'value', 'name'],
+       colModel:[
+         {name:'data',index:'data', hidden:true},
+         {name:'evType',index:'evType', hidden:true},
+         {name:'newValue',index:'newValue', hidden:true},
+         {name:'name',index:'name', width:funcDefaultWidth}
+       ],
+       height: funcDefaultHeight,
+       multiselect: false,
+       hidegrid: false,
+       caption: "Functions"
+  });
 }
 
 
 jQuery("#functionsTable").jqGrid('gridDnD',{
-	connectWith:'#actionsTable', 
-	onstart : functDragStart,
-	droppos: 'last', 
-	beforedrop : functBeforeDrop
+  connectWith:'#actionsTable', 
+  onstart : functDragStart,
+  droppos: 'last', 
+  beforedrop : functBeforeDrop
 });
 
 var functionsDefArray = 
@@ -58,112 +58,112 @@ var functionsDefArray =
 getFunctionsData();
 
 function functDragStart(ev, ui) {
-	if($(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable') == undefined) {
-		return;
-	}
-	possitionOffsX = ev.offsetX-$(ui.helper).width()-20;
-	$(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.left -= possitionOffsX;
-	$(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.top -= 0;
+  if($(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable') == undefined) {
+    return;
+  }
+  possitionOffsX = ev.offsetX-$(ui.helper).width()-20;
+  $(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.left -= possitionOffsX;
+  $(".ui-draggable.ui-widget-content.jqgrow.ui-state-hover").data('draggable').offset.click.top -= 0;
 }
 
 function functBeforeDrop(ev, ui, getdata, $source, $target) {
-	var targetId = $("#actionsTable .ui-state-hover")[0].id;
+  var targetId = $("#actionsTable .ui-state-hover")[0].id;
     var projObj = getSelectedProjData ();
     
     if(projObj==null) {
-		writeHelpMessage("Please select project", "red");
-		return;
-	}
-	
-	if(projObj["isProject"] == false) {
-		writeHelpMessage("Please select project (not group)", "red");
-		return;
-	}
-	
-	var dataObj = JSON.parse(localStorage.getItem("data"));
-	var projectsArray = dataObj[projObj["group"]].projects;
-	
-	var actionId = targetId;
-	
-	for(i=0;i<projectsArray.length;i++) {
-		if(projectsArray[i].name == projObj["project"]) {
-			if(actionId == null) {
-				projectsArray[i].action.push(getdata);
-			}
-			else {
-				actionId++;
-				projectsArray[i].action.splice(actionId++, 0, getdata);
-			}
-			
-		}
-	}
-	localStorage.setItem("data", JSON.stringify(dataObj));
-	getActionsData();
-	
-	if(actionId == null) {
-		jQuery("#actionsTable").setSelection(actionsQuantity-1, true);
-	}
-	else {
-		jQuery("#actionsTable").setSelection(actionId-1, true);
-	}
-	
-	ui.helper.dropped = false;
+    writeHelpMessage("Please select project", "red");
+    return;
+  }
+  
+  if(projObj["isProject"] == false) {
+    writeHelpMessage("Please select project (not group)", "red");
+    return;
+  }
+  
+  var dataObj = JSON.parse(localStorage.getItem("data"));
+  var projectsArray = dataObj[projObj["group"]].projects;
+  
+  var actionId = targetId;
+  
+  for(i=0;i<projectsArray.length;i++) {
+    if(projectsArray[i].name == projObj["project"]) {
+      if(actionId == null) {
+        projectsArray[i].action.push(getdata);
+      }
+      else {
+        actionId++;
+        projectsArray[i].action.splice(actionId++, 0, getdata);
+      }
+      
+    }
+  }
+  localStorage.setItem("data", JSON.stringify(dataObj));
+  getActionsData();
+  
+  if(actionId == null) {
+    jQuery("#actionsTable").setSelection(actionsQuantity-1, true);
+  }
+  else {
+    jQuery("#actionsTable").setSelection(actionId-1, true);
+  }
+  
+  ui.helper.dropped = false;
 }
 
 function checkFuncStorage() {
-	
-	if((localStorage.getItem("cba-functions") == null)||(localStorage.getItem("cba-functions")==undefined)) {
-		localStorage.setItem("cba-functions", JSON.stringify(functionsDefArray));
-	}
+  
+  if((localStorage.getItem("cba-functions") == null)||(localStorage.getItem("cba-functions")==undefined)) {
+    localStorage.setItem("cba-functions", JSON.stringify(functionsDefArray));
+  }
 }
 
 function addFuncClick() {
-	var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
-	functionsArray.push({name: $("#funcName").val(), data: $("#funcData").val(), evType: $("#funcEvType").val(), msgType:"apiEvent", newValue: $("#funcNewValue").val()});
-	localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
-	getFunctionsData();
+  var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
+  functionsArray.push({name: $("#funcName").val(), data: $("#funcData").val(), evType: $("#funcEvType").val(), msgType:"apiEvent", newValue: $("#funcNewValue").val()});
+  localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
+  getFunctionsData();
 }
 
 function deleteFuncClick() {
-	
-	var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
-	if(gr == null) {
-	} else {
-		var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
-		functionsArray.splice(gr, 1);
-		localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
-		getFunctionsData();
-	}
+  
+  var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
+  if(gr == null) {
+  } else {
+    var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
+    functionsArray.splice(gr, 1);
+    localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
+    getFunctionsData();
+  }
 }
 
 function saveFuncClick() {
-	var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
-	if(gr == null) {
-	} else {
-		var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
-		functionsArray[gr] = {name: $("#funcName").val(), data: $("#funcData").val(), evType: $("#funcEvType").val(), msgType:"apiEvent", newValue: $("#funcNewValue").val()};
-		localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
-		getFunctionsData();
-	}
+  var gr = jQuery("#functionsTableEdit").jqGrid('getGridParam', 'selrow');
+  if(gr == null) {
+  } else {
+    var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
+    functionsArray[gr] = {name: $("#funcName").val(), data: $("#funcData").val(), evType: $("#funcEvType").val(), msgType:"apiEvent", newValue: $("#funcNewValue").val()};
+    localStorage.setItem("cba-functions", JSON.stringify(functionsArray));
+    getFunctionsData();
+  }
 }
 
 /*
  * Populating functions table
  */
 function getFunctionsData() {
-	if(window.location.pathname == "/options.html") {
-		$("#functionsTableEdit").jqGrid("clearGridData");
-	}
-	$("#functionsTable").jqGrid("clearGridData");
-	
-	checkFuncStorage();
-	var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
-	
-	for(var i=0;i<functionsArray.length;i++) {
-		if(window.location.pathname == "/options.html") {
-			jQuery("#functionsTableEdit").jqGrid('addRowData',i, functionsArray[i]);
-		}
-		jQuery("#functionsTable").jqGrid('addRowData',i, functionsArray[i]);
-		
-	}
+  if(window.location.pathname == "/options.html") {
+    $("#functionsTableEdit").jqGrid("clearGridData");
+  }
+  $("#functionsTable").jqGrid("clearGridData");
+  
+  checkFuncStorage();
+  var functionsArray = JSON.parse(localStorage.getItem("cba-functions"));
+  
+  for(var i=0;i<functionsArray.length;i++) {
+    if(window.location.pathname == "/options.html") {
+      jQuery("#functionsTableEdit").jqGrid('addRowData',i, functionsArray[i]);
+    }
+    jQuery("#functionsTable").jqGrid('addRowData',i, functionsArray[i]);
+    
+  }
 }
