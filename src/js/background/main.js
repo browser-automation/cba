@@ -104,7 +104,12 @@ function stopButtonClick() {
  * Function that calls after clicking on Play button
  */
 function playButtonClick(projObj, currProjectId, repeatVal) {
-  cba.setProject(projObj, currProjectId, repeatVal);
+  if (cba.paused == 1) {
+    cba.restore();
+  }
+  else {
+    cba.setProject(projObj, currProjectId, repeatVal);
+  }
   playNextAction();
 }
 

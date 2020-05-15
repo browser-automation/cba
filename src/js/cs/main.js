@@ -3,13 +3,11 @@ require("./record");
 let clipboard = {};
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  const currentResponse = sendResponse;
-  
   if(request.action == "play") {
     clipboard = request.clipboard;
     if(request.instruction.evType == "timer") {
       setTimeout(() => {
-        currentResponse({answere: "instructOK", clipboard: clipboard})
+        sendResponse({answere: "instructOK", clipboard: clipboard})
       }, request.instruction.newValue);
     }
     else {

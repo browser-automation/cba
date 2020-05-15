@@ -1,66 +1,19 @@
 const readyFunctions = require("./bg_function");
 
-function playNextAction() {
+async function playNextAction() {
   if(cba.allowPlay == 0 ) {
     return;
   }
   if(cba.instructArray.length) {
-    chrome.tabs.getSelected(null ,function(tab) {
-      if(!tab) {
-        setTimeout(playNextAction, 1000);
-        return;
-      }
-      chrome.browserAction.setBadgeText({"text":"play"});
-      const [instruction] = cba.instructArray.splice(0, 1);
-      const {evType, data} = instruction;
-      // Send a request to content script.
-      cba.playingTabId = tab.id;  // TODO: Do we need this?
-
-      switch (evType) {
-        case "redirect":
-        case "submit-click": {
-          cba.update = true;
-          messageContentScript(instruction, cba.clipboard);
-          break;
-        }
-        case "update": {
-          cba.update = true;
-          break;
-        }
-        case "timer": {
-          setTimeout(playNextAction, instruction.newValue);
-          break;
-        }
-        case "bg-function": {
-          bgFunctionParser(data);
-          break;
-        }
-        case "bg-inject": {
-          const sendInstruction = () => playNextAction();
-          const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
-          let sendBgInstruction = true;
-          // see -> https://github.com/browser-automation/cba/issues/13
-          let clipboard = cba.clipboard;
-          eval(data);
-          if (clipboard !== cba.clipboard)
-            cba.clipboard = clipboard;
-          if(sendBgInstruction == true) {
-            playNextAction();
-          }
-          break;
-        }
-        case "pause": {
-          cba.allowPlay = 0;
-          cba.pause = 1;
-          chrome.browserAction.setBadgeText({"text":"||"});
-          break;
-        }
-        default: {
-          messageContentScript(instruction, cba.clipboard);
-          break;
-        }
-      }
-    });
+    const [tab] = await browser.tabs.query({active: true});
+    if(!tab) {
+      setTimeout(playNextAction, 1000);
+      return;
+    }
+    browser.browserAction.setBadgeText({"text":"play"});
+    cba.playingTabId = tab.id;  // TODO: Do we need this?
+    const [instruction] = cba.instructArray.splice(0, 1);
+    await playAction(instruction);
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
@@ -68,7 +21,56 @@ function playNextAction() {
   }
   else {
     cba.allowPlay = 0;
-    chrome.browserAction.setBadgeText({"text": ""});
+    browser.browserAction.setBadgeText({"text": ""});
+  }
+}
+
+async function playAction(instruction)
+{
+  const {evType, data} = instruction;
+  switch (evType) {
+    case "redirect":
+    case "submit-click": {
+      cba.update = true;
+      messageContentScript(instruction, cba.clipboard);
+      break;
+    }
+    case "update": {
+      cba.update = true;
+      break;
+    }
+    case "timer": {
+      setTimeout(playNextAction, instruction.newValue);
+      break;
+    }
+    case "bg-function": {
+      await bgFunctionParser(data);
+      playNextAction();
+      break;
+    }
+    case "bg-inject": {
+      const sendInstruction = () => playNextAction();
+      const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
+      let sendBgInstruction = true;
+      // see -> https://github.com/browser-automation/cba/issues/13
+      let clipboard = cba.clipboard;
+      eval(data);
+      if (clipboard !== cba.clipboard)
+        cba.clipboard = clipboard;
+      if(sendBgInstruction == true) {
+        playNextAction();
+      }
+      break;
+    }
+    case "pause": {
+      cba.pause();
+      browser.browserAction.setBadgeText({"text":"||"});
+      break;
+    }
+    default: {
+      messageContentScript(instruction, cba.clipboard);
+      break;
+    }
   }
 }
 
@@ -116,7 +118,6 @@ async function bgFunctionParser(value){
   else {
     await readyFunctions[functionName]();
   }
-  playNextAction();
 }
 
 function getClipboardValue(attr) {

@@ -2,7 +2,7 @@ class CBA {
   constructor() {
     this.allowRec = 0;
     this.allowPlay = 0;
-    this.pause = 0;
+    this.paused = 0;
     this.playingProjectId;
     this.instructArray;
     this.defInstructArray;
@@ -18,12 +18,6 @@ class CBA {
   }
 
   setProject(projObj, currProjectId, repeatVal) {
-    if(this.pause == 1) {
-      this.pause = 0;
-      this.allowPlay = 1;
-      return;
-    }
-
     if(this.clipboard == null) {
       this.clipboard = {};
     }
@@ -48,7 +42,12 @@ class CBA {
   stop() {
     this.allowRec = 0;
     this.allowPlay = 0;
-    this.pause = 0;
+    this.paused = 0;
+  }
+
+  pause() {
+    this.allowPlay = 0;
+    this.paused = 1;
   }
 
   record(projObj, projectId) {
@@ -60,6 +59,11 @@ class CBA {
   setInstructionArray(arr)
   {
     this.instructArray = arr;
+  }
+
+  restore() {
+    this.paused = 0;
+    this.allowPlay = 1;
   }
 }
 

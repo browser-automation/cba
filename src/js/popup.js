@@ -168,12 +168,12 @@ function timedCount() {
   if(bg.lastSelectedProjectId != null) {
     jQuery("#projectsTable").setSelection(bg.lastSelectedProjectId, true);
   }
-  if((bg.allowPlay == 1)||(bg.allowPlay == 2)) {
+  if(bg.allowPlay == 1) {
     jQuery("#projectsTable").setSelection(bg.playingProjectId, true);
     jQuery("#actionsTable").setSelection(actionsQuantity - bg.instructArray.length - 1, true);
     setTimeout(timedCount,100);
   }
-  else if (bg.pause == 1) {
+  else if (bg.paused == 1) {
     jQuery("#projectsTable").setSelection(bg.playingProjectId, true);
     jQuery("#actionsTable").setSelection(actionsQuantity - bg.instructArray.length - 1, true);
     if ($("#playButton").val() != "resume") {
