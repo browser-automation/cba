@@ -35,57 +35,68 @@ function setHighlight(query, highlight = true)
 /*
  * Function for managing record type and executing some script 
  */
-function recordExecution(recordRow, sendResponse, request){
-  if(recordRow.evType == "change") {
-    const targetElement = document.querySelector(recordRow.data);
-    targetElement.focus();
-    targetElement.value = placeholders(recordRow.newValue);
-    const event = new Event("change");
-    targetElement.dispatchEvent(event, { "bubbles": true });
-  }
-  else if ((recordRow.evType == "click")||(recordRow.evType == "submit-click")) {
-    document.querySelector(recordRow.data).click();
-  }
-  else if (recordRow.evType == "check") {
-    document.querySelector(recordRow.data).checked = true;
-  }
-  else if (recordRow.evType == "redirect") {
-    sendResponse({answere: "instructOK", clipboard: clipboard});
-    window.location = recordRow.data;
-    return;
-  }
-  else if (recordRow.evType == "inject") {
-    const clipboardId = "grabClipboardHere";
-    const script = document.createElement('script');
-    script.setAttribute("type", "application/javascript");
-    script.textContent =  `
-      var clipboard=${JSON.stringify(request.clipboard)};
-      ${recordRow.data};
-      var newdiv = document.createElement('div');
-      if(document.getElementById('${clipboardId}')!= null) {
-        document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
-      }
-      else {
-        newdiv.setAttribute('id', '${clipboardId}');
-        newdiv.textContent = JSON.stringify(clipboard);
-        document.body.appendChild(newdiv);
-      }
-      document.getElementById('${clipboardId}').style.display = 'none';`;
-    document.documentElement.appendChild(script); // run the script
-    document.documentElement.removeChild(script); // clean up
-    const injectedClipboard = document.querySelector(`#${clipboardId}`);
-    if(injectedClipboard) {
-      clipboard = JSON.parse(injectedClipboard.textContent);
+function recordExecution(recordRow, sendResponse, request) {
+  const {evType} = recordRow;
+  switch (evType) {
+    case "change": {
+      const targetElement = document.querySelector(recordRow.data);
+      targetElement.focus();
+      targetElement.value = placeholders(recordRow.newValue);
+      const event = new Event("change");
+      targetElement.dispatchEvent(event, { "bubbles": true });
+      break;
     }
-  }
-  else if (recordRow.evType == "cs-inject") {
-    eval(recordRow.data);
-  }
-  else if (recordRow.evType == "copy") {
-    const targetElement = document.querySelector(recordRow.data);
-    if(targetElement) {
-      clipboard["copy"] = targetElement.innerHTML;
+    case "submit-click":
+    case "click": {
+      document.querySelector(recordRow.data).click();
+      break;
     }
+    case "check": {
+      document.querySelector(recordRow.data).checked = true;
+      break;
+    }
+    case "redirect": {
+      window.location = recordRow.data;
+      break;
+    }
+    case "inject": {
+      const clipboardId = "grabClipboardHere";
+      const script = document.createElement('script');
+      script.setAttribute("type", "application/javascript");
+      script.textContent =  `
+        var clipboard=${JSON.stringify(request.clipboard)};
+        ${recordRow.data};
+        var newdiv = document.createElement('div');
+        if(document.getElementById('${clipboardId}')!= null) {
+          document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
+        }
+        else {
+          newdiv.setAttribute('id', '${clipboardId}');
+          newdiv.textContent = JSON.stringify(clipboard);
+          document.body.appendChild(newdiv);
+        }
+        document.getElementById('${clipboardId}').style.display = 'none';`;
+      document.documentElement.appendChild(script); // run the script
+      document.documentElement.removeChild(script); // clean up
+      const injectedClipboard = document.querySelector(`#${clipboardId}`);
+      if(injectedClipboard) {
+        clipboard = JSON.parse(injectedClipboard.textContent);
+      }
+      break;
+    }
+    case "cs-inject": {
+      eval(recordRow.data);
+      break;
+    }
+    case "copy": {
+      const targetElement = document.querySelector(recordRow.data);
+      if(targetElement) {
+        clipboard["copy"] = targetElement.innerHTML;
+      }
+      break;
+    }
+    default:
+      break;
   }
   sendResponse({answere: "instructOK", clipboard: clipboard});
 }
