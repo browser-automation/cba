@@ -1,4 +1,4 @@
-const port = chrome.extension.connect({name: "recordPort"});
+const port = browser.runtime.connect({name: "recordPort"});
 
 function findClosest(query)
 {

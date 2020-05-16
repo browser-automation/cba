@@ -13,7 +13,7 @@ async function playNextAction() {
     browser.browserAction.setBadgeText({"text":"play"});
     cba.playingTabId = tab.id;  // TODO: Do we need this?
     const [instruction] = cba.instructArray.splice(0, 1);
-    await playAction(instruction);
+    await actionExecution(instruction);
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
@@ -25,7 +25,7 @@ async function playNextAction() {
   }
 }
 
-async function playAction(instruction)
+async function actionExecution(instruction)
 {
   const {evType, data} = instruction;
   switch (evType) {
@@ -74,10 +74,10 @@ async function playAction(instruction)
   }
 }
 
-function messageContentScript(instruction, clipboard)
+async function messageContentScript(instruction, clipboard)
 {
-  const options = {"action": "play" ,instruction, clipboard};
-  chrome.tabs.sendRequest(cba.playingTabId, options, playResponse);
+  const message = {"action": "play" ,instruction, clipboard};
+  await browser.tabs.sendMessage(cba.playingTabId, message).then(playResponse);
 }
 
 function playResponse(response) {
@@ -93,7 +93,7 @@ function playResponse(response) {
   }
 }
 
-async function bgFunctionParser(value){
+async function bgFunctionParser(value) {
   const methodPattern = /<\$function=(\S*)>/;
   const attributePattern = /<\$attr=([^>]*)>/g;
   const clipboardPattern = /clipboard\[["'](.*)["']\]/;

@@ -42,11 +42,10 @@ function actionGridLoad() {
        ||(window.location.pathname == "/options.html")) {
        return;
      }
-     chrome.tabs.getSelected(null ,function(tab) {
+     chrome.tabs.getSelected(null ,async (tab) => {
        if((tab.url.indexOf("chrome://") ==-1)&&(tab.url.indexOf("chrome-extension://")==-1)) {
-         chrome.tabs.sendRequest(tab.id, {"action": "highlight" ,"selector": selector});
+         browser.tabs.sendMessage(tab.id, {"action": "highlight" ,"selector": selector});
        }
-       
      });
    });
    
@@ -61,11 +60,10 @@ function actionGridLoad() {
        return;
      }
      //if(currentUrl.indexOf("chrome://") !=-1) 
-     chrome.tabs.getSelected(null ,function(tab) {
+     chrome.tabs.getSelected(null ,async (tab) => {
        if((tab.url.indexOf("chrome://") ==-1)&&(tab.url.indexOf("chrome-extension://")==-1)) {
-         chrome.tabs.sendRequest(tab.id, {"action": "unHighlight" ,"selector": selector});
+          browser.tabs.sendMessage(tab.id, {"action": "unHighlight" ,"selector": selector});
        }
-       
      });
    });
 }

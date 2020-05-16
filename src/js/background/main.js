@@ -11,8 +11,8 @@ window.cba.stopButtonClick = stopButtonClick;
 /*
  * Function for listening to connection port and get data from content script
  */
-chrome.extension.onConnect.addListener(function(port) {
-  port.onMessage.addListener(function(msg) {
+browser.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener((msg) => {
     if(cba.allowRec==1) {
       storeRecord(msg);
     }
@@ -89,7 +89,7 @@ async function storeCurrentUrl() {
 async function recordButtonClick(projObj, projectId) {
   cba.record(projObj, projectId);
   await storeCurrentUrl();
-  chrome.browserAction.setBadgeText({"text": "rec"});
+  browser.browserAction.setBadgeText({"text": "rec"});
 }
 
 /*
@@ -97,7 +97,7 @@ async function recordButtonClick(projObj, projectId) {
  */
 function stopButtonClick() {
   cba.stop();
-  chrome.browserAction.setBadgeText({"text": ""});
+  browser.browserAction.setBadgeText({"text": ""});
 }
 
 /*
@@ -113,7 +113,7 @@ function playButtonClick(projObj, currProjectId, repeatVal) {
   playNextAction();
 }
 
-chrome.tabs.onUpdated.addListener(function( tabId , info ) {
+browser.tabs.onUpdated.addListener(function( tabId , info ) {
   if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
     playNextAction();
     cba.update = false;

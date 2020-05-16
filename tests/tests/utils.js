@@ -221,8 +221,8 @@ async function sendCurrentTabRequest(request)
   return backgroundPage().evaluate((request) => {
     return new Promise((resp) =>
     {
-      chrome.tabs.getSelected(null ,(tab) => {
-        chrome.tabs.sendRequest(tab.id, request);
+      chrome.tabs.getSelected(null , async (tab) => {
+        await browser.tabs.sendMessage(tab.id, request);
         resp();
       });
     });
