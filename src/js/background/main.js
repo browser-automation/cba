@@ -103,19 +103,14 @@ function stopButtonClick() {
 /*
  * Function that calls after clicking on Play button
  */
-function playButtonClick(projObj, currProjectId, repeatVal) {
+async function playButtonClick(projObj, currProjectId, repeatVal) {
   if (cba.paused == 1) {
     cba.restore();
   }
   else {
     cba.setProject(projObj, currProjectId, repeatVal);
   }
+  const [tab] = await browser.tabs.query({active: true});
+  cba.playingTabId = tab.id;
   playNextAction();
 }
-
-browser.tabs.onUpdated.addListener(function( tabId , info ) {
-  if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
-    playNextAction();
-    cba.update = false;
-  }
-});

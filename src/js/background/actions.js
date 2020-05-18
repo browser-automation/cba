@@ -5,13 +5,7 @@ async function playNextAction() {
     return;
   }
   if(cba.instructArray.length) {
-    const [tab] = await browser.tabs.query({active: true});
-    if(!tab) {
-      setTimeout(playNextAction, 1000);
-      return;
-    }
     browser.browserAction.setBadgeText({"text":"play"});
-    cba.playingTabId = tab.id;  // TODO: Do we need this?
     const [instruction] = cba.instructArray.splice(0, 1);
     await actionExecution(instruction);
   }
@@ -123,5 +117,12 @@ async function bgFunctionParser(value) {
 function getClipboardValue(attr) {
   return cba.clipboard[attr];
 }
+
+browser.tabs.onUpdated.addListener(function( tabId , info ) {
+  if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
+    playNextAction();
+    cba.update = false;
+  }
+});
 
 module.exports = {playNextAction};
