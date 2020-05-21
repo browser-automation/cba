@@ -1,6 +1,6 @@
 require("./analytics");
 const {CBA} = require("./CBA");
-const {playNextAction} = require("./actions");
+const {playProject} = require("./actions");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -112,5 +112,5 @@ async function playButtonClick(projObj, currProjectId, repeatVal) {
   }
   const [tab] = await browser.tabs.query({active: true});
   cba.playingTabId = tab.id;
-  playNextAction();
+  playProject();
 }

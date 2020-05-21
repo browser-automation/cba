@@ -1,6 +1,6 @@
 const readyFunctions = require("./bg_function");
 
-async function playNextAction() {
+async function playProject() {
   if(cba.allowPlay == 0 ) {
     return;
   }
@@ -8,11 +8,12 @@ async function playNextAction() {
     browser.browserAction.setBadgeText({"text":"play"});
     const [instruction] = cba.instructArray.splice(0, 1);
     await actionExecution(instruction);
-    await playNextAction();
+    await playProject();
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
     cba.setProject(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
+    playProject();
   }
   else {
     cba.allowPlay = 0;
@@ -133,4 +134,4 @@ function waitForUpdate()
   }).then(() => browser.tabs.onUpdated.removeListener(onUpdate));
 }
 
-module.exports = {playNextAction};
+module.exports = {playProject};
