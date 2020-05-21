@@ -8,8 +8,7 @@ async function playNextAction() {
     browser.browserAction.setBadgeText({"text":"play"});
     const [instruction] = cba.instructArray.splice(0, 1);
     await actionExecution(instruction);
-    if (!cba.update)
-      await playNextAction();
+    await playNextAction();
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
@@ -21,22 +20,18 @@ async function playNextAction() {
   }
 }
 
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function actionExecution(instruction)
 {
   const {evType, data} = instruction;
   switch (evType) {
     case "redirect":
     case "submit-click": {
-      cba.update = true;
-      await messageContentScript(instruction, cba.clipboard);
+      messageContentScript(instruction, cba.clipboard);
+      await waitForUpdate();
       break;
     }
     case "update": {
-      cba.update = true;
+      await waitForUpdate();
       break;
     }
     case "timer": {
@@ -121,11 +116,21 @@ function getClipboardValue(attr) {
   return cba.clipboard[attr];
 }
 
-browser.tabs.onUpdated.addListener(function( tabId , info ) {
-  if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
-    playNextAction();
-    cba.update = false;
-  }
-});
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function waitForUpdate()
+{
+  let onUpdate;
+  return new Promise((resolve) =>
+  {
+    onUpdate = (tabId , info) => {
+      if(tabId == cba.playingTabId && info.status == "complete")
+        resolve();
+    };
+    browser.tabs.onUpdated.addListener(onUpdate);
+  }).then(() => browser.tabs.onUpdated.removeListener(onUpdate));
+}
 
 module.exports = {playNextAction};

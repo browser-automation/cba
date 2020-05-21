@@ -11,7 +11,6 @@ class CBA {
     this.selectedProjectId;
     this.lastEvType;
     this.currentTab;
-    this.update = false;
     this.projectRepeat = 1;
     this.lastSelectedProjectId;
     this.selectedProjObj;
@@ -25,7 +24,6 @@ class CBA {
     this.allowPlay = 1;
     this.projectRepeat = repeatVal;
     this.playingProjectId = currProjectId;
-    this.update = false;
     this.selectedProjObj = projObj;
     const dataObj = JSON.parse(localStorage.getItem("data"));
 
