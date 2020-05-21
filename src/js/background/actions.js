@@ -1,17 +1,19 @@
 const readyFunctions = require("./bg_function");
 
-async function playNextAction() {
+async function playProject() {
   if(cba.allowPlay == 0 ) {
     return;
   }
-  if(cba.instructArray.length) {
+  else if(cba.instructArray.length) {
     browser.browserAction.setBadgeText({"text":"play"});
     const [instruction] = cba.instructArray.splice(0, 1);
     await actionExecution(instruction);
+    await playProject();
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
-    cba.playButtonClick(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
+    cba.setProject(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
+    playProject();
   }
   else {
     cba.allowPlay = 0;
@@ -25,25 +27,24 @@ async function actionExecution(instruction)
   switch (evType) {
     case "redirect":
     case "submit-click": {
-      cba.update = true;
       messageContentScript(instruction, cba.clipboard);
+      await waitForUpdate();
       break;
     }
     case "update": {
-      cba.update = true;
+      await waitForUpdate();
       break;
     }
     case "timer": {
-      setTimeout(playNextAction, instruction.newValue);
+      await timeout(instruction.newValue);
       break;
     }
     case "bg-function": {
       await bgFunctionParser(data);
-      playNextAction();
       break;
     }
     case "bg-inject": {
-      const sendInstruction = () => playNextAction();
+      let sendInstruction = () => "";
       const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
       let sendBgInstruction = true;
       // see -> https://github.com/browser-automation/cba/issues/13
@@ -51,8 +52,10 @@ async function actionExecution(instruction)
       eval(data);
       if (clipboard !== cba.clipboard)
         cba.clipboard = clipboard;
-      if(sendBgInstruction == true) {
-        playNextAction();
+      if(!sendBgInstruction) {
+        return new Promise((resolve) => {
+          sendInstruction = resolve;
+        });
       }
       break;
     }
@@ -62,7 +65,7 @@ async function actionExecution(instruction)
       break;
     }
     default: {
-      messageContentScript(instruction, cba.clipboard);
+      await messageContentScript(instruction, cba.clipboard);
       break;
     }
   }
@@ -74,16 +77,12 @@ async function messageContentScript(instruction, clipboard)
   await browser.tabs.sendMessage(cba.playingTabId, message).then(playResponse);
 }
 
-function playResponse(response) {
+async function playResponse(response) {
   if(response == null) {
-    setTimeout(playNextAction, 1000);
-    return;
+    await timeout(1000);
   }
-  if(response.answere == "instructOK") {
+  else if(response.answere == "instructOK") {
     cba.clipboard = response.clipboard;
-    if (cba.update == false) {
-      playNextAction();
-    }
   }
 }
 
@@ -118,11 +117,21 @@ function getClipboardValue(attr) {
   return cba.clipboard[attr];
 }
 
-browser.tabs.onUpdated.addListener(function( tabId , info ) {
-  if((tabId == cba.playingTabId)&&( info.status == "complete" )&&(cba.allowPlay==1)) {
-    playNextAction();
-    cba.update = false;
-  }
-});
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-module.exports = {playNextAction};
+function waitForUpdate()
+{
+  let onUpdate;
+  return new Promise((resolve) =>
+  {
+    onUpdate = (tabId , info) => {
+      if(tabId == cba.playingTabId && info.status == "complete")
+        resolve();
+    };
+    browser.tabs.onUpdated.addListener(onUpdate);
+  }).then(() => browser.tabs.onUpdated.removeListener(onUpdate));
+}
+
+module.exports = {playProject};
