@@ -1,7 +1,7 @@
 let clipboard = {};
 
 browser.runtime.onMessage.addListener((request, sender) => {
-  if(request.action == "play") {
+  if(request.action == "execute") {
     clipboard = request.clipboard;
     if(request.instruction.evType == "timer") {
       setTimeout(() => {

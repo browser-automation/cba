@@ -73,7 +73,7 @@ async function actionExecution(instruction)
 
 async function messageContentScript(instruction, clipboard)
 {
-  const message = {"action": "play" ,instruction, clipboard};
+  const message = {"action": "execute" ,instruction, clipboard};
   await browser.tabs.sendMessage(cba.playingTabId, message).then(playResponse);
 }
 
