@@ -1,4 +1,4 @@
-require("./analytics");
+require("../analytics");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 

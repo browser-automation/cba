@@ -1,20 +1,7 @@
+const {_gaq} = require("./analytics")
+
 var bg = chrome.extension.getBackgroundPage().cba;
 
-var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-32260034-1']);
-_gaq.push(['_trackPageview']);
-
-
-/*
- * Analytics start
- */
-(function() {
-  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-  ga.src = 'https://ssl.google-analytics.com/ga.js';
-  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-})();
-
-  
 function trackButtonClick(e) {
    _gaq.push(['_trackEvent', e.target.id, 'clicked']);
 };
@@ -26,10 +13,6 @@ function analytAllButtons() {
   buttons[i].addEventListener('click', trackButtonClick);
   }
  }
- /*
- * Analytics End
- */
-  
 
 function recordButtonClick() {
   var projObj = getSelectedProjData ();

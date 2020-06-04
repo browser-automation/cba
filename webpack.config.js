@@ -8,7 +8,9 @@ module.exports =
   context: path.resolve(__dirname),
   entry: {
     "cs": "./src/js/cs/main.js",
-    "back": "./src/js/background/main.js"
+    "back": "./src/js/background/main.js",
+    "popup": "./src/js/popup.js",
+    "options": "./src/js/options.js"
   },
   output: {
     path: path.resolve('dist'),

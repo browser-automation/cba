@@ -7,3 +7,5 @@ _gaq.push(['_trackPageview']);
   ga.src = 'https://ssl.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
+
+module.exports = {_gaq};
