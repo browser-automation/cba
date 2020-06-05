@@ -8,7 +8,8 @@ const notOk = (value) => ok(!value);
 const {playTestProject, setTestProject, addTestAction, getTextContent, getPageUrl,
        resetBackgroundGlobalVar, startTestRecording, stopTestRecording,
        getTestProjectActions, focusAndType, wait, getBadgeText} = require("./utils");
-const {server, setTestPage, navigateToTestPage, page} = require("../main");
+const {setTestPage, navigateTo, page} = require("../main");
+const {server} = require("../config");
 
 const bgGlobalVarName = "cba-test";
 
@@ -37,7 +38,8 @@ const pageSetup = {
       <button id="cba-path-button">click me</button>
       <button id="cba-path-button-nested"><span>click me</span></button>
     </div>
-  `
+  `,
+  path: server
 }
 
 beforeEach(async () =>
@@ -47,8 +49,8 @@ beforeEach(async () =>
   await resetBackgroundGlobalVar(bgGlobalVarName);
 
   if (path.relative(pageUrl, server) != "")
-    await navigateToTestPage();
-  await setTestPage(pageSetup);
+    await navigateTo(server);
+  await setTestPage(pageSetup.body);
 });
 
 it("Starting and stoping the recording adds a redirect action", async() =>

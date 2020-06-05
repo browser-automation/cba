@@ -1,11 +1,6 @@
 const puppeteer = require("puppeteer");
 const extensionPath = "dist";
-const tests = [
-  {path:"play.js", name: "Testing actions"},
-  {path:"record.js", name: "Testing recording"},
-  {path:"generic.js", name: "Running generic Tests"},
-];
-const server = "http://127.0.0.1:3001";
+const {tests, server, closeBrowser} = require("./config");
 
 let browser;
 let page;
@@ -13,10 +8,10 @@ let backgroundPage;
 
 function run()
 {
-  for (const {path, name} of tests)
+  for (const {file, name} of tests)
   {
     describe(name, () => {
-      const {pageSetup} = require(`./tests/${path}`);
+      const {pageSetup} = require(`./tests/${file}`);
       before(async () =>
       {
         browser = await puppeteer.launch({headless: false, args: [
@@ -29,27 +24,31 @@ function run()
         const targets = await browser.targets();
         const backgroundPageTarget = targets.find(({ _targetInfo }) => _targetInfo.title === extensionName && _targetInfo.type === "background_page");
         backgroundPage = await backgroundPageTarget.page();
+        const [,, extensionID] = backgroundPage.url().split('/');
 
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36");
-        await navigateToTestPage();
-        await setTestPage(pageSetup);
+        if (pageSetup.path.startsWith("http"))
+          await navigateTo(pageSetup.path);
+        else
+          await navigateTo(`chrome-extension://${extensionID}/${pageSetup.path}`);
       });
       after(async () =>
       {
-        await browser.close();
+        if (closeBrowser)
+          await browser.close();
       })
     });
   }
 }
 
-async function navigateToTestPage()
+async function navigateTo(path)
 {
-  return page.goto(server);
+  return page.goto(path);
 }
 
 async function setTestPage(pageSetup)
 {
-  return page.evaluate((bodyHTML) => document.body.innerHTML = bodyHTML, pageSetup.body);
+  return page.evaluate((bodyHTML) => document.body.innerHTML = bodyHTML, pageSetup);
 }
 
-module.exports = {backgroundPage: () => backgroundPage, page: () => page, run, server, setTestPage, navigateToTestPage};
+module.exports = {backgroundPage: () => backgroundPage, page: () => page, run, server, setTestPage, navigateTo};

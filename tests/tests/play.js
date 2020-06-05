@@ -11,7 +11,8 @@ const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
        getBadgeText, setListener, getSelectedValue, resetClipboardValue,
        isElementExist} = require("./utils");
-const {server, setTestPage, navigateToTestPage} = require("../main");
+const {setTestPage, navigateTo} = require("../main");
+const {server} = require("../config");
 
 const bgGlobalVarName = "cba-test";
 
@@ -34,7 +35,8 @@ const pageSetup = {
     </form>
     <span id="cba-copy">Copy me</span>
     <input id="cba-paste" type="text"></input>
-  `
+  `,
+  path: server
 }
 
 beforeEach(async () =>
@@ -45,8 +47,8 @@ beforeEach(async () =>
   await resetClipboardValue();
 
   if (path.relative(pageUrl, server) != "")
-    await navigateToTestPage();
-  await setTestPage(pageSetup);
+    await navigateTo(server);
+  await setTestPage(pageSetup.body);
 });
 
 it("Playing actions should add badge text 'play' to the icon.", async() =>

@@ -5,14 +5,13 @@ var bg = chrome.extension.getBackgroundPage().cba;
 function trackButtonClick(e) {
    _gaq.push(['_trackEvent', e.target.id, 'clicked']);
 };
-  
-  
+
 function analytAllButtons() {
   var buttons = document.querySelectorAll('input[type=button]');
   for (var i = 0; i < buttons.length; i++) {
-  buttons[i].addEventListener('click', trackButtonClick);
+    buttons[i].addEventListener('click', trackButtonClick);
   }
- }
+}
 
 function recordButtonClick() {
   var projObj = getSelectedProjData ();

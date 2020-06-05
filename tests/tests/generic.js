@@ -8,16 +8,18 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {getLocalStorageData, sendCurrentTabRequest, getStyle, getElementAttribute, wait} = require("./utils");
 const {setTestPage} = require("../main");
+const {server} = require("../config");
 
 const pageSetup = {
   body: `
     <span id="higlight">Highlight me</span>
-  `
+  `,
+  path: server
 }
 
 beforeEach(async () =>
 {
-  await setTestPage(pageSetup);
+  await setTestPage(pageSetup.body);
 });
 
 it("Starting the extension should set default actions", async() =>
