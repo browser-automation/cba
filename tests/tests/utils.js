@@ -23,6 +23,79 @@ async function setTestProject()
   return backgroundPage().evaluate((data) => localStorage.setItem("data", JSON.stringify(data)) , dataObj);
 }
 
+async function setWindowLocalStorage(key, data)
+{
+  return backgroundPage().evaluate((key, data) => localStorage.setItem(key, JSON.stringify(data)) , key, data);
+}
+
+async function getWindowLocalStorage(key)
+{
+  return backgroundPage().evaluate((key) => JSON.parse(localStorage.getItem(key)) , key);
+}
+
+async function reloadExtension()
+{
+  return backgroundPage().evaluate(() => browser.runtime.reload());
+}
+
+async function setDefaultCollections()
+{
+    const collections = [{
+      text: "group",
+      type: "group",
+      expanded: false,
+      subItems: [
+        {
+          text: "project",
+          type: "project",
+          actions: []
+        }
+      ]
+    }];
+  return backgroundPage().evaluate(async(collections) => await browser.storage.local.set({collections}), collections);
+}
+
+async function cbaListHasTextCount(query, text, parentText)
+{
+  const items = await cbaListItemsByText(query, text, parentText);
+  if (!items)
+    return 0;
+  else
+    return items.length;
+}
+
+async function cbaListItemsByText(query, text, parentText)
+{
+  return page().evaluate(async(query, text, parentText) => {
+    let items = document.querySelector(query).items;
+    if (parentText)
+    {
+      const {subItems} = items.filter((item) => item.text === parentText)[0];
+      if (!subItems)
+        return null;
+      else
+        items = subItems;
+    }
+    return items.filter((item) => item.text === text);
+  }, query, text, parentText);
+}
+
+async function cbaListItemExpand(query, text)
+{
+  const [item] = await cbaListItemsByText(query, text);
+  return page().evaluate(async(query, id) => {
+    return document.querySelector(query).setExpansion(id, true);
+  }, query, item.id);
+}
+
+async function cbaListItemSelect(query, text, parentText)
+{
+  const [item] = await cbaListItemsByText(query, text, parentText);
+  return page().evaluate(async(query, id) => {
+    return document.querySelector(query).selectRow(id);
+  }, query, item.id);
+}
+
 async function startTestRecording()
 {
   const projectId = "testProject";
@@ -39,9 +112,9 @@ async function stopTestRecording()
   return backgroundPage().evaluate(() => cba.stopButtonClick());
 }
 
-async function getLocalStorageData()
+async function getLocalStorageData(key)
 {
-  return backgroundPage().evaluate(() => JSON.parse(localStorage.getItem("data")));
+  return backgroundPage().evaluate(async(key) => await browser.storage.local.get(key), key);
 }
 
 async function getProjectActions(groupName, projectName, num, key)
@@ -236,4 +309,6 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
-                  resetClipboardValue, isElementExist};
+                  resetClipboardValue, isElementExist, setDefaultCollections,
+                  cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
+                  setWindowLocalStorage, getWindowLocalStorage, reloadExtension};

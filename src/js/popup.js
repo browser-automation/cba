@@ -1,4 +1,5 @@
-const {_gaq} = require("./analytics")
+const {_gaq} = require("./analytics");
+require("./ui/projects");
 
 var bg = chrome.extension.getBackgroundPage().cba;
 
@@ -30,7 +31,6 @@ function recordButtonClick() {
   bg.recordButtonClick(projObj, projectId);
   $("#recordButton").val("recording...");
   $("#recordButton").css({"width":"90px"});
-  
 }
 
 
@@ -75,12 +75,6 @@ function popupLoad() {
   
   CSPbindings();
   analytAllButtons();
-}
-
-function getSelectedProjectName() {
-  var gr = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
-  var projectName = jQuery("#projectsTable").jqGrid('getRowData',gr).pname;
-  return projectName;
 }
 
 function actionEvTypeChange() {

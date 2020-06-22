@@ -1,4 +1,5 @@
 require("../analytics");
+const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 
@@ -22,29 +23,30 @@ browser.runtime.onConnect.addListener((port) => {
 /*
  * check whether background page is loading for first time.
  */
-function isFirstLoad() {
-  if(!localStorage.getItem("data")) {
-    const initialData = {
-      group0: {
+async function isFirstLoad() {
+  const data = localStorage.getItem("data");
+  const collections = await browser.storage.local.get("collections");
+  if (data) {
+    await backup();
+    await migrate();
+    localStorage.removeItem("data");
+  }
+  else if (!Object.keys(collections).length) {
+    const collections = [
+      {
+        text: "group",
+        type: "group",
         expanded: false,
-        isLeaf: false,
-        level: "0",
-        loaded: true,
-        name: "group0",
-        parent: "",
-        projects: [
+        subItems: [
           {
-            action: [],
-            expanded: false,
-            isLeaf: true,
-            level: "1",
-            loaded: true,
-            name: "project"
+            text: "project",
+            type: "project",
+            actions: []
           }
         ]
       }
-    };
-    localStorage.setItem("data", JSON.stringify(initialData));
+    ];
+    await browser.storage.local.set({collections});
   }
 }
 

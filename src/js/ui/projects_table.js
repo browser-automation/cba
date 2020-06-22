@@ -1,6 +1,7 @@
 var projectOldName;
 var projectRenameId;
 var projectRenameParentGroup;
+var bg = chrome.extension.getBackgroundPage().cba;
 
 var projDefaultWidth = window.location.pathname != "/options.html"?150:200;
 
@@ -48,6 +49,12 @@ $.jgrid.extend({
         return orgCollapseNode.call(this, rc);
     }
 });
+
+function getSelectedProjectName() {
+  var gr = jQuery("#projectsTable").jqGrid('getGridParam', 'selrow');
+  var projectName = jQuery("#projectsTable").jqGrid('getRowData',gr).pname;
+  return projectName;
+}
 
 function projectSelected(id) {
   if(window.location.pathname != "/options.html") {

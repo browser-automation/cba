@@ -1,3 +1,8 @@
+cba-list {
+	--icon-group: no-repeat url("/css/images/icon-group.svg");
+  --icon-project: no-repeat url("/css/images/icon-project.svg");
+}
+
 #main {
 	width: 580px;
 }

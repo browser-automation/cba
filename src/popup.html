@@ -1,19 +1,31 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
   <head>
     <title>CBA</title>
     <link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui-1.8.1.custom.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid.css" />
-    <script type="text/javascript" src="js/cba-components.js"></script>
+    <script type="text/javascript" src="js/browser-polyfill.min.js"></script>
+    <script type="module" src="js/cba-components.js"></script>
     <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="js/ui/jquery.tablednd.js"></script>
     <script type="text/javascript" src="js/ui/jquery.jqGrid.min.js"></script>
     <script type="text/javascript" src="js/ui/jquery-ui-1.8.20.custom.min.js"></script>
-
-    <script type="text/javascript" src="js/popup.js"></script>
+    <script type="text/javascript" src="js/popup.js" defer></script>
     <link rel="stylesheet" type="text/css" href="css/main.css" />
   </head>
   <body bgcolor="#f0f0f0">
+    <div>
+      <cba-list id="projects" heading="Projects" subheading="record"></cba-list>
+      <cba-table caption="Actions">
+        <cba-column name="data" width="33%">data</cba-column>
+        <cba-column name="event" width="33%">event</cba-column>
+        <cba-column name="value" width="33%">value</cba-column>
+      </cba-table>
+      <cba-button data-action="addGroup">G+</cba-button>
+      <cba-button data-action="addProject">+</cba-button>
+      <cba-button data-action="removeProject">-</cba-button>
+      <cba-button data-action="renameProject">Rename</cba-button>
+    </div>
     <div id="main">
       <div style="display:inline-table">
         <table id="projectsTable"></table>
@@ -24,6 +36,7 @@
       </div>
 
       <div style="display:inline-table">
+        
         <table id="actionsTable"></table>
       </div>
       <div style="display:inline-table">

@@ -25,26 +25,20 @@ beforeEach(async () =>
 it("Starting the extension should set default actions", async() =>
 {
   const initialData = {
-    group0: {
+    collections: [{
+      text: "group",
+      type: "group",
       expanded: false,
-      isLeaf: false,
-      level: "0",
-      loaded: true,
-      name: "group0",
-      parent: "",
-      projects: [
+      subItems: [
         {
-          action: [],
-          expanded: false,
-          isLeaf: true,
-          level: "1",
-          loaded: true,
-          name: "project"
+          text: "project",
+          type: "project",
+          actions: []
         }
       ]
-    }
+    }]
   };
-  deepEqual(await getLocalStorageData(), initialData);
+  deepEqual(await getLocalStorageData("collections"), initialData);
 });
 
 it("Sending highlight and unHighlight event should outline specific element according to selector", async() =>
