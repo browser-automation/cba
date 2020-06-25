@@ -34,6 +34,17 @@ async function remove(text, groupText) {
   return browser.storage.local.set({collections});
 }
 
+async function addAction(groupText, text, action, index) {
+  let collections = await load();
+  const {subItems}  = collections.filter((item) => item.text === groupText)[0];
+  if (!subItems)
+    return false;
+
+  const {actions} = subItems.filter((item) => item.text === text)[0];
+  actions.push(action);
+  return browser.storage.local.set({collections});
+}
+
 function getNextTextNumber(items, prefix) {
   if (!items || !items.length)
     return null;
@@ -67,4 +78,4 @@ function createProjectObj(projectText) {
   }
 }
 
-module.exports = {addGroup, addProject, remove, load};
+module.exports = {addGroup, addProject, remove, load, addAction};

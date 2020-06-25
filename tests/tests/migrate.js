@@ -104,23 +104,29 @@ it("Extension should move and backup old data", async() =>
           text: "oldProject0",
           type: "project",
           actions: [{
-            data: "Please enter the time in milliseconds",
-            evType: "timer",
-            value: "70000"
+            texts: {
+              data: "Please enter the time in milliseconds",
+              evType: "timer",
+              value: "70000"
+            }
           },
           {
-            data: "this event will let the script wait for page update",
-            evType: "update",
-            value: ""
+            texts: {
+              data: "this event will let the script wait for page update",
+              evType: "update",
+              value: ""
+            }
           }]
         },
         {
           text: "oldProject2",
           type: "project",
           actions: [{
-            data: "console.log(\"heloo World\");",
-            evType: "inject",
-            value: ""
+            texts: {
+              data: "console.log(\"heloo World\");",
+              evType: "inject",
+              value: ""
+            }
           }]
         }
       ]

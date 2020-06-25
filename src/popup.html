@@ -16,15 +16,21 @@
   <body bgcolor="#f0f0f0">
     <div>
       <cba-list id="projects" heading="Projects" subheading="record"></cba-list>
-      <cba-table caption="Actions">
+      <cba-table id="actions" caption="Actions">
         <cba-column name="data" width="33%">data</cba-column>
         <cba-column name="event" width="33%">event</cba-column>
         <cba-column name="value" width="33%">value</cba-column>
       </cba-table>
+
       <cba-button data-action="addGroup">G+</cba-button>
       <cba-button data-action="addProject">+</cba-button>
       <cba-button data-action="removeProject">-</cba-button>
       <cba-button data-action="renameProject">Rename</cba-button>
+
+      <cba-button data-action="addAction">Add</cba-button>
+      <cba-button data-action="deleteAction">Delete</cba-button>
+      <cba-button data-action="saveAction">Save</cba-button>
+
     </div>
     <div id="main">
       <div style="display:inline-table">

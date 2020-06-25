@@ -1,4 +1,4 @@
-const {load, remove, addGroup, addProject} = require("../db/collections");
+const {load, remove, addGroup, addProject, addAction} = require("../db/collections");
 
 const projects = document.querySelector("#projects");
 const actions = document.querySelector("#actions");
@@ -6,11 +6,14 @@ const actions = document.querySelector("#actions");
 async function loadProjects()
 {
   projects.items = await load();
+  const {type, actions} = projects.getSelectedItem();
+  if (type === "project")
+    populateActions(actions);
 }
 
-function populateActions(actions)
+function populateActions(items)
 {
-  console.log(actions);
+  actions.items = items;
 }
 
 async function onProjectSelect()
@@ -54,6 +57,29 @@ async function onAction(action)
     }
     case "renameProject": {
       // TBA
+      break;
+    }
+    case "addAction": {
+      const selectedProject = projects.getSelectedItem();
+      if (!selectedProject)
+        return null;
+
+      const {type, id, text} = selectedProject;
+      const parentItem = projects.getParentItem(id);
+      if (type === "project") {
+        const data = "";
+        const evType = "";
+        const value = "";
+        addAction(parentItem.text, text, {texts: {data, evType, value}});
+      }
+      break;
+    }
+    case "deleteAction": {
+      
+      break;
+    }
+    case "saveAction": {
+      
       break;
     }
     default:

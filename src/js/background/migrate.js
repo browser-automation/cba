@@ -21,7 +21,7 @@ async function backup() {
 function migrateActions(actions) {
   if (actions && actions.length) {
     return actions.map(({data, evType, newValue}) => { 
-      return {data, evType, value: newValue};
+      return {texts : {data, evType, value: newValue}};
     });
   }
   else {
