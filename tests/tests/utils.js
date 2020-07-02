@@ -96,6 +96,27 @@ async function cbaListItemSelect(query, text, parentText)
   }, query, item.id);
 }
 
+async function cbaTableItemsLength(query)
+{
+  return page().evaluate(async(table) => {
+    return table.items.length;
+  }, await page().$(query));
+}
+
+async function cbaTableGetItem(query, itemIndex)
+{
+  return page().evaluate(async(table, itemIndex) => {
+    return table.items[itemIndex];
+  }, await page().$(query), itemIndex);
+}
+
+async function cbaTableSelectRow(query, id)
+{
+  return page().evaluate(async(table, id) => {
+    return table.selectRow(id);
+  }, await page().$(query), id);
+}
+
 async function startTestRecording()
 {
   const projectId = "testProject";
@@ -184,6 +205,14 @@ async function getTextContent(query)
 async function getValue(query)
 {
   return getElementAttribute(query, "value");
+}
+
+async function setValue(query, value)
+{
+  const element = await page().$(query);
+  return page().evaluate((element, value) => {
+    return element.value = value;
+  } , element, value);
 }
 
 async function getSelectedValue(query)
@@ -305,10 +334,12 @@ async function sendCurrentTabRequest(request)
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
-                  getTextContent, getValue, isChecked, addCookie, getCookie,
+                  getTextContent, getValue, setValue, isChecked, addCookie,
+                  getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
                   resetClipboardValue, isElementExist, setDefaultCollections,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
-                  setWindowLocalStorage, getWindowLocalStorage, reloadExtension};
+                  setWindowLocalStorage, getWindowLocalStorage, reloadExtension,
+                  cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow};

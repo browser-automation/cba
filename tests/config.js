@@ -5,6 +5,7 @@ const tests = [
   {file:"popup.js", name: "Testing popup"},
   {file:"migrate.js", name: "Testing data migration"},
 ];
+
 const server = "http://127.0.0.1:3001";
 const closeBrowser = true;
 
