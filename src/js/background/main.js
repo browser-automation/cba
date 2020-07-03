@@ -26,28 +26,77 @@ browser.runtime.onConnect.addListener((port) => {
 async function isFirstLoad() {
   const data = localStorage.getItem("data");
   const collections = await browser.storage.local.get("collections");
+  const predefinedActions = await browser.storage.local.get("predefinedActions");
   if (data) {
     await backup();
     await migrate();
     localStorage.removeItem("data");
   }
-  else if (!Object.keys(collections).length) {
-    const collections = [
-      {
-        text: "group",
-        type: "group",
-        expanded: false,
-        subItems: [
-          {
-            text: "project",
-            type: "project",
-            actions: []
-          }
-        ]
-      }
-    ];
-    await browser.storage.local.set({collections});
-  }
+  else {
+    if (!Object.keys(collections).length) {
+      const collections = [
+        {
+          text: "group",
+          type: "group",
+          expanded: false,
+          subItems: [
+            {
+              text: "project",
+              type: "project",
+              actions: []
+            }
+          ]
+        }
+      ];
+  
+      await browser.storage.local.set({collections});
+    }
+    if (!Object.keys(predefinedActions).length) {
+      const predefinedActions = [
+        {
+          data: {
+            texts: {
+              data: "Please enter the time in milliseconds",
+              event: "timer",
+              value: "1000"
+            }
+          },
+          text: "Timer"
+        },
+        {
+          data: {
+            texts: {
+              data: "this event will let the script wait for page update",
+              event: "update",
+              value: ""
+            }
+          },
+          text: "Update"
+        },
+        {
+          data: {
+            texts: {
+              data: "<$function=removeCookie>\n<$attr=.*>",
+              event: "bg-function",
+              value: "use regular expressions to filter domains"
+            }
+          },
+          text: "Clear cookies"
+        },
+        {
+          data: {
+            texts: {
+              data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
+              event: "bg-function",
+              value: "Write to clipboard Object to access data later. Use Json in the attr."
+            }
+          },
+          text: "Clipboard"
+        }
+      ];
+      await browser.storage.local.set({predefinedActions});
+    }
+  } 
 }
 
 isFirstLoad();

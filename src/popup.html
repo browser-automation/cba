@@ -16,11 +16,12 @@
   <body bgcolor="#f0f0f0">
     <div>
       <cba-list id="projects" heading="Projects" subheading="record"></cba-list>
-      <cba-table id="actions" caption="Actions">
+      <cba-table id="actions" caption="Actions" droppable="true" reorder="true">
         <cba-column name="data" width="33%">data</cba-column>
         <cba-column name="event" width="33%">event</cba-column>
         <cba-column name="value" width="33%">value</cba-column>
       </cba-table>
+      <cba-list id="functions" heading="Functions" subHeading="Name" draggable="true"></cba-list>
 
       <cba-button data-action="addGroup">G+</cba-button>
       <cba-button data-action="addProject">+</cba-button>
@@ -34,8 +35,8 @@
     <div id="main">
       <div style="display:inline-table">
         <table id="projectsTable"></table>
-        <input type="button" value="G+" id="groupAddBtn" title="Add new group" >
-        <input type="button" value="+" id="projectAddBtn" title="Add new project" >
+        <input type="button" value="G+" id="groupAddBtn" title="Add new group">
+        <input type="button" value="+" id="projectAddBtn" title="Add new project">
         <input type="button" value="-" id="projectDeleteBtn" title="Delete">
         <input type="button" value="Rename" id="projectRenameBtn">
       </div>

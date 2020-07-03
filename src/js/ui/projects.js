@@ -1,6 +1,8 @@
+const {load: prefefinedActionsLoad, saveState: prefefinedActionsSave} = require("../db/predefinedActions");
 const {load, saveState} = require("../db/collections");
 
 const projects = document.querySelector("#projects");
+const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
 const actionData = document.querySelector("#actionData");
 const actionEvType = document.querySelector("#actionEvType");
@@ -12,6 +14,11 @@ async function loadProjects()
   const {type, actions} = projects.getSelectedItem();
   if (type === "project")
     populateActions(actions);
+}
+
+async function loadFunctions()
+{
+  functions.items = await prefefinedActionsLoad();
 }
 
 function populateActions(items)
@@ -188,8 +195,13 @@ function registerActionListener(callback)
 }
 
 loadProjects();
+loadFunctions();
 projects.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
+actionsComp.addEventListener("dragndrop", ()=>
+{
+  //TODO: Update project state
+});
 registerActionListener(onAction);
 browser.storage.onChanged.addListener(({collections}) => {
   if (collections)

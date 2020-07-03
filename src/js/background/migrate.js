@@ -41,18 +41,30 @@ function migrateProjects({projects}) {
 }
 
 async function migrate() {
-  const collections = [];
   const {data, cbaFunctions} = getOldData();
-  for (const groupName of Object.keys(data)) {
-    const group = {
-      "text": groupName,
-      "expanded": false,
-      "subItems": migrateProjects(data[groupName]),
-      "type": "group"
-    };
-    collections.push(group);
+  if (data) {
+    const collections = [];
+    for (const groupName of Object.keys(data)) {
+      const group = {
+        "text": groupName,
+        "expanded": false,
+        "subItems": migrateProjects(data[groupName]),
+        "type": "group"
+      };
+      collections.push(group);
+    }
+    await browser.storage.local.set({collections});
   }
-  await browser.storage.local.set({collections});
+  if (cbaFunctions) {
+    const predefinedActions = [];
+    for (const {name, data, evType, newValue} of cbaFunctions) {
+      predefinedActions.push({
+        data: {texts: {data, event: evType, value: newValue}},
+        text: name
+      });
+    }
+    await browser.storage.local.set({predefinedActions});
+  }
 }
 
 module.exports = {migrate, backup};
