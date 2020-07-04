@@ -73,9 +73,42 @@ const oldData = {
   }
 };
 
+const oldCbaFunctions = 
+[
+  {
+    name: "Timer",
+    data:"Please enter the time in milliseconds",
+    evType:"timer",
+    msgType:"apiEvent",
+    newValue:"1000"
+  },
+  {
+    name: "Update",
+    data:"this event will let the script wait for page update",
+    evType:"update",
+    msgType:"apiEvent",
+    newValue:""
+  },
+  {
+    name: "Clear cookies",
+    data:"<$function=removeCookie>\n<$attr=.*>",
+    evType:"bg-function",
+    msgType:"apiEvent",
+    newValue:"use regular expressions to filter domains"
+  },
+  {
+    name: "Clipboard",
+    data:'<$function=saveToClipboard>\n<$attr={"name": "value"}>',
+    evType:"bg-function",
+    msgType:"apiEvent",
+    newValue:"Write to clipboard Object to access data later. Use Json in the attr."
+  },
+];
+
 beforeEach(async () =>
 {
   await setWindowLocalStorage("data", oldData);
+  await setWindowLocalStorage("cba-functions", oldCbaFunctions);
   await reloadExtension();
   await wait();
 });
@@ -133,7 +166,53 @@ it("Extension should move and backup old data", async() =>
     }]
   };
 
+  const migratedPredefinedActions = {
+    predefinedActions: [
+      {
+        data: {
+          texts: {
+            data: "Please enter the time in milliseconds",
+            event: "timer", 
+            value: "1000"
+          }
+        },
+        text: "Timer"
+      },
+      {
+        data: {
+          texts: {
+            data: "this event will let the script wait for page update",
+            event: "update", 
+            value: ""
+          }
+        },
+        text: "Update"
+      },
+      {
+        data: {
+          texts: {
+            data: "<$function=removeCookie>\n<$attr=.*>",
+            event: "bg-function", 
+            value: "use regular expressions to filter domains"
+          }
+        },
+        text: "Clear cookies"
+      },
+      {
+        data: {
+          texts: {
+            data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
+            event: "bg-function", 
+            value: "Write to clipboard Object to access data later. Use Json in the attr."
+          }
+        },
+        text: "Clipboard"
+      }
+    ]
+  };
+
   equal(await getWindowLocalStorage("data"), null, "Old window.localStorageo('data') is deleted");
   deepEqual(backup.data, oldData, "Old data is backed up in browser.storage.local.get('backup')");
   deepEqual(await getLocalStorageData("collections"), migratedData, "Old data should be reconstructed moved into browser.storage.local.get('collections')");
+  deepEqual(await getLocalStorageData("predefinedActions"), migratedPredefinedActions, "Old cba-functions should be reconstructed moved into browser.storage.local.get('predefinedActions')");
 });
