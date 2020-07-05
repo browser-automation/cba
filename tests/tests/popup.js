@@ -8,7 +8,9 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {wait, setDefaultCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
-       cbaTableSelectRow, setValue, getValue} = require("./utils");
+       cbaTableSelectRow, setValue, getValue, triggerDragStart,
+       getCbaListRowHandle, getCbaTableRowHandle,
+       triggerDrop} = require("./utils");
 const {page} = require("../main");
 
 const pageSetup = {
@@ -17,6 +19,7 @@ const pageSetup = {
 
 const cbaTableQuery = "#actions";
 const cbaListQuery = "#projects";
+const cbaFunctionsQuery = "#functions";
 
 const inputDataQuery = "#actionData";
 const inputEventQuery = "#actionEvType";
@@ -35,6 +38,7 @@ beforeEach(async () =>
 {
   await setDefaultCollections();
   await wait(50);
+  await page().reload({waitUntil: "domcontentloaded"});
 });
 
 it("'G+' button adds new group item with unique text", async() =>
@@ -118,7 +122,7 @@ it("'Add' button adds new empty action to the selected project", async () =>
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
   const texts = {
     data: "",
-    evType: "",
+    event: "",
     value: ""
   };
   const item1 = {
@@ -213,6 +217,33 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputDataQuery), data);
   equal(await getValue(inputEventQuery), event);
   equal(await getValue(inputValueQuery), value);
+});
+
+
+it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
+{
+  await addThreeEmptyActions();
+  const handle = await getCbaListRowHandle(cbaFunctionsQuery, "cba-list-id-1");
+
+  await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
+  const data = "Please enter the time in milliseconds";
+  const event = "timer";
+  const value = "1000";
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  const {texts, id} = await cbaTableGetItem(cbaTableQuery, 1);
+  deepEqual(texts, {data, event, value});
+
+  const tableRowHandle = await getCbaTableRowHandle(cbaTableQuery, id);
+
+  await triggerDrop(cbaTableQuery, "cba-table-id-2", await triggerDragStart(tableRowHandle));
+
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 2)).texts, {data, event, value});
+  await page().reload({waitUntil: "domcontentloaded"});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 2)).texts, {data, event, value});
+
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", event: "", value: ""});
 });
 
 async function addThreeEmptyActions()

@@ -117,6 +117,59 @@ async function cbaTableSelectRow(query, id)
   }, await page().$(query), id);
 }
 
+async function getCbaTableRowHandle(query, id)
+{
+  const rootHandle = await getShadowRoot(query)
+  return rootHandle.$(`tr[data-id="${id}"]`);
+}
+
+async function getShadowRoot(query)
+{
+  const handle = await page().$(query);
+  return handle.evaluateHandle((cbaList) => cbaList.shadowRoot);
+}
+
+async function getCbaListRowHandle(query, id)
+{
+  const rootHandle = await getShadowRoot(query);
+  return rootHandle.$(`ul [data-id="${id}"]`);
+}
+
+async function triggerDrop(query, id, data)
+{
+  const handle = await getCbaTableRowHandle(query, id);
+  const table = await page().$(query);
+  return handle.evaluate((cbaTableRow, cbaTable, data) => {
+    return new Promise((resolve) => {
+      cbaTable.addEventListener('dragndrop', ({detail}) =>
+      {
+        return resolve(detail);
+      })
+      const dataTransfer = new DataTransfer();
+      dataTransfer.setData("text/plain", data);
+      const event = new DragEvent("drop", {
+        bubbles: true,
+        dataTransfer
+      });
+      cbaTableRow.dispatchEvent(event);
+    });
+    
+  }, table, data);
+}
+
+async function triggerDragStart(handle)
+{
+  return handle.evaluate((row) => {
+    const event = new DragEvent("dragstart", {
+      bubbles: true,
+      dataTransfer: new DataTransfer()
+    });
+    row.dispatchEvent(event);
+
+    return event.dataTransfer.getData("text/plain");
+  });
+}
+
 async function startTestRecording()
 {
   const projectId = "testProject";
@@ -342,4 +395,6 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetClipboardValue, isElementExist, setDefaultCollections,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
                   setWindowLocalStorage, getWindowLocalStorage, reloadExtension,
-                  cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow};
+                  cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
+                  getCbaListRowHandle, triggerDrop, triggerDragStart,
+                  getCbaTableRowHandle};

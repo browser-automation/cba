@@ -14,6 +14,8 @@ async function loadProjects()
   const {type, actions} = projects.getSelectedItem();
   if (type === "project")
     populateActions(actions);
+  else
+    populateActions([]);
 }
 
 async function loadFunctions()
@@ -103,9 +105,9 @@ async function onAction(action)
       const {type} = selectedProject;
       if (type === "project") {
         const data = "";
-        const evType = "";
+        const event = "";
         const value = "";
-        actionsComp.addRow({texts: {data, evType, value}});
+        actionsComp.addRow({texts: {data, event, value}});
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
@@ -140,6 +142,17 @@ async function onAction(action)
         const value = actionNewValue.value;
 
         actionsComp.updateRow({texts: {data, event, value}}, selectedAction.id);
+        selectedProject.actions = actionsComp.items;
+        projects.updateRow(selectedProject, selectedProject.id);
+        saveState(projects.items);
+      }
+      break;
+    }
+    case "drop": {
+      const selectedProject = projects.getSelectedItem();
+
+      const {type} = selectedProject;
+      if (type === "project") {
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
@@ -200,7 +213,7 @@ projects.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
 actionsComp.addEventListener("dragndrop", ()=>
 {
-  //TODO: Update project state
+  onAction("drop");
 });
 registerActionListener(onAction);
 browser.storage.onChanged.addListener(({collections}) => {
