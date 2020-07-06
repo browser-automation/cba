@@ -18,7 +18,7 @@ const pageSetup = {
 }
 
 const cbaTableQuery = "#actions";
-const cbaListQuery = "#projects";
+const cbaListQuery = "#projects cba-list";
 const cbaFunctionsQuery = "#functions";
 
 const inputDataQuery = "#actionData";
@@ -220,28 +220,34 @@ it("Selecting action populates input deselecting clears", async() =>
 });
 
 
+
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
 {
   await addThreeEmptyActions();
   const handle = await getCbaListRowHandle(cbaFunctionsQuery, "cba-list-id-1");
 
+  const actionTableItemIsTimer = async(index) =>
+  {
+    const data = "Please enter the time in milliseconds";
+    const event = "timer";
+    const value = "1000";
+    deepEqual((await cbaTableGetItem(cbaTableQuery, index)).texts, {data, event, value});
+  };
+
   await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
-  const data = "Please enter the time in milliseconds";
-  const event = "timer";
-  const value = "1000";
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  await actionTableItemIsTimer(1);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  const {texts, id} = await cbaTableGetItem(cbaTableQuery, 1);
-  deepEqual(texts, {data, event, value});
+  await actionTableItemIsTimer(1);
 
+  const {id} = await cbaTableGetItem(cbaTableQuery, 1);
   const tableRowHandle = await getCbaTableRowHandle(cbaTableQuery, id);
 
   await triggerDrop(cbaTableQuery, "cba-table-id-2", await triggerDragStart(tableRowHandle));
 
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 2)).texts, {data, event, value});
+  await actionTableItemIsTimer(2);
   await page().reload({waitUntil: "domcontentloaded"});
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 2)).texts, {data, event, value});
+  await actionTableItemIsTimer(2);
 
   deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", event: "", value: ""});
 });

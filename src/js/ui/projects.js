@@ -1,7 +1,7 @@
 const {load: prefefinedActionsLoad, saveState: prefefinedActionsSave} = require("../db/predefinedActions");
 const {load, saveState} = require("../db/collections");
 
-const projects = document.querySelector("#projects");
+const projects = document.querySelector("#projects cba-list");
 const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
 const actionData = document.querySelector("#actionData");

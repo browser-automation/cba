@@ -10,48 +10,32 @@
     <script type="text/javascript" src="js/ui/jquery.tablednd.js"></script>
     <script type="text/javascript" src="js/ui/jquery.jqGrid.min.js"></script>
     <script type="text/javascript" src="js/ui/jquery-ui-1.8.20.custom.min.js"></script>
+
     <script type="text/javascript" src="js/popup.js" defer></script>
-    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/popup.css" />
   </head>
   <body bgcolor="#f0f0f0">
-    <div>
-      <cba-list id="projects" heading="Projects" subheading="record"></cba-list>
+    <div id="projectsManagement">
+      <div id="projects">
+        <cba-list heading="Projects" subheading="record"></cba-list>
+        <div class="controls">
+          <cba-button data-action="addGroup">G+</cba-button>
+          <cba-button data-action="addProject">+</cba-button>
+          <cba-button data-action="removeProject">-</cba-button>
+          <cba-button data-action="renameProject">Rename</cba-button>
+        </div>
+      </div>
+
       <cba-table id="actions" caption="Actions" droppable="true" reorder="true">
         <cba-column name="data" width="33%">data</cba-column>
         <cba-column name="event" width="33%">event</cba-column>
         <cba-column name="value" width="33%">value</cba-column>
       </cba-table>
       <cba-list id="functions" heading="Functions" subHeading="Name" draggable="true"></cba-list>
-
-      <cba-button data-action="addGroup">G+</cba-button>
-      <cba-button data-action="addProject">+</cba-button>
-      <cba-button data-action="removeProject">-</cba-button>
-      <cba-button data-action="renameProject">Rename</cba-button>
-
-      <cba-button data-action="addAction">Add</cba-button>
-      <cba-button data-action="deleteAction">Delete</cba-button>
-      <cba-button data-action="saveAction">Save</cba-button>
     </div>
-    <div id="main">
-      <div style="display:inline-table">
-        <table id="projectsTable"></table>
-        <input type="button" value="G+" id="groupAddBtn" title="Add new group">
-        <input type="button" value="+" id="projectAddBtn" title="Add new project">
-        <input type="button" value="-" id="projectDeleteBtn" title="Delete">
-        <input type="button" value="Rename" id="projectRenameBtn">
-      </div>
-
-      <div style="display:inline-table">
-        
-        <table id="actionsTable"></table>
-      </div>
-      <div style="display:inline-table">
-        <table id="functionsTable"></table>
-      </div>
-      <div style="display:inline-table">
-        <textarea rows="3" cols="39" id="actionData"></textarea>
-      </div>
-      <div style="display:inline-block; vertical-align: top;">
+    <div id="actionInput">
+      <textarea rows="3" cols="39" id="actionData"></textarea>
+      <div>
         <select id="actionEvType">
           <option value="inject">inject</option>
           <option value="cs-inject">cs-inject</option>
@@ -67,30 +51,29 @@
           <option value="copy">copy</option>
           <option value="pause">pause</option>
         </select>
-        <br>
         <input type="text" id="actionNewValue" style="width:200px"/>
       </div>
-
-      <div style="display:block">
-        <input type="button" value="Add" id="actionsAdd" >
-        <input type="button" value="Delete" id="actionsDelete">
-        <input type="button" value="Save" id="actionsSave">
+    </div>
+    <div>
+      <div id="actionsControl">
+        <cba-button data-action="addAction">Add</cba-button>
+        <cba-button data-action="deleteAction">Delete</cba-button>
+        <cba-button data-action="saveAction">Save</cba-button>
       </div>
-      <div style="display:block">
-        <input type="button" value="Rec" id="recordButton" >
-        <input type="button" value="stop" id="stopButton" style="width:'55px'">
-        <input type="button" value="play" id="playButton" style="width:'49px'">
-        <input type="text" id="repeat" size="1" value="1"/> times
+      <div id="playbackControl">
+        <input type="button" value="Rec" id="recordButton">
+        <input type="button" value="stop" id="stopButton">
+        <input type="button" value="play" id="playButton">
+        <input type="text" id="repeat" size="3" value="1"/> times
       </div>
       <div style="display:block" id="helpMessage"></div>
-      <div style="position: absolute; bottom: 10px; right: 10px;">
+    </div>
+    <div id="logo">
 
-        <a href="http://chrome-automation.com/" target="_blank" style="color:#444; text-decoration:none">
-          chrome-automation.com
-          <img src="logo.png" style="width: 50px;" />
-        </a>
-      </div>
-
+      <a href="http://chrome-automation.com/" target="_blank">
+        chrome-automation.com
+        <img src="logo.png" style="width: 50px;" />
+      </a>
     </div>
   </body>
   <script type="text/javascript" src="js/ui/projects_table.js"></script>

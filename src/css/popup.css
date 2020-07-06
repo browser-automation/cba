@@ -1,0 +1,64 @@
+cba-list {
+  --icon-group: no-repeat url("/css/images/icon-group.svg");
+  --icon-project: no-repeat url("/css/images/icon-project.svg");
+}
+
+body {
+  max-width: 600px;
+}
+
+#projectsManagement {
+  display: flex;
+  height: 200px;
+}
+
+#projectsManagement > *:not(:first-child) {
+  margin-left: 2px;
+}
+
+#projects {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+#projects cba-list {
+  flex: 1;
+}
+
+#projects .controls {
+  margin-top: 5px;
+  display: block;
+}
+
+#actions {
+  flex: 3;
+}
+
+#functions {
+  flex: 1;
+}
+
+#actionInput {
+  margin-top: 5px;
+  display: flex;
+}
+
+#actionInput div {
+  margin-left: 5px;
+}
+
+#actionInput input {
+  margin-top: 3px;
+}
+
+#logo {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#logo a {
+  color: #444;
+  text-decoration: none;
+}
