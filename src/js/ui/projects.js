@@ -61,6 +61,27 @@ async function onActionSelect()
     actionEvType.selectedIndex = 0;
 }
 
+function onEventInputChange()
+{
+  // TODO: Reset writeHelpMessage
+  actionNewValue.disabled = false;
+  actionData.disabled = false;
+  const actionType = actionEvType.value;
+  const disablesNewValue = ["inject", "cs-inject", "bg-inject", "bg-function",
+                            "check", "click","submit-click","update", "redirect",
+                            "copy", "pause"];
+  const disablesData = ["update", "timer", "pause"];
+  
+  if (disablesNewValue.includes(actionType))
+  {
+    actionNewValue.disabled = true;
+  }
+  if (disablesData.includes(actionType))
+  {
+    actionData.disabled = true;
+  }
+}
+
 async function onAction(action)
 {
   switch (action) {
@@ -220,3 +241,6 @@ browser.storage.onChanged.addListener(({collections}) => {
   if (collections)
     loadProjects();
 });
+
+actionEvType.addEventListener("change", onEventInputChange);
+onEventInputChange();

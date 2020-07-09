@@ -260,11 +260,26 @@ async function getValue(query)
   return getElementAttribute(query, "value");
 }
 
+async function isDisabled(query)
+{
+  const element = await page().$(query);
+  return element.evaluate((element) => element.hasAttribute("disabled"))
+}
+
 async function setValue(query, value)
 {
   const element = await page().$(query);
   return page().evaluate((element, value) => {
     return element.value = value;
+  } , element, value);
+}
+
+async function changeValue(query, value)
+{
+  const element = await page().$(query);
+  return page().evaluate((element, value) => {
+    element.value = value;
+    element.dispatchEvent(new Event("change"));
   } , element, value);
 }
 
@@ -387,8 +402,8 @@ async function sendCurrentTabRequest(request)
 module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
-                  getTextContent, getValue, setValue, isChecked, addCookie,
-                  getCookie,
+                  getTextContent, getValue, setValue, changeValue, isDisabled,
+                  isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   sendCurrentTabRequest, getStyle, getSelectedValue,

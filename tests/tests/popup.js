@@ -8,7 +8,7 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {wait, setDefaultCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
-       cbaTableSelectRow, setValue, getValue, triggerDragStart,
+       cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle,
        triggerDrop} = require("./utils");
 const {page} = require("../main");
@@ -219,8 +219,6 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputValueQuery), value);
 });
 
-
-
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
 {
   await addThreeEmptyActions();
@@ -250,6 +248,38 @@ it("dragndropping from the functions table or self-organizing actions table shou
   await actionTableItemIsTimer(2);
 
   deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", event: "", value: ""});
+});
+
+it("Changing action selectbox disables fields accordingly", async() =>
+{
+  // [data, value]
+  const disableState = {
+    "inject": [false, true],
+    "cs-inject": [false, true],
+    "bg-inject": [false, true],
+    "bg-function": [false, true],
+    "change": [false, false],
+    "check": [false, true],
+    "click": [false, true],
+    "submit-click": [false, true],
+    "update": [true, true],
+    "timer": [true, false],
+    "redirect": [false, true],
+    "copy": [false, true],
+    "pause": [true, true],
+  }
+
+  for (const event in disableState) {
+    const [dataVisible, valueVisible] = disableState[event];
+    await changeValue(inputEventQuery, event);
+    equal(await isDisabled(inputDataQuery), dataVisible, `${event}'s data should${dataVisible ? "": " not"} be disabled`);
+    equal(await isDisabled(inputValueQuery), valueVisible, `${event}'s value should${valueVisible ? "": " not"} be disabled`);
+  }
+});
+
+it("Test error messages", async() =>
+{
+  //
 });
 
 async function addThreeEmptyActions()

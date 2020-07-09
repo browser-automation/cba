@@ -77,64 +77,6 @@ function popupLoad() {
   analytAllButtons();
 }
 
-function actionEvTypeChange() {
-  writeHelpMessage("", "");
-  var actionEvTypeValue = $("#actionEvType").val();
-  
-  if(actionEvTypeValue == "inject") {
-     $("#actionNewValue").prop("disabled",true);
-     $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "cs-inject") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "bg-inject") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "bg-function") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "change") {
-    $("#actionNewValue").prop("disabled",false);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "check") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "click") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "redirect") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "submit-click") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "update") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",true);
-  }
-  else if(actionEvTypeValue == "timer") {
-    $("#actionData").prop("disabled",true);
-    $("#actionNewValue").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "copy") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",false);
-  }
-  else if(actionEvTypeValue == "pause") {
-    $("#actionNewValue").prop("disabled",true);
-    $("#actionData").prop("disabled",true);
-  }
-}
-
 function writeHelpMessage(helpMsg, color) {
   $("#helpMessage").html(helpMsg);
   $("#helpMessage").css('color', color);
@@ -176,7 +118,5 @@ function CSPbindings() {
   $("#recordButton").click(recordButtonClick);
   $("#stopButton").click(stopButtonClick);
   $("#playButton").click(playButtonClick);
-  $("#actionEvType").change(actionEvTypeChange);
-  
 }
 $(document).ready(popupLoad);
