@@ -1,4 +1,8 @@
 const {load: prefefinedActionsLoad, saveState: prefefinedActionsSave} = require("../db/predefinedActions");
+const notification = require("./notification");
+const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
+  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED} = notification;
+
 const {load, saveState} = require("../db/collections");
 
 const projects = document.querySelector("#projects cba-list");
@@ -94,7 +98,7 @@ async function onAction(action)
     case "addProject": {
       const project = projects.getSelectedItem();
       if (!project)
-        return null;
+        return notification.error(NO_PROJ_GROUP_SELECTED);
 
       const {type, id} = project;
       const topItem = type == "group" ? project : projects.getParentItem(id);
@@ -107,7 +111,7 @@ async function onAction(action)
     case "removeProject": {
       const selectedProject = projects.getSelectedItem();
       if (!selectedProject)
-        return null;
+        return notification.error(NO_PROJ_GROUP_SELECTED);
 
       const {id} = selectedProject;
       projects.deleteRow(id);
@@ -115,13 +119,18 @@ async function onAction(action)
       break;
     }
     case "renameProject": {
-      // TBA
+      const selectedProject = projects.getSelectedItem();
+      if (!selectedProject)
+        return notification.error(NO_PROJ_GROUP_SELECTED);
+
+      // TODO: add errors  `The group with choosen name already exists` and
+      // `The group already has project with current name` accordingly
       break;
     }
     case "addAction": {
       const selectedProject = projects.getSelectedItem();
       if (!selectedProject)
-        return null;
+        return notification.error(NO_PROJ_SELECTED);
 
       const {type} = selectedProject;
       if (type === "project") {
@@ -133,13 +142,18 @@ async function onAction(action)
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
       }
+      else {
+        return notification.error(SELECT_PROJ_NOT_GROUP);
+      }
       break;
     }
     case "deleteAction": {
       const selectedProject = projects.getSelectedItem();
       const selectedAction = actionsComp.getSelectedItem();
-      if (!selectedProject || !selectedAction)
-        return null;
+      if (!selectedAction)
+        return notification.error(NO_ACTION_SELECTED);
+      if (!selectedProject)
+        return notification.error(NO_PROJ_SELECTED);
 
       const {type} = selectedProject;
       if (type === "project") {
@@ -148,13 +162,18 @@ async function onAction(action)
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
       }
+      else {
+        return notification.error(SELECT_PROJ_NOT_GROUP);
+      }
       break;
     }
     case "saveAction": {
       const selectedProject = projects.getSelectedItem();
       const selectedAction = actionsComp.getSelectedItem();
-      if (!selectedProject || !selectedAction)
-        return null;
+      if (!selectedAction)
+        return notification.error(NO_ACTION_SELECTED);
+      if (!selectedProject)
+        return notification.error(NO_PROJ_SELECTED);
 
       const {type} = selectedProject;
       if (type === "project") {
@@ -165,18 +184,24 @@ async function onAction(action)
         actionsComp.updateRow({texts: {data, event, value}}, selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
-        saveState(projects.items);
+        await saveState(projects.items);
+        notification.show(CHANGES_SAVED);
       }
       break;
     }
     case "drop": {
       const selectedProject = projects.getSelectedItem();
+      if (!selectedProject)
+        return notification.error(NO_PROJ_SELECTED);
 
       const {type} = selectedProject;
       if (type === "project") {
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
+      }
+      else {
+        return notification.error(SELECT_PROJ_NOT_GROUP);
       }
       break;
     }

@@ -135,6 +135,11 @@ async function getCbaListRowHandle(query, id)
   return rootHandle.$(`ul [data-id="${id}"]`);
 }
 
+async function getNotificationMsg()
+{
+  return getElementAttribute("#notification", "textContent");
+}
+
 async function triggerDrop(query, id, data)
 {
   const handle = await getCbaTableRowHandle(query, id);
@@ -412,4 +417,4 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   setWindowLocalStorage, getWindowLocalStorage, reloadExtension,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
-                  getCbaTableRowHandle};
+                  getCbaTableRowHandle, getNotificationMsg};

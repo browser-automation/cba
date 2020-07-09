@@ -62,3 +62,12 @@ body {
   color: #444;
   text-decoration: none;
 }
+
+#notification {
+  display: block;
+  color: #01a735;
+}
+
+#notification.error {
+  color: #c30606;
+}

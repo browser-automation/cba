@@ -10,8 +10,11 @@ const {wait, setDefaultCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle,
-       triggerDrop} = require("./utils");
+       triggerDrop, getNotificationMsg} = require("./utils");
 const {page} = require("../main");
+const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
+       NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
+       CHANGES_SAVED} = require("../../src/js/ui/notification");
 
 const pageSetup = {
   path: "popup.html"
@@ -175,7 +178,8 @@ it("'Save' button updates selected action with the data from action input fields
   await setValue(inputValueQuery, value);
 
   await clickSaveAction();
-
+  
+  equal(await getNotificationMsg(), CHANGES_SAVED)
   deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
 
   await page().reload({waitUntil: "domcontentloaded"});
@@ -279,7 +283,27 @@ it("Changing action selectbox disables fields accordingly", async() =>
 
 it("Test error messages", async() =>
 {
-  //
+  await clickAddProject();
+  equal(await getNotificationMsg(), NO_PROJ_GROUP_SELECTED);
+
+  await clickRemoveProject();
+  equal(await getNotificationMsg(), NO_PROJ_GROUP_SELECTED);
+
+  await clickRenameProject();
+  equal(await getNotificationMsg(), NO_PROJ_GROUP_SELECTED);
+
+  await clickAddAction();
+  equal(await getNotificationMsg(), NO_PROJ_SELECTED);
+
+  await clickDeleteAction();
+  equal(await getNotificationMsg(), NO_ACTION_SELECTED);
+
+  await clickSaveAction();
+  equal(await getNotificationMsg(), NO_ACTION_SELECTED);
+
+  await cbaListItemSelect(cbaListQuery, "group");
+  await clickAddAction();
+  equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
 });
 
 async function addThreeEmptyActions()
