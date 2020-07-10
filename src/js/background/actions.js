@@ -12,7 +12,7 @@ async function playProject() {
   }
   else if(cba.projectRepeat > 1) {
     cba.projectRepeat--;
-    cba.setProject(cba.selectedProjObj, cba.playingProjectId, cba.projectRepeat);
+    cba.setProject(cba.defInstructArray, cba.projectRepeat, cba.playingProjectId);
     playProject();
   }
   else {
@@ -23,7 +23,9 @@ async function playProject() {
 
 async function actionExecution(instruction)
 {
-  const {evType, data} = instruction;
+  const evType = instruction.type;
+  const data = instruction.data;
+  const newValue = instruction.value;
   switch (evType) {
     case "redirect":
     case "submit-click": {
@@ -36,7 +38,7 @@ async function actionExecution(instruction)
       break;
     }
     case "timer": {
-      await timeout(instruction.newValue);
+      await timeout(newValue);
       break;
     }
     case "bg-function": {

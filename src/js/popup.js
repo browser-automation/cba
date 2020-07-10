@@ -62,9 +62,9 @@ function playButtonClick() {
 
 
 function popupLoad() {
-  bg.allowRec==0?$("#recordButton").val("rec"):$("#recordButton").val("recording...");
+  bg.allowRec?$("#recordButton").val("rec"):$("#recordButton").val("recording...");
   
-  if(bg.allowRec == 1) {
+  if(bg.allowRec) {
     jQuery("#projectsTable").jqGrid('setSelection',bg.selectedProjectId);
     $("#recordButton").css({"width":"90px"});
   }

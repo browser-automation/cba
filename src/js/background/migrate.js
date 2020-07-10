@@ -21,7 +21,7 @@ async function backup() {
 function migrateActions(actions) {
   if (actions && actions.length) {
     return actions.map(({data, evType, newValue}) => { 
-      return {texts : {data, evType, value: newValue}};
+      return {texts : {data, type: evType, value: newValue}};
     });
   }
   else {
@@ -59,7 +59,7 @@ async function migrate() {
     const predefinedActions = [];
     for (const {name, data, evType, newValue} of cbaFunctions) {
       predefinedActions.push({
-        data: {texts: {data, event: evType, value: newValue}},
+        data: {texts: {data, type: evType, value: newValue}},
         text: name
       });
     }

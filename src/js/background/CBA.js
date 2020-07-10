@@ -1,6 +1,6 @@
 class CBA {
   constructor() {
-    this.allowRec = 0;
+    this.allowRec = false;
     this.allowPlay = 0;
     this.paused = 0;
     this.playingProjectId;
@@ -16,7 +16,7 @@ class CBA {
     this.selectedProjObj;
   }
 
-  setProject(projObj, currProjectId, repeatVal) {
+  setProject(actions, repeatVal, currProjectId) {
     if(this.clipboard == null) {
       this.clipboard = {};
     }
@@ -24,21 +24,13 @@ class CBA {
     this.allowPlay = 1;
     this.projectRepeat = repeatVal;
     this.playingProjectId = currProjectId;
-    this.selectedProjObj = projObj;
-    const dataObj = JSON.parse(localStorage.getItem("data"));
 
-    const projectsArray = dataObj[projObj["group"]].projects;
-    for(let i=0; i < projectsArray.length; i++) {
-      if(projectsArray[i].name == projObj["project"]) {
-        this.instructArray = projectsArray[i].action;
-      }
-    }
-
+    this.instructArray = actions;
     this.defInstructArray = this.instructArray.slice(0);
   }
 
   stop() {
-    this.allowRec = 0;
+    this.allowRec = false;
     this.allowPlay = 0;
     this.paused = 0;
   }
@@ -51,7 +43,7 @@ class CBA {
   record(projObj, projectId) {
     this.selectedProjObj = projObj;
     this.selectedProjectId = projectId;
-    this.allowRec = 1;
+    this.allowRec = true;
   }
 
   setInstructionArray(arr)

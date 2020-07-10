@@ -12,6 +12,8 @@ const actionData = document.querySelector("#actionData");
 const actionEvType = document.querySelector("#actionEvType");
 const actionNewValue = document.querySelector("#actionNewValue");
 
+const bg = chrome.extension.getBackgroundPage().cba;
+
 async function loadProjects()
 {
   projects.items = await load();
@@ -56,11 +58,11 @@ async function onActionSelect()
   if (!texts) {
     return null;
   }
-  const {data, event, value} = texts;
+  const {data, type, value} = texts;
   actionData.value = data;
   actionNewValue.value = value;
-  if (event)
-    actionEvType.value = event;
+  if (type)
+    actionEvType.value = type;
   else
     actionEvType.selectedIndex = 0;
 }
@@ -84,6 +86,14 @@ function onEventInputChange()
   {
     actionData.disabled = true;
   }
+}
+
+function updateRecordButtonState() {
+  const recordButton = document.querySelector("#recordButton");
+  if (bg.allowRec)
+    recordButton.textContent("recording...");
+  else
+    recordButton.textContent("rec");
 }
 
 async function onAction(action)
@@ -135,9 +145,9 @@ async function onAction(action)
       const {type} = selectedProject;
       if (type === "project") {
         const data = "";
-        const event = "";
+        const type = "";
         const value = "";
-        actionsComp.addRow({texts: {data, event, value}});
+        actionsComp.addRow({texts: {data, type, value}});
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
@@ -178,10 +188,10 @@ async function onAction(action)
       const {type} = selectedProject;
       if (type === "project") {
         const data = actionData.value;
-        const event = actionEvType.value;
+        const type = actionEvType.value;
         const value = actionNewValue.value;
 
-        actionsComp.updateRow({texts: {data, event, value}}, selectedAction.id);
+        actionsComp.updateRow({texts: {data, type, value}}, selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         await saveState(projects.items);
@@ -199,6 +209,33 @@ async function onAction(action)
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveState(projects.items);
+      }
+      else {
+        return notification.error(SELECT_PROJ_NOT_GROUP);
+      }
+      break;
+    }
+    case "record": {
+
+      break;
+    }
+    case "stop": {
+      notification.clean();
+      bg.stopButtonClick();
+      updateRecordButtonState();
+      break;
+    }
+    case "play": {
+      const selectedProject = projects.getSelectedItem();
+      if (!selectedProject)
+        return notification.error(NO_PROJ_SELECTED);
+
+      const {type, actions, id} = selectedProject;
+      if (type === "project" && actions) {
+        const repeateValue = document.querySelector("#repeat").value;
+        bg.playButtonClick(actions.map(({texts}) => texts), repeateValue, id);
+        // TODO implement timedCount and/or alternative
+
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);

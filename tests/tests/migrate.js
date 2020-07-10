@@ -139,14 +139,14 @@ it("Extension should move and backup old data", async() =>
           actions: [{
             texts: {
               data: "Please enter the time in milliseconds",
-              evType: "timer",
+              type: "timer",
               value: "70000"
             }
           },
           {
             texts: {
               data: "this event will let the script wait for page update",
-              evType: "update",
+              type: "update",
               value: ""
             }
           }]
@@ -157,7 +157,7 @@ it("Extension should move and backup old data", async() =>
           actions: [{
             texts: {
               data: "console.log(\"heloo World\");",
-              evType: "inject",
+              type: "inject",
               value: ""
             }
           }]
@@ -172,7 +172,7 @@ it("Extension should move and backup old data", async() =>
         data: {
           texts: {
             data: "Please enter the time in milliseconds",
-            event: "timer", 
+            type: "timer", 
             value: "1000"
           }
         },
@@ -182,7 +182,7 @@ it("Extension should move and backup old data", async() =>
         data: {
           texts: {
             data: "this event will let the script wait for page update",
-            event: "update", 
+            type: "update", 
             value: ""
           }
         },
@@ -192,7 +192,7 @@ it("Extension should move and backup old data", async() =>
         data: {
           texts: {
             data: "<$function=removeCookie>\n<$attr=.*>",
-            event: "bg-function", 
+            type: "bg-function", 
             value: "use regular expressions to filter domains"
           }
         },
@@ -202,7 +202,7 @@ it("Extension should move and backup old data", async() =>
         data: {
           texts: {
             data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
-            event: "bg-function", 
+            type: "bg-function", 
             value: "Write to clipboard Object to access data later. Use Json in the attr."
           }
         },

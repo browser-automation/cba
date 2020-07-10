@@ -28,7 +28,7 @@
 
       <cba-table id="actions" caption="Actions" droppable="true" reorder="true">
         <cba-column name="data" width="33%">data</cba-column>
-        <cba-column name="event" width="33%">event</cba-column>
+        <cba-column name="type" width="33%">event</cba-column>
         <cba-column name="value" width="33%">value</cba-column>
       </cba-table>
       <cba-list id="functions" heading="Functions" subHeading="Name" draggable="true"></cba-list>
@@ -61,6 +61,9 @@
         <cba-button data-action="saveAction">Save</cba-button>
       </div>
       <div id="playbackControl">
+        <cba-button id="recordButton" data-action="record">Rec</cba-button>
+        <cba-button data-action="stop">stop</cba-button>
+        <cba-button data-action="play">play</cba-button>
         <input type="button" value="Rec" id="recordButton">
         <input type="button" value="stop" id="stopButton">
         <input type="button" value="play" id="playButton">

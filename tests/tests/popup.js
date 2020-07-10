@@ -58,6 +58,7 @@ it("'G+' button adds new group item with unique text", async() =>
   equal(await cbaListHasTextCount(cbaListQuery, "group2"), 1);
 
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "group1"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "group2"), 1);
 });
@@ -125,7 +126,7 @@ it("'Add' button adds new empty action to the selected project", async () =>
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
   const texts = {
     data: "",
-    event: "",
+    type: "",
     value: ""
   };
   const item1 = {
@@ -171,19 +172,19 @@ it("'Save' button updates selected action with the data from action input fields
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
   const data = "testAction1";
-  const event = "bg-inject";
+  const type = "bg-inject";
   const value = "testValue1";
   await setValue(inputDataQuery, data);
-  await setValue(inputEventQuery, event);
+  await setValue(inputEventQuery, type);
   await setValue(inputValueQuery, value);
 
   await clickSaveAction();
   
   equal(await getNotificationMsg(), CHANGES_SAVED)
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 
   await page().reload({waitUntil: "domcontentloaded"});
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 });
 
 it("Selecting action populates input deselecting clears", async() =>
@@ -192,15 +193,15 @@ it("Selecting action populates input deselecting clears", async() =>
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
   const data = "testAction1";
-  const event = "bg-inject";
+  const type = "bg-inject";
   const value = "testValue1";
 
   await setValue(inputDataQuery, data);
-  await setValue(inputEventQuery, event);
+  await setValue(inputEventQuery, type);
   await setValue(inputValueQuery, value);
 
   await clickSaveAction();
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-1");
   equal(await getValue(inputDataQuery), "");
@@ -208,7 +209,7 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputValueQuery), "");
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 
   await cbaListItemSelect(cbaListQuery, "group");
   equal(await getValue(inputDataQuery), "");
@@ -216,10 +217,10 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputValueQuery), "");
 
   await cbaListItemSelect(cbaListQuery, "project", "group");
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, event, value});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 
   equal(await getValue(inputDataQuery), data);
-  equal(await getValue(inputEventQuery), event);
+  equal(await getValue(inputEventQuery), type);
   equal(await getValue(inputValueQuery), value);
 });
 
@@ -231,9 +232,9 @@ it("dragndropping from the functions table or self-organizing actions table shou
   const actionTableItemIsTimer = async(index) =>
   {
     const data = "Please enter the time in milliseconds";
-    const event = "timer";
+    const type = "timer";
     const value = "1000";
-    deepEqual((await cbaTableGetItem(cbaTableQuery, index)).texts, {data, event, value});
+    deepEqual((await cbaTableGetItem(cbaTableQuery, index)).texts, {data, type, value});
   };
 
   await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
@@ -251,7 +252,7 @@ it("dragndropping from the functions table or self-organizing actions table shou
   await page().reload({waitUntil: "domcontentloaded"});
   await actionTableItemIsTimer(2);
 
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", event: "", value: ""});
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", type: "", value: ""});
 });
 
 it("Changing action selectbox disables fields accordingly", async() =>
@@ -273,11 +274,11 @@ it("Changing action selectbox disables fields accordingly", async() =>
     "pause": [true, true],
   }
 
-  for (const event in disableState) {
-    const [dataVisible, valueVisible] = disableState[event];
-    await changeValue(inputEventQuery, event);
-    equal(await isDisabled(inputDataQuery), dataVisible, `${event}'s data should${dataVisible ? "": " not"} be disabled`);
-    equal(await isDisabled(inputValueQuery), valueVisible, `${event}'s value should${valueVisible ? "": " not"} be disabled`);
+  for (const type in disableState) {
+    const [dataVisible, valueVisible] = disableState[type];
+    await changeValue(inputEventQuery, type);
+    equal(await isDisabled(inputDataQuery), dataVisible, `${type}'s data should${dataVisible ? "": " not"} be disabled`);
+    equal(await isDisabled(inputValueQuery), valueVisible, `${type}'s value should${valueVisible ? "": " not"} be disabled`);
   }
 });
 

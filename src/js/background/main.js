@@ -14,7 +14,7 @@ window.cba.stopButtonClick = stopButtonClick;
  */
 browser.runtime.onConnect.addListener((port) => {
   port.onMessage.addListener((msg) => {
-    if(cba.allowRec==1) {
+    if(cba.allowRec) {
       storeRecord(msg);
     }
   });
@@ -57,7 +57,7 @@ async function isFirstLoad() {
           data: {
             texts: {
               data: "Please enter the time in milliseconds",
-              event: "timer",
+              type: "timer",
               value: "1000"
             }
           },
@@ -67,7 +67,7 @@ async function isFirstLoad() {
           data: {
             texts: {
               data: "this event will let the script wait for page update",
-              event: "update",
+              type: "update",
               value: ""
             }
           },
@@ -77,7 +77,7 @@ async function isFirstLoad() {
           data: {
             texts: {
               data: "<$function=removeCookie>\n<$attr=.*>",
-              event: "bg-function",
+              type: "bg-function",
               value: "use regular expressions to filter domains"
             }
           },
@@ -87,7 +87,7 @@ async function isFirstLoad() {
           data: {
             texts: {
               data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
-              event: "bg-function",
+              type: "bg-function",
               value: "Write to clipboard Object to access data later. Use Json in the attr."
             }
           },
@@ -154,12 +154,12 @@ function stopButtonClick() {
 /*
  * Function that calls after clicking on Play button
  */
-async function playButtonClick(projObj, currProjectId, repeatVal) {
+async function playButtonClick(actions, repeatVal, currProjectId) {
   if (cba.paused == 1) {
     cba.restore();
   }
   else {
-    cba.setProject(projObj, currProjectId, repeatVal);
+    cba.setProject(actions, repeatVal, currProjectId);
   }
   const [tab] = await browser.tabs.query({active: true});
   cba.playingTabId = tab.id;

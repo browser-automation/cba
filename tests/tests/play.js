@@ -6,7 +6,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, setTestProject, addTestAction, getTextContent, getValue,
+const {playTestProject, addTestAction, getTextContent, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
        getBadgeText, setListener, getSelectedValue, resetClipboardValue,
@@ -41,7 +41,6 @@ const pageSetup = {
 
 beforeEach(async () =>
 {
-  await setTestProject();
   const pageUrl = await getPageUrl();
   await resetBackgroundGlobalVar(bgGlobalVarName);
   await resetClipboardValue();
@@ -53,8 +52,8 @@ beforeEach(async () =>
 
 it("Playing actions should add badge text 'play' to the icon.", async() =>
 {
-  await addTestAction("", "timer", "150");
-  await playTestProject();
+  const tests = createAction("", "timer", "150");
+  await playTestProject([tests]);
   equal(await getBadgeText(), "play");
   await wait(150);
   equal(await getBadgeText(), "");
@@ -62,10 +61,10 @@ it("Playing actions should add badge text 'play' to the icon.", async() =>
 
 it("Inject function runs specified script in the web page", async() =>
 {
-  const newText = "Injected text";
   const evType = "inject";
-  await addTestAction(setTextContentScript("#changeContent", newText), evType, "");
-  await playTestProject();
+  const newText = "Injected text";
+  const action = createAction(setTextContentScript("#changeContent", newText), evType, "");
+  await playTestProject([action]);
   equal(await getTextContent("#changeContent"), newText);
 });
 
@@ -73,8 +72,8 @@ it("cs-inject function runs specified script in content script", async() =>
 {
   const newText = "CS injected text";
   const evType = "cs-inject";
-  await addTestAction(setTextContentScript("#changeContent", newText), evType, "");
-  await playTestProject();
+  const action =  createAction(setTextContentScript("#changeContent", newText), evType, "");
+  await playTestProject([action]);
   equal(await getTextContent("#changeContent"), newText);
 });
 
@@ -82,8 +81,8 @@ it("Jquery is accessible through cs-inject", async() =>
 {
   const newText = "Jquery in CS injected text";
   const query = "#changeContent";
-  await addTestAction(`$("${query}").text("${newText}")`, "cs-inject", "");
-  await playTestProject();
+  const action = createAction(`$("${query}").text("${newText}")`, "cs-inject", "");
+  await playTestProject([action]);
   equal(await getTextContent(query), newText);
 });
 
@@ -92,8 +91,8 @@ it("bg-inject function runs specified script in background page", async() =>
   const value = "BG injected text";
   const data = `window["${bgGlobalVarName}"] = "${value}";`;
   const evType = "bg-inject";
-  await addTestAction(data, evType, "");
-  await playTestProject();
+  const action = createAction(data, evType, "");
+  await playTestProject([action]);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
 });
 
@@ -106,11 +105,11 @@ it("bg-function should execute predefined function and play next action when/if 
 <$attr=example>
   `;
   const evType = "bg-function";
-  await addTestAction(data, evType, "");
+  const action1 = createAction(data, evType, "");
   const injectText = "Next action is played";
   const query = "#changeContent";
-  await addTestAction(setTextContentScript(query, injectText), "inject", "");
-  await playTestProject();
+  const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
+  await playTestProject([action1, action2]);
   await wait();
   notOk(await getCookie("https://www.example.com/", "cba"));
   equal(await getTextContent(query), injectText);
@@ -123,9 +122,9 @@ it("bg-function saveToClipboard should save JSON data into the clipboard", async
 <$function=saveToClipboard>
 <$attr=${clipboardObject}>
   `;
-  await addTestAction(data, "bg-function", "");
-  await addTestAction(`window["${bgGlobalVarName}"] = clipboard;`, "bg-inject", "");
-  await playTestProject();
+  const action1 = createAction(data, "bg-function", "");
+  const action2 = createAction(`window["${bgGlobalVarName}"] = clipboard;`, "bg-inject", "");
+  await playTestProject([action1, action2]);
   await wait();
   deepEqual(await getBackgroundGlobalVar(bgGlobalVarName), JSON.parse(clipboardObject));
 });
@@ -134,10 +133,10 @@ it("bg-function reloadCurrentTab(without attributes test) should reload current 
 {
   const query = "#defaultContent";
   const newText = "New default text";
-  await addTestAction(`<$function=reloadCurrentTab>`, "bg-function", "");
-  await addTestAction("", "update", "");
-  await addTestAction(setTextContentScript(query, newText), "inject", "");
-  await playTestProject();
+  const action1 = createAction(`<$function=reloadCurrentTab>`, "bg-function", "");
+  const action2 = createAction("", "update", "");
+  const action3 = createAction(setTextContentScript(query, newText), "inject", "");
+  await playTestProject([action1, action2, action3]);
   await wait();
   notOk(await isElementExist("#changeContent"));
   equal(await getTextContent(query), newText);
@@ -149,14 +148,14 @@ it("Change action updates value of a textbox, focuses and fires a change event",
   const id = "cba-textbox";
   const query = `#${id}`;
   const evType = "change";
-  await addTestAction(query, evType, newText);
+  const action = createAction(query, evType, newText);
   let changeEvent = null;
   setListener(query, "change", (e) =>
   {
     changeEvent = e;
   });
   await wait();
-  await playTestProject();
+  await playTestProject([action]);
   equal(await getValue(query), newText);
   equal(await getActiveElementId(), id);
   ok(changeEvent);
@@ -166,13 +165,13 @@ it("Change action updates value of selectbox and textarea", async() =>
 {
   const evType = "change";
   const selectboxQuery = "#cba-selectbox";
-  await addTestAction(selectboxQuery, evType, "2");
+  const action1 = createAction(selectboxQuery, evType, "2");
 
   const newText = "Injected value";
   const textareaQuery = "#cba-textarea";
-  await addTestAction(textareaQuery, evType, newText);
+  const action2 = createAction(textareaQuery, evType, newText);
   
-  await playTestProject();
+  await playTestProject([action1, action2]);
   equal(await getSelectedValue(selectboxQuery), "2");
   equal(await getValue(textareaQuery), newText);
 });
@@ -181,8 +180,8 @@ it("Check action checks the checkbox", async() =>
 {
   const query = "#cba-checkbox";
   const evType = "check";
-  await addTestAction(query, evType, "");
-  await playTestProject();
+  const action = createAction(query, evType, "");
+  await playTestProject([action]);
   ok(await isChecked(query));
 });
 
@@ -190,10 +189,10 @@ it("Click action toggle the checkbox", async() =>
 {
   const query = "#cba-click";
   const evType = "click";
-  await addTestAction(query, evType, "");
-  await playTestProject();
+  const action = createAction(query, evType, "");
+  await playTestProject([action]);
   ok(await isChecked(query));
-  await playTestProject();
+  await playTestProject([action]);
   notOk(await isChecked(query))
 });
 
@@ -201,9 +200,9 @@ it("submit-click should wait for the page load before proceeding with next actio
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  await addTestAction("#cba-submit", "submit-click", "");
-  await addTestAction(setTextContentScript(query, injectText), "inject", "");
-  await playTestProject();
+  const action1 = createAction("#cba-submit", "submit-click", "");
+  const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
+  await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent(query), injectText);
 });
@@ -212,10 +211,10 @@ it("Update should wait for the page load before proceeding with next actions", a
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  await addTestAction(gotoRedirectPageScript(), "inject", "");
-  await addTestAction("", "update", "");
-  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
-  await playTestProject();
+  const action1 = createAction(gotoRedirectPageScript(), "inject", "");
+  const action2 = createAction("", "update", "");
+  const action3 = createAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject([action1, action2, action3]);
   await wait();
   equal(await getTextContent(query), injectText);
 });
@@ -224,10 +223,10 @@ it("Timer should wait for specified amount of milliseconds before proceeding wit
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  await addTestAction(gotoRedirectPageScript(), "inject", "");
-  await addTestAction("", "timer", "150");
-  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
-  await playTestProject();
+  const action1 = createAction(gotoRedirectPageScript(), "inject", "");
+  const action2 = createAction("", "timer", "150");
+  const action3 = createAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject([action1, action2, action3]);
   await wait();
   equal(await getTextContent(query), injectText);
 });
@@ -236,9 +235,9 @@ it("Redirect should redirect to specific page and wait for page load before proc
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  await addTestAction("/redirect", "redirect", "");
-  await addTestAction(setTextContentScript(query, injectText), "inject", injectText);
-  await playTestProject();
+  const action1 = createAction("/redirect", "redirect", "");
+  const action2 = createAction(setTextContentScript(query, injectText), "inject", injectText);
+  await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent(query), injectText);
 });
@@ -246,9 +245,9 @@ it("Redirect should redirect to specific page and wait for page load before proc
 it("Copy action should save element content into the clipboard and <$clipboard=copy> can be used to paste value", async() =>
 {
   const pasteQuery = "#cba-paste";
-  await addTestAction("#cba-copy", "copy", "");
-  await addTestAction(pasteQuery, "change", "<$clipboard=copy>");
-  await playTestProject();
+  const action1 = createAction("#cba-copy", "copy", "");
+  const action2 = createAction(pasteQuery, "change", "<$clipboard=copy>");
+  await playTestProject([action1, action2]);
   await wait();
   equal(await getValue(pasteQuery), "Copy me");
 });
@@ -257,10 +256,10 @@ it("Pause action pauses the workflow until the project is played again and set '
 {
   const beforePauseText = "First change";
   const afterPauseText = "Second change";
-  await addTestAction(setTextContentScript("#changeContent", beforePauseText), "inject", "");
-  await addTestAction("", "pause", "");
-  await addTestAction(setTextContentScript("#changeContent", afterPauseText), "inject", "");
-  await playTestProject();
+  const action1 = createAction(setTextContentScript("#changeContent", beforePauseText), "inject", "");
+  const action2 = createAction("", "pause", "");
+  const action3 = createAction(setTextContentScript("#changeContent", afterPauseText), "inject", "");
+  await playTestProject([action1, action2, action3]);
   equal(await getTextContent("#changeContent"), beforePauseText);
   equal(await getBadgeText(), "||");
   await playTestProject();
@@ -273,10 +272,10 @@ it("Clipboard set in inject should be accessible in cs-inject and bg-inject", as
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
   const bgGlobalVarName = "cba-bg-test";
-  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "inject", "");
-  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "cs-inject", "");
-  await addTestAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
-  await playTestProject();
+  const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "inject", "");
+  const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "cs-inject", "");
+  const action3 = createAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
+  await playTestProject([action1, action2, action3]);
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
@@ -287,10 +286,10 @@ it("Clipboard set in cs-inject should be accessible in inject and bg-inject", as
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
   const bgGlobalVarName = "cba-bg-test";
-  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "cs-inject", "");
-  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
-  await addTestAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
-  await playTestProject();
+  const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "cs-inject", "");
+  const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
+  const action3 = createAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
+  await playTestProject([action1, action2, action3]);
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
@@ -300,9 +299,9 @@ it("Clipboard set in bg-inject should be accessible in inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
-  await addTestAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "bg-inject", "");
-  await addTestAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
-  await playTestProject();
+  const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "bg-inject", "");
+  const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
+  await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
 });
@@ -315,9 +314,9 @@ it("clipboard[...] set as bg-function attribute should be passed along the funct
   ok(await getCookie("https://www.example2.com/", "cba"));
   const clipboardKey = "clip-key";
   const clipboardValue = "example1";
-  await addTestAction(`clipboard["${clipboardKey}"] = "${clipboardValue}";`, "bg-inject", "");
-  await addTestAction(`<$function=removeCookie> <$attr=clipboard["${clipboardKey}"]>`, "bg-function", "");
-  await playTestProject();
+  const action1 = createAction(`clipboard["${clipboardKey}"] = "${clipboardValue}";`, "bg-inject", "");
+  const action2 = createAction(`<$function=removeCookie> <$attr=clipboard["${clipboardKey}"]>`, "bg-function", "");
+  await playTestProject([action1, action2]);
   await wait();
   notOk(await getCookie("https://www.example1.com/", "cba"));
   ok(await getCookie("https://www.example2.com/", "cba"));
@@ -326,12 +325,12 @@ it("clipboard[...] set as bg-function attribute should be passed along the funct
 it("<$unique=> placeholder should generate random number with the specified characters length", async() =>
 {
   const pasteQuery = "#cba-paste";
-  await addTestAction(pasteQuery, "change", "<$unique=2>");
-  await playTestProject();
+  const action1 = createAction(pasteQuery, "change", "<$unique=2>");
+  await playTestProject([action1]);
   const firstUnique = await getValue(pasteQuery);
   equal(firstUnique.length, 2);
-  await addTestAction(pasteQuery, "change", "<$unique=2>");
-  await playTestProject();
+  const action2 = createAction(pasteQuery, "change", "<$unique=2>");
+  await playTestProject([action2]);
   const secondUnique = await getValue(pasteQuery);
   equal(secondUnique.length, 2);
   notEqual(firstUnique, secondUnique);
@@ -346,8 +345,8 @@ it("Repeat option should keep repeating actions in the project", async() =>
       value = 1;
     document.querySelector("${query}").value = ++value;`;
 
-  await addTestAction(code, "inject");
-  await playTestProject(4);
+  const action = createAction(code, "inject", "");
+  await playTestProject([action], 4);
   await wait();
   equal(await getValue("#cba-num"), "5");
 });
@@ -363,9 +362,9 @@ it("sendBgInstruction variable and sendInstruction() method can be used in bg-in
     window["${bgGlobalVarName}"] = "${firstActionText}";
     sendInstruction();
   }, 100);`;
-  await addTestAction(code, "bg-inject");
-  await addTestAction(`window["${bgGlobalVarName}"] = "${secondActionText}";`, "bg-inject");
-  await playTestProject();
+  const action1 = createAction(code, "bg-inject", "");
+  const action2 = createAction(`window["${bgGlobalVarName}"] = "${secondActionText}";`, "bg-inject");
+  await playTestProject([action1, action2]);
   await wait(200);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), secondActionText);
 });
@@ -377,11 +376,11 @@ it("actionToPlay can be used in bg-inject to Jump to another action", async() =>
   const secondInjectedText = "Second Injected Text"; 
   const jumpToAction = 3;
   const lastActionText = "Last action has been played";
-  await addTestAction(setTextContentScript(query, firstInjectedText), "inject");
-  await addTestAction(`actionToPlay(${jumpToAction});`, "bg-inject");
-  await addTestAction(setTextContentScript(query, secondInjectedText), "inject");
-  await addTestAction(`window["${bgGlobalVarName}"] = "${lastActionText}";`, "bg-inject", "");
-  await playTestProject();
+  const action1 = createAction(setTextContentScript(query, firstInjectedText), "inject");
+  const action2 = createAction(`actionToPlay(${jumpToAction});`, "bg-inject");
+  const action3 = createAction(setTextContentScript(query, secondInjectedText), "inject");
+  const action4 = createAction(`window["${bgGlobalVarName}"] = "${lastActionText}";`, "bg-inject", "");
+  await playTestProject([action1, action2, action3, action4]);
   await wait();
   equal(await getTextContent(query), firstInjectedText);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), lastActionText);
@@ -400,6 +399,11 @@ function setTextContentScript(query, newText)
 function setContentFromClipboardScript(query, clipboardName)
 {
   return `document.querySelector('${query}').textContent = clipboard["${clipboardName}"];`
+}
+
+function createAction(data, type, value)
+{
+  return {data, type, value};
 }
 
 module.exports = {pageSetup};

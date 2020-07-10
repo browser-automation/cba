@@ -235,16 +235,11 @@ async function addTestAction(data, evType, newValue)
   }, actionObj);
 }
 
-async function playTestProject(repeate = "1")
+async function playTestProject(actions, repeate = "1")
 {
-  const porjectData = {
-    isProject: true,
-    project: "testProject",
-    group: "testGroup",
-    groupObj: ""
-  };
-  const projectId = "2";
-  await backgroundPage().evaluate((porjectData, projectId, repeate) => cba.playButtonClick(porjectData, projectId, repeate), porjectData, projectId, repeate);
+  await backgroundPage().evaluate((actions, repeate) =>  {
+    cba.playButtonClick(actions, repeate)
+  }, actions, repeate);
 }
 
 async function getElementAttribute(query, ...attributes)

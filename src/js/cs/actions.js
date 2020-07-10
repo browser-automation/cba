@@ -16,27 +16,29 @@ browser.runtime.onMessage.addListener((request, sender) => {
 
 function executeAction(recordRow, request)
 {
-  const {evType} = recordRow;
+  const evType = recordRow.type;
+  const data = recordRow.data;
+  const newValue = recordRow.value;
   switch (evType) {
     case "change": {
-      const targetElement = document.querySelector(recordRow.data);
+      const targetElement = document.querySelector(data);
       targetElement.focus();
-      targetElement.value = placeholders(recordRow.newValue);
+      targetElement.value = placeholders(newValue);
       const event = new Event("change");
       targetElement.dispatchEvent(event, { "bubbles": true });
       break;
     }
     case "submit-click":
     case "click": {
-      document.querySelector(recordRow.data).click();
+      document.querySelector(data).click();
       break;
     }
     case "check": {
-      document.querySelector(recordRow.data).checked = true;
+      document.querySelector(data).checked = true;
       break;
     }
     case "redirect": {
-      window.location = recordRow.data;
+      window.location = data;
       break;
     }
     case "inject": {
@@ -45,7 +47,7 @@ function executeAction(recordRow, request)
       script.setAttribute("type", "application/javascript");
       script.textContent =  `
         var clipboard=${JSON.stringify(request.clipboard)};
-        ${recordRow.data};
+        ${data};
         var newdiv = document.createElement('div');
         if(document.getElementById('${clipboardId}')!= null) {
           document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
@@ -65,11 +67,11 @@ function executeAction(recordRow, request)
       break;
     }
     case "cs-inject": {
-      eval(recordRow.data);
+      eval(data);
       break;
     }
     case "copy": {
-      const targetElement = document.querySelector(recordRow.data);
+      const targetElement = document.querySelector(data);
       if(targetElement) {
         clipboard["copy"] = targetElement.innerHTML;
       }
