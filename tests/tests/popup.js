@@ -9,8 +9,8 @@ const notOk = (value) => ok(!value);
 const {wait, setDefaultCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
-       getCbaListRowHandle, getCbaTableRowHandle,
-       triggerDrop, getNotificationMsg} = require("./utils");
+       getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
+       triggerDrop, getNotificationMsg, getTextContent} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -37,9 +37,12 @@ const clickAddAction = () => page().click("[data-action='addAction']");
 const clickDeleteAction = () => page().click("[data-action='deleteAction']");
 const clickSaveAction = () => page().click("[data-action='saveAction']");
 
+const clickPlay = () => page().click("[data-action='play']");
+
 beforeEach(async () =>
 {
   await setDefaultCollections();
+  await resetCbaObject();
   await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
 });
@@ -131,6 +134,7 @@ it("'Add' button adds new empty action to the selected project", async () =>
   };
   const item1 = {
     id: "cba-table-id-1",
+    selected: true,
     texts
   };
   const item2 = {
@@ -149,26 +153,26 @@ it("'Add' button adds new empty action to the selected project", async () =>
 
 it("'Delete' button removes selected action from the selected project", async () =>
 {
-  await addThreeEmptyActions();
+  await addFourEmptyActions();
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
   await clickDeleteAction();
-  equal(await cbaTableItemsLength(cbaTableQuery), 2);
+  equal(await cbaTableItemsLength(cbaTableQuery), 3);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
   equal((await cbaTableGetItem(cbaTableQuery, 1)).id, "cba-table-id-3");
 
   await clickDeleteAction();
-  equal(await cbaTableItemsLength(cbaTableQuery), 1);
+  equal(await cbaTableItemsLength(cbaTableQuery), 2);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
 
   await page().reload({waitUntil: "domcontentloaded"});
-  equal(await cbaTableItemsLength(cbaTableQuery), 1);
+  equal(await cbaTableItemsLength(cbaTableQuery), 2);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
 });
 
 it("'Save' button updates selected action with the data from action input fields", async() =>
 {
-  await addThreeEmptyActions()
+  await addFourEmptyActions()
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
   const data = "testAction1";
@@ -189,7 +193,7 @@ it("'Save' button updates selected action with the data from action input fields
 
 it("Selecting action populates input deselecting clears", async() =>
 {
-  await addThreeEmptyActions();
+  await addFourEmptyActions();
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
   const data = "testAction1";
@@ -226,7 +230,7 @@ it("Selecting action populates input deselecting clears", async() =>
 
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
 {
-  await addThreeEmptyActions();
+  await addFourEmptyActions();
   const handle = await getCbaListRowHandle(cbaFunctionsQuery, "cba-list-id-1");
 
   const actionTableItemIsTimer = async(index) =>
@@ -293,6 +297,9 @@ it("Test error messages", async() =>
   await clickRenameProject();
   equal(await getNotificationMsg(), NO_PROJ_GROUP_SELECTED);
 
+  await clickPlay();
+  equal(await getNotificationMsg(), NO_PROJ_SELECTED);
+
   await clickAddAction();
   equal(await getNotificationMsg(), NO_PROJ_SELECTED);
 
@@ -305,9 +312,89 @@ it("Test error messages", async() =>
   await cbaListItemSelect(cbaListQuery, "group");
   await clickAddAction();
   equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
+
+  await clickPlay();
+  equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
 });
 
-async function addThreeEmptyActions()
+it("Selecting project and actions is remembered after reload", async() =>
+{
+  notOk(await getSelectedRow(cbaListQuery));
+  await cbaListItemExpand(cbaListQuery, "group");
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  ok(await getSelectedRow(cbaListQuery));
+  equal((await getSelectedRow(cbaListQuery)).text, "project");
+
+  await addFourEmptyActions();
+  await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+
+  await resetCbaObject();
+  await page().reload({waitUntil: "domcontentloaded"});
+  await cbaListItemExpand(cbaListQuery, "group");
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
+});
+
+it("Actions are being updated while playing", async() =>
+{
+  await addFourEmptyActions();
+
+  await updateSpecificAction("cba-table-id-1", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-2", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "190");
+  await updateSpecificAction("cba-table-id-4", "", "timer", "200");
+  await clickPlay();
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
+
+  await wait(200);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
+});
+
+it("When paused play button becomes 'resume', when clicked resumes playback", async() => {
+  await addFourEmptyActions();
+
+  await updateSpecificAction("cba-table-id-1", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-2", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-3", "", "pause", "");
+  await updateSpecificAction("cba-table-id-4", "", "timer", "190");
+
+  await clickPlay();
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
+
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
+  equal(await getTextContent("#playButton"), "resume");
+
+  await clickPlay();
+  equal(await getTextContent("#playButton"), "play");
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
+  await wait(100);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
+});
+
+async function addFourEmptyActions()
 {
   await cbaListItemExpand(cbaListQuery, "group");
   await cbaListItemSelect(cbaListQuery, "project", "group");
@@ -315,11 +402,23 @@ async function addThreeEmptyActions()
   await clickAddAction();
   await clickAddAction();
   await clickAddAction();
+  await clickAddAction();
 
-  equal(await cbaTableItemsLength(cbaTableQuery), 3);
+  equal(await cbaTableItemsLength(cbaTableQuery), 4);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
   equal((await cbaTableGetItem(cbaTableQuery, 1)).id, "cba-table-id-2");
   equal((await cbaTableGetItem(cbaTableQuery, 2)).id, "cba-table-id-3");
+  equal((await cbaTableGetItem(cbaTableQuery, 3)).id, "cba-table-id-4");
+}
+
+async function updateSpecificAction(id, data, type, value)
+{
+  await cbaTableSelectRow(cbaTableQuery, id);
+
+  await setValue(inputDataQuery, data);
+  await setValue(inputEventQuery, type);
+  await setValue(inputValueQuery, value);
+  await clickSaveAction();
 }
 
 module.exports = {pageSetup};

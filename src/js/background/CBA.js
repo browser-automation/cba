@@ -4,6 +4,7 @@ class CBA {
     this.allowPlay = 0;
     this.paused = 0;
     this.playingProjectId;
+    this.playingActionId = null;
     this.instructArray;
     this.defInstructArray;
     this.playingTabId = 0;
@@ -13,6 +14,7 @@ class CBA {
     this.currentTab;
     this.projectRepeat = 1;
     this.lastSelectedProjectId;
+    this.lastSelectedActionId;
     this.selectedProjObj;
   }
 
@@ -23,7 +25,8 @@ class CBA {
 
     this.allowPlay = 1;
     this.projectRepeat = repeatVal;
-    this.playingProjectId = currProjectId;
+    if (currProjectId)
+      this.playingProjectId = currProjectId;
 
     this.instructArray = actions;
     this.defInstructArray = this.instructArray.slice(0);

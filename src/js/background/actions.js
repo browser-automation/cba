@@ -7,6 +7,9 @@ async function playProject() {
   else if(cba.instructArray.length) {
     browser.browserAction.setBadgeText({"text":"play"});
     const [instruction] = cba.instructArray.splice(0, 1);
+    if (instruction.id)
+      cba.playingActionId = instruction.id;
+
     await actionExecution(instruction);
     await playProject();
   }
@@ -16,6 +19,8 @@ async function playProject() {
     playProject();
   }
   else {
+    cba.playingActionId = null;
+    cba.playingProjectId = null;
     cba.allowPlay = 0;
     browser.browserAction.setBadgeText({"text": ""});
   }
@@ -23,9 +28,7 @@ async function playProject() {
 
 async function actionExecution(instruction)
 {
-  const evType = instruction.type;
-  const data = instruction.data;
-  const newValue = instruction.value;
+  const {evType, data, newValue} = instruction;
   switch (evType) {
     case "redirect":
     case "submit-click": {

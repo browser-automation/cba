@@ -88,6 +88,12 @@ async function cbaListItemExpand(query, text)
   }, query, item.id);
 }
 
+async function getSelectedRow(query)
+{
+  const listItem = await page().$(query);
+  return listItem.evaluate(async(listItem) => listItem.getSelectedItem());
+}
+
 async function cbaListItemSelect(query, text, parentText)
 {
   const [item] = await cbaListItemsByText(query, text, parentText);
@@ -326,6 +332,29 @@ async function resetClipboardValue()
   return backgroundPage().evaluate(() => cba.clipboard = {});
 }
 
+async function resetCbaObject()
+{
+  return backgroundPage().evaluate(() => {
+    cba.allowRec = false;
+    cba.allowPlay = 0;
+    cba.paused = 0;
+    cba.playingProjectId;
+    cba.playingActionId = null;
+    cba.instructArray;
+    cba.defInstructArray;
+    cba.playingTabId = 0;
+    cba.instruction;
+    cba.selectedProjectId;
+    cba.lastEvType;
+    cba.currentTab;
+    cba.projectRepeat = 1;
+    cba.lastSelectedProjectId = null;
+    cba.lastSelectedActionId = null;
+    cba.selectedProjObj = null;
+    return cba;
+  });
+}
+
 async function getBadgeText()
 {
   return backgroundPage().evaluate(() => {
@@ -409,7 +438,8 @@ module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
                   resetClipboardValue, isElementExist, setDefaultCollections,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
-                  setWindowLocalStorage, getWindowLocalStorage, reloadExtension,
+                  getSelectedRow,setWindowLocalStorage, getWindowLocalStorage,
+                  reloadExtension,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
-                  getCbaTableRowHandle, getNotificationMsg};
+                  getCbaTableRowHandle, getNotificationMsg, resetCbaObject};

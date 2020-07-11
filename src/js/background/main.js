@@ -155,7 +155,7 @@ function stopButtonClick() {
  * Function that calls after clicking on Play button
  */
 async function playButtonClick(actions, repeatVal, currProjectId) {
-  if (cba.paused == 1) {
+  if (cba.paused) {
     cba.restore();
   }
   else {

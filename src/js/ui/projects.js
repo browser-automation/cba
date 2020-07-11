@@ -17,11 +17,18 @@ const bg = chrome.extension.getBackgroundPage().cba;
 async function loadProjects()
 {
   projects.items = await load();
+  if (bg.lastSelectedProjectId)
+    projects.selectRow(bg.lastSelectedProjectId);
+
   const {type, actions} = projects.getSelectedItem();
   if (type === "project")
     populateActions(actions);
   else
     populateActions([]);
+
+  //TODO: avoide specifing those here.
+  if(bg.allowPlay || bg.paused)
+    keepHighlightingPlayingAction();
 }
 
 async function loadFunctions()
@@ -32,12 +39,17 @@ async function loadFunctions()
 function populateActions(items)
 {
   actionsComp.items = items;
+  if (bg.lastSelectedActionId)
+    actionsComp.selectRow(bg.lastSelectedActionId);
+  else
+    selectFirstAction();
   onActionSelect();
 }
 
 async function onProjectSelect()
 {
-  const {type, actions} = projects.getSelectedItem();
+  const {type, actions, id} = projects.getSelectedItem();
+  bg.lastSelectedProjectId = id;
   resetActionInput();
   if (type === "project")
     populateActions(actions);
@@ -52,9 +64,17 @@ function resetActionInput()
   actionNewValue.value = "";
 }
 
+function selectFirstAction()
+{
+  const [firstItem] = actionsComp.items;
+  if (firstItem)
+    actionsComp.selectRow(firstItem.id);
+}
+
 async function onActionSelect()
 {
-  const {texts} = actionsComp.getSelectedItem();
+  const {texts, id} = actionsComp.getSelectedItem();
+  bg.lastSelectedActionId = id;
   if (!texts) {
     return null;
   }
@@ -65,6 +85,8 @@ async function onActionSelect()
     actionEvType.value = type;
   else
     actionEvType.selectedIndex = 0;
+
+  actionEvType.dispatchEvent(new Event("change"));
 }
 
 function onEventInputChange()
@@ -77,7 +99,6 @@ function onEventInputChange()
                             "check", "click","submit-click","update", "redirect",
                             "copy", "pause"];
   const disablesData = ["update", "timer", "pause"];
-  
   if (disablesNewValue.includes(actionType))
   {
     actionNewValue.disabled = true;
@@ -94,6 +115,31 @@ function updateRecordButtonState() {
     recordButton.textContent("recording...");
   else
     recordButton.textContent("rec");
+}
+
+function updatePlayButtonState() {
+  const playButton = document.querySelector("#playButton");
+  if (bg.paused)
+    playButton.textContent = "resume";
+  else
+    playButton.textContent = "play";
+}
+
+function keepHighlightingPlayingAction()
+{
+  updatePlayButtonState();
+  if(bg.allowPlay || bg.paused)
+  {
+    projects.selectRow(bg.playingProjectId);
+    if (bg.playingActionId)
+      actionsComp.selectRow(bg.playingActionId);
+
+    setTimeout(keepHighlightingPlayingAction, 100);
+  }
+  else
+  {
+    selectFirstAction();
+  }
 }
 
 async function onAction(action)
@@ -226,6 +272,13 @@ async function onAction(action)
       break;
     }
     case "play": {
+      const uiToCbaActions = ({texts, id}) => {
+        const evType = texts.type;
+        const data = texts.data;
+        const newValue = texts.value;
+        return {evType, data, newValue, id};
+      };
+
       const selectedProject = projects.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
@@ -233,9 +286,8 @@ async function onAction(action)
       const {type, actions, id} = selectedProject;
       if (type === "project" && actions) {
         const repeateValue = document.querySelector("#repeat").value;
-        bg.playButtonClick(actions.map(({texts}) => texts), repeateValue, id);
-        // TODO implement timedCount and/or alternative
-
+        bg.playButtonClick(actions.map(uiToCbaActions), repeateValue, id);
+        keepHighlightingPlayingAction();
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
