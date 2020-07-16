@@ -20,7 +20,7 @@ function recordButtonClick() {
     writeHelpMessage("Please select project", "red");
     return;
   }
-  
+
   if(projObj["isProject"] == false) {
     writeHelpMessage("Please select project (not group)", "red");
     return;

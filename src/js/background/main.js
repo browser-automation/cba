@@ -2,6 +2,7 @@ require("../analytics");
 const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
+const {addAction} = require("../db/collections");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -13,7 +14,7 @@ window.cba.stopButtonClick = stopButtonClick;
  * Function for listening to connection port and get data from content script
  */
 browser.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener((msg) => {
+  port.onMessage.addListener(async(msg) => {
     if(cba.allowRec) {
       storeRecord(msg);
     }
@@ -36,11 +37,13 @@ async function isFirstLoad() {
     if (!Object.keys(collections).length) {
       const collections = [
         {
+          id: "group",
           text: "group",
           type: "group",
           expanded: false,
           subItems: [
             {
+              id: "project",
               text: "project",
               type: "project",
               actions: []
@@ -106,39 +109,30 @@ isFirstLoad();
  */
 function storeRecord(msg) {
   if(msg.evType == "redirect") {
-    pushRecord(msg);
-    return;
+    return addAction(cba.recordingGroupId, cba.recordingProjectId, {texts: msg});
   }
   if((cba.lastEvType == "update") && (msg.evType == "update")) {
-    return;
+    return false;
   }
   cba.lastEvType = msg.evType;
-  
-  pushRecord(msg);
-}
-
-function pushRecord(msg) {
-  const dataObj = JSON.parse(localStorage.getItem("data"));
-  const projectsArray = dataObj[cba.selectedProjObj["group"]].projects;
-
-  for(let i=0; i < projectsArray.length; i++) {
-    if(projectsArray[i].name == cba.selectedProjObj["project"]) {
-      projectsArray[i].action.push(msg);
-    }
-  }
-  localStorage.setItem("data", JSON.stringify(dataObj));
+  return addAction(cba.recordingGroupId, cba.recordingProjectId, {texts: msg});
 }
 
 async function storeCurrentUrl() {
   const {url} = (await browser.tabs.query({active: true}))[0];
-  storeRecord({msgType: "RecordedEvent", "data": url, "evType": 'redirect', "newValue" : ''});
+  await storeRecord({
+                        msgType: "RecordedEvent",
+                        data: url,
+                        type: "redirect",
+                        value: ""
+                      });
 }
 
 /*
  * Function that calls after clicking on record button
  */
-async function recordButtonClick(projObj, projectId) {
-  cba.record(projObj, projectId);
+async function recordButtonClick(groupId, projectId) {
+  cba.record(groupId, projectId);
   await storeCurrentUrl();
   browser.browserAction.setBadgeText({"text": "rec"});
 }

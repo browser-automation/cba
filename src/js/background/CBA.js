@@ -5,6 +5,8 @@ class CBA {
     this.paused = 0;
     this.playingProjectId;
     this.playingActionId = null;
+    this.recordingProjectId = null;
+    this.recordingGroupId = null;
     this.instructArray;
     this.defInstructArray;
     this.playingTabId = 0;
@@ -43,9 +45,9 @@ class CBA {
     this.paused = 1;
   }
 
-  record(projObj, projectId) {
-    this.selectedProjObj = projObj;
-    this.selectedProjectId = projectId;
+  record(groupId, projectId) {
+    this.recordingProjectId = projectId;
+    this.recordingGroupId = groupId;
     this.allowRec = true;
   }
 

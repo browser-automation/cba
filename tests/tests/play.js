@@ -401,9 +401,9 @@ function setContentFromClipboardScript(query, clipboardName)
   return `document.querySelector('${query}').textContent = clipboard["${clipboardName}"];`
 }
 
-function createAction(data, evType, newValue)
+function createAction(data, type, value)
 {
-  return {data, evType, newValue};
+  return {data, type, value};
 }
 
 module.exports = {pageSetup};

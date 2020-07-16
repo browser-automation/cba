@@ -5,7 +5,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {setTestProject, getTextContent, getPageUrl,
+const {setDefaultCollections, getTextContent, getPageUrl,
        resetBackgroundGlobalVar, startTestRecording, stopTestRecording,
        getTestProjectActions, focusAndType, wait, getBadgeText} = require("./utils");
 const {setTestPage, navigateTo, page} = require("../main");
@@ -44,7 +44,7 @@ const pageSetup = {
 
 beforeEach(async () =>
 {
-  await setTestProject();
+  await setDefaultCollections();
   const pageUrl = await getPageUrl();
   await resetBackgroundGlobalVar(bgGlobalVarName);
 
@@ -57,7 +57,7 @@ it("Starting and stoping the recording adds a redirect action", async() =>
 {
   await startTestRecording();
   await stopTestRecording();
-  equal(await getTestProjectActions(0, "evType"), "redirect");
+  equal(await getTestProjectActions(0, "type"), "redirect");
   equal(await getTestProjectActions(0, "data"), `${server}/`);
 });
 
@@ -181,10 +181,12 @@ it("Clicking element inside catchable one should get recorded accordingly and us
             createAction("#cba-path-button-nested", "click"));
 });
 
-function createAction(data, evType, newValue="")
+function createAction(data, type, value="")
 {
   return {
-    data, evType, newValue, msgType: "RecordedEvent"
+    texts : {
+      data, type, value, msgType: "RecordedEvent"
+    }
   }
 }
 

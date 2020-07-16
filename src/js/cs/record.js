@@ -10,7 +10,7 @@ function getActionDataValue(data, target)
   return typeof data === "function" ? data(target) : data;
 }
 
-function recordAction(target,actionsData)
+function recordAction(target, actionsData)
 {
   for (const {queries, action, data, newValue} of actionsData) {
     const closestTargets = queries.map(findClosest.bind(target)).filter(e => e);
@@ -110,7 +110,7 @@ function getPath(element) {
  * newValue: newValue as example for chaged value
  */
 function sendmsg(data, evType, newValue){
-  port.postMessage({msgType: "RecordedEvent", "data": data, "evType": evType, "newValue" : newValue});
+  port.postMessage({msgType: "RecordedEvent", "data": data, "type": evType, "value" : newValue});
 }
 
 document.addEventListener("click", actionRecorder);

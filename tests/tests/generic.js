@@ -28,11 +28,13 @@ it("Starting the extension should set default actions", async() =>
     collections: [{
       text: "group",
       type: "group",
+      id: "group",
       expanded: false,
       subItems: [
         {
           text: "project",
           type: "project",
+          id: "project",
           actions: []
         }
       ]

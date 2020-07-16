@@ -262,7 +262,18 @@ async function onAction(action)
       break;
     }
     case "record": {
+      const selectedProject = projects.getSelectedItem();
+      if (!selectedProject)
+        return notification.error(NO_PROJ_SELECTED);
 
+      const {type, id} = selectedProject;
+      if (type === "project") {
+        const parentItem = projects._findItem("id", id, true);
+        bg.recordButtonClick(parentItem.id, id);
+      }
+      else {
+        return notification.error(SELECT_PROJ_NOT_GROUP);
+      }
       break;
     }
     case "stop": {
@@ -273,10 +284,8 @@ async function onAction(action)
     }
     case "play": {
       const uiToCbaActions = ({texts, id}) => {
-        const evType = texts.type;
-        const data = texts.data;
-        const newValue = texts.value;
-        return {evType, data, newValue, id};
+        const {data, type, value} = texts;
+        return {data, type, value, id};
       };
 
       const selectedProject = projects.getSelectedItem();

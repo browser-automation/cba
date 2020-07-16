@@ -28,7 +28,9 @@ async function playProject() {
 
 async function actionExecution(instruction)
 {
-  const {evType, data, newValue} = instruction;
+  const {type, data, value} = instruction;
+  const evType = type;
+  const newValue = value;
   switch (evType) {
     case "redirect":
     case "submit-click": {

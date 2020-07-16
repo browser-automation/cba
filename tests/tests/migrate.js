@@ -119,22 +119,26 @@ it("Extension should move and backup old data", async() =>
   const migratedData = {
     collections: [{
       text: "oldGroup",
+      id: "oldGroup",
       type: "group",
       expanded: false,
       subItems: [
         {
           text: "oldProject",
+          id: "oldGroup_oldProject",
           type: "project",
           actions: []
         }
       ]
     }, {
       text: "oldGroup1",
+      id: "oldGroup1",
       type: "group",
       expanded: false,
       subItems: [
         {
           text: "oldProject0",
+          id: "oldGroup1_oldProject0",
           type: "project",
           actions: [{
             texts: {
@@ -153,6 +157,7 @@ it("Extension should move and backup old data", async() =>
         },
         {
           text: "oldProject2",
+          id: "oldGroup1_oldProject2",
           type: "project",
           actions: [{
             texts: {

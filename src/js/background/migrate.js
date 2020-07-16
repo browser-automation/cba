@@ -21,7 +21,7 @@ async function backup() {
 function migrateActions(actions) {
   if (actions && actions.length) {
     return actions.map(({data, evType, newValue}) => { 
-      return {texts : {data, type: evType, value: newValue}};
+      return {texts: {data, type: evType, value: newValue}};
     });
   }
   else {
@@ -29,10 +29,13 @@ function migrateActions(actions) {
   }
 }
 
-function migrateProjects({projects}) {
+function migrateProjects({projects}, groupName) {
   if (projects && projects.length) {
     return projects.map(({name, action}) => {
-      return {text: name, actions: migrateActions(action), type: "project"}
+      return {
+        id: `${groupName}_${name}`,
+        text: name, 
+        actions: migrateActions(action), type: "project"}
     });
   }
   else {
@@ -47,8 +50,9 @@ async function migrate() {
     for (const groupName of Object.keys(data)) {
       const group = {
         "text": groupName,
+        "id": groupName,
         "expanded": false,
-        "subItems": migrateProjects(data[groupName]),
+        "subItems": migrateProjects(data[groupName], groupName),
         "type": "group"
       };
       collections.push(group);

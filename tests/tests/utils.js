@@ -1,28 +1,5 @@
 const {backgroundPage, page} = require("../main");
 
-async function setTestProject()
-{
-  const dataObj = {
-    "testGroup": {
-      "name": "testGroup",
-      "level": "0",
-      "parent": "",
-      "isLeaf": false,
-      "expanded": true,
-      "loaded": true,
-      "projects": [{
-        "action": [],
-        "name": "testProject",
-        "level": "1",
-        "isLeaf": true,
-        "expanded": false,
-        "loaded": true
-      }]
-    }
-  };
-  return backgroundPage().evaluate((data) => localStorage.setItem("data", JSON.stringify(data)) , dataObj);
-}
-
 async function setWindowLocalStorage(key, data)
 {
   return backgroundPage().evaluate((key, data) => localStorage.setItem(key, JSON.stringify(data)) , key, data);
@@ -41,11 +18,13 @@ async function reloadExtension()
 async function setDefaultCollections()
 {
     const collections = [{
+      id: "group",
       text: "group",
       type: "group",
       expanded: false,
       subItems: [
         {
+          id: "project",
           text: "project",
           type: "project",
           actions: []
@@ -183,13 +162,9 @@ async function triggerDragStart(handle)
 
 async function startTestRecording()
 {
-  const projectId = "testProject";
-  const projectObj = {
-    "isProject": true,
-    "project": `${projectId}`,
-    "group": "testGroup",
-  };
-  return backgroundPage().evaluate((projectObj, projectId) => cba.recordButtonClick(projectObj, projectId) , projectObj, projectId);
+  const groupId = "group";
+  const projectId = "project";
+  return backgroundPage().evaluate((groupId, projectId) => cba.recordButtonClick(groupId, projectId) , groupId, projectId);
 }
 
 async function stopTestRecording()
@@ -221,7 +196,17 @@ async function getProjectActions(groupName, projectName, num, key)
 
 async function getTestProjectActions(num, key)
 {
-  return getProjectActions("testGroup", "testProject", num, key);
+  const {collections} = await getLocalStorageData("collections");
+  const [group] = collections.filter(({id}) => id === "group");
+  if (!group)
+    return null;
+  const [project] = group.subItems.filter(({id}) => id === "project");
+
+  if (!project || !project.actions)
+    return null;
+
+  const {actions} = project;
+  return key ? actions[num].texts[key] : actions[num];
 }
 
 async function addTestAction(data, evType, newValue)
@@ -428,7 +413,7 @@ async function sendCurrentTabRequest(request)
   }, request);
 }
 
-module.exports = {setTestProject, playTestProject, getBackgroundGlobalVar,
+module.exports = {playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getValue, setValue, changeValue, isDisabled,

@@ -16,7 +16,9 @@ browser.runtime.onMessage.addListener((request, sender) => {
 
 function executeAction(recordRow, request)
 {
-  const {evType, data, newValue} = recordRow;
+  const {type, data, value} = recordRow;
+  const evType = type;
+  const newValue = value;
   switch (evType) {
     case "change": {
       const targetElement = document.querySelector(data);
