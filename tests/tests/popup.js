@@ -217,6 +217,14 @@ it("Selecting action populates input deselecting clears", async() =>
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
   deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
+  equal(await getValue(inputDataQuery), data);
+  equal(await getValue(inputEventQuery), type);
+  equal(await getValue(inputValueQuery), value);
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal(await getValue(inputDataQuery), data);
+  equal(await getValue(inputEventQuery), type);
+  equal(await getValue(inputValueQuery), value);
 
   await cbaListItemSelect(cbaListQuery, "group");
   equal(await getValue(inputDataQuery), "");
@@ -226,9 +234,9 @@ it("Selecting action populates input deselecting clears", async() =>
   await cbaListItemSelect(cbaListQuery, "project", "group");
   deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
 
-  equal(await getValue(inputDataQuery), data);
-  equal(await getValue(inputEventQuery), type);
-  equal(await getValue(inputValueQuery), value);
+  equal(await getValue(inputDataQuery), "");
+  equal(await getValue(inputEventQuery), "inject");
+  equal(await getValue(inputValueQuery), "");
 });
 
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>

@@ -39,7 +39,8 @@ async function loadFunctions()
 function populateActions(items)
 {
   actionsComp.items = items;
-  if (bg.lastSelectedActionId)
+  const projectId = projects.getSelectedItem().id;
+  if (bg.lastSelectedActionId && bg.lastSelectedProjectId === projectId)
     actionsComp.selectRow(bg.lastSelectedActionId);
   else
     selectFirstAction();
