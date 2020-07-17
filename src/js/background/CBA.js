@@ -4,7 +4,7 @@ class CBA {
     this.allowPlay = 0;
     this.paused = 0;
     this.playingProjectId;
-    this.playingActionId = null;
+    this.playingActionIndex = -1;
     this.recordingProjectId = null;
     this.recordingGroupId = null;
     this.instructArray;

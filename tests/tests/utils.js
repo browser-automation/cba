@@ -125,6 +125,13 @@ async function getNotificationMsg()
   return getElementAttribute("#notification", "textContent");
 }
 
+async function getCurrentWindowUrl()
+{
+  return page().evaluate(async() => {
+    return window.location.href;
+  });
+}
+
 async function triggerDrop(query, id, data)
 {
   const handle = await getCbaTableRowHandle(query, id);
@@ -324,7 +331,7 @@ async function resetCbaObject()
     cba.allowPlay = 0;
     cba.paused = 0;
     cba.playingProjectId;
-    cba.playingActionId = null;
+    cba.playingActionIndex = -1;
     cba.instructArray;
     cba.defInstructArray;
     cba.playingTabId = 0;
@@ -427,4 +434,5 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   reloadExtension,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
-                  getCbaTableRowHandle, getNotificationMsg, resetCbaObject};
+                  getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
+                  getCurrentWindowUrl};

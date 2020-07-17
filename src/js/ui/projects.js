@@ -112,9 +112,9 @@ function onEventInputChange()
 function updateRecordButtonState() {
   const recordButton = document.querySelector("#recordButton");
   if (bg.allowRec)
-    recordButton.textContent("recording...");
+    recordButton.textContent = "recording...";
   else
-    recordButton.textContent("rec");
+    recordButton.textContent = "rec";
 }
 
 function updatePlayButtonState() {
@@ -131,9 +131,13 @@ function keepHighlightingPlayingAction()
   if(bg.allowPlay || bg.paused)
   {
     projects.selectRow(bg.playingProjectId);
-    if (bg.playingActionId)
-      actionsComp.selectRow(bg.playingActionId);
 
+    console.log(bg.playingActionIndex);
+    if (bg.playingActionIndex >= 0)
+    {
+      const {id} = actionsComp.items[bg.playingActionIndex];
+      actionsComp.selectRow(id);
+    }
     setTimeout(keepHighlightingPlayingAction, 100);
   }
   else
@@ -142,13 +146,18 @@ function keepHighlightingPlayingAction()
   }
 }
 
+function saveProjectsState()
+{
+  return saveState(projects.items);
+}
+
 async function onAction(action)
 {
   switch (action) {
     case "addGroup": {
       const num = getNextTextNumber(projects.items, "group");
       projects.addRow(createGroupObj(`group${num}`));
-      saveState(projects.items);
+      saveProjectsState();
       break;
     }
     case "addProject": {
@@ -161,7 +170,7 @@ async function onAction(action)
 
       const num = getNextTextNumber(topItem.subItems, "project");
       projects.addRow(createProjectObj(`project${num}`), topItem.id);
-      saveState(projects.items);
+      saveProjectsState();
       break;
     }
     case "removeProject": {
@@ -171,7 +180,7 @@ async function onAction(action)
 
       const {id} = selectedProject;
       projects.deleteRow(id);
-      saveState(projects.items);
+      saveProjectsState();
       break;
     }
     case "renameProject": {
@@ -196,7 +205,7 @@ async function onAction(action)
         actionsComp.addRow({texts: {data, type, value}});
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
-        saveState(projects.items);
+        saveProjectsState();
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
@@ -216,7 +225,7 @@ async function onAction(action)
         actionsComp.deleteRow(selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
-        saveState(projects.items);
+        saveProjectsState();
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
@@ -240,7 +249,7 @@ async function onAction(action)
         actionsComp.updateRow({texts: {data, type, value}}, selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
-        await saveState(projects.items);
+        await saveProjectsState();
         notification.show(CHANGES_SAVED);
       }
       break;
@@ -254,7 +263,7 @@ async function onAction(action)
       if (type === "project") {
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
-        saveState(projects.items);
+        saveProjectsState();
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
@@ -274,6 +283,7 @@ async function onAction(action)
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
       }
+      updateRecordButtonState();
       break;
     }
     case "stop": {
@@ -353,6 +363,9 @@ function registerActionListener(callback)
 
 loadProjects();
 loadFunctions();
+updateRecordButtonState();
+
+projects.addEventListener("expand", saveProjectsState);
 projects.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
 actionsComp.addEventListener("dragndrop", ()=>

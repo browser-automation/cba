@@ -7,8 +7,7 @@ async function playProject() {
   else if(cba.instructArray.length) {
     browser.browserAction.setBadgeText({"text":"play"});
     const [instruction] = cba.instructArray.splice(0, 1);
-    if (instruction.id)
-      cba.playingActionId = instruction.id;
+    cba.playingActionIndex = (cba.defInstructArray.length - cba.instructArray.length) - 1;
 
     await actionExecution(instruction);
     await playProject();
@@ -19,7 +18,7 @@ async function playProject() {
     playProject();
   }
   else {
-    cba.playingActionId = null;
+    cba.playingActionIndex = -1;
     cba.playingProjectId = null;
     cba.allowPlay = 0;
     browser.browserAction.setBadgeText({"text": ""});

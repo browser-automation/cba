@@ -10,7 +10,8 @@ const {wait, setDefaultCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
-       triggerDrop, getNotificationMsg, getTextContent} = require("./utils");
+       triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
+       getBadgeText} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -38,6 +39,8 @@ const clickDeleteAction = () => page().click("[data-action='deleteAction']");
 const clickSaveAction = () => page().click("[data-action='saveAction']");
 
 const clickPlay = () => page().click("[data-action='play']");
+const clickRecord = () => page().click("[data-action='record']");
+const clickStop = () => page().click("[data-action='stop']");
 
 beforeEach(async () =>
 {
@@ -300,6 +303,9 @@ it("Test error messages", async() =>
   await clickPlay();
   equal(await getNotificationMsg(), NO_PROJ_SELECTED);
 
+  await clickRecord();
+  equal(await getNotificationMsg(), NO_PROJ_SELECTED);
+
   await clickAddAction();
   equal(await getNotificationMsg(), NO_PROJ_SELECTED);
 
@@ -314,6 +320,9 @@ it("Test error messages", async() =>
   equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
 
   await clickPlay();
+  equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
+
+  await clickRecord();
   equal(await getNotificationMsg(), SELECT_PROJ_NOT_GROUP);
 });
 
@@ -392,6 +401,24 @@ it("When paused play button becomes 'resume', when clicked resumes playback", as
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
   await wait(100);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
+});
+
+it("Clicking record button adds redirect event to the selected project", async() => {
+  await cbaListItemExpand(cbaListQuery, "group");
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+
+  await clickRecord();
+  const data = await getCurrentWindowUrl();
+  const type = "redirect";
+  const value = "";
+  const msgType = "RecordedEvent";
+  deepEqual((await cbaTableGetItem(cbaTableQuery, 0)).texts, {data, type, value, msgType});
+  equal(await getTextContent("#recordButton"), "recording...");
+  equal(await getBadgeText(), "rec");
+
+  await clickStop();
+  equal(await getTextContent("#recordButton"), "rec");
+  equal(await getBadgeText(), "");
 });
 
 async function addFourEmptyActions()
