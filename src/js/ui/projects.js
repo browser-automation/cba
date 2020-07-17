@@ -1,4 +1,4 @@
-const {load: prefefinedActionsLoad, saveState: prefefinedActionsSave} = require("../db/predefinedActions");
+const {load: prefefinedActionsLoad} = require("../db/predefinedActions");
 const notification = require("./notification");
 const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   SELECT_PROJ_NOT_GROUP, CHANGES_SAVED} = notification;
@@ -26,9 +26,7 @@ async function loadProjects()
   else
     populateActions([]);
 
-  //TODO: avoide specifing those here.
-  if(bg.allowPlay || bg.paused)
-    keepHighlightingPlayingAction();
+  keepHighlightingPlayingAction(true);
 }
 
 async function loadFunctions()
@@ -97,8 +95,8 @@ function onEventInputChange()
   actionData.disabled = false;
   const actionType = actionEvType.value;
   const disablesNewValue = ["inject", "cs-inject", "bg-inject", "bg-function",
-                            "check", "click","submit-click","update", "redirect",
-                            "copy", "pause"];
+                            "check", "click", "submit-click", "update", 
+                            "redirect", "copy", "pause"];
   const disablesData = ["update", "timer", "pause"];
   if (disablesNewValue.includes(actionType))
   {
@@ -126,7 +124,7 @@ function updatePlayButtonState() {
     playButton.textContent = "play";
 }
 
-function keepHighlightingPlayingAction()
+function keepHighlightingPlayingAction(isPopupLoad)
 {
   updatePlayButtonState();
   if(bg.allowPlay || bg.paused)
@@ -139,7 +137,7 @@ function keepHighlightingPlayingAction()
     }
     setTimeout(keepHighlightingPlayingAction, 100);
   }
-  else
+  else if (!isPopupLoad)
   {
     selectFirstAction();
   }

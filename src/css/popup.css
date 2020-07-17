@@ -5,6 +5,7 @@ cba-list {
 
 body {
   max-width: 600px;
+  background-color: #f0f0f0;
 }
 
 #projectsManagement {

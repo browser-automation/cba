@@ -376,7 +376,7 @@ it("Actions are being updated while playing", async() =>
   await page().reload({waitUntil: "domcontentloaded"});
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
-  await wait(100);
+  await wait(200);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
 
   await wait(200);
