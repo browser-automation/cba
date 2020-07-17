@@ -411,6 +411,27 @@ it("When paused play button becomes 'resume', when clicked resumes playback", as
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
 });
 
+it("Setting repeate should repeate the project, specified amount of times", async() =>
+{
+  await setValue("#repeat", 2);
+  await addEmptyActions(3);
+  await updateSpecificAction("cba-table-id-1", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-2", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "90");
+
+  await clickPlay();
+  await wait(110);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+  
+  await wait(310);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+  equal(await getBadgeText(), "play");
+
+  await wait(250);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
+  equal(await getBadgeText(), "");
+});
+
 it("Clicking record button adds redirect event to the selected project", async() => {
   await cbaListItemExpand(cbaListQuery, "group");
   await cbaListItemSelect(cbaListQuery, "project", "group");
@@ -431,19 +452,21 @@ it("Clicking record button adds redirect event to the selected project", async()
 
 async function addFourEmptyActions()
 {
+  return addEmptyActions(4);
+}
+
+async function addEmptyActions(amount)
+{
   await cbaListItemExpand(cbaListQuery, "group");
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
-  await clickAddAction();
-  await clickAddAction();
-  await clickAddAction();
-  await clickAddAction();
+  for (let index = 0; index < amount; index++)
+    await clickAddAction();
 
-  equal(await cbaTableItemsLength(cbaTableQuery), 4);
-  equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
-  equal((await cbaTableGetItem(cbaTableQuery, 1)).id, "cba-table-id-2");
-  equal((await cbaTableGetItem(cbaTableQuery, 2)).id, "cba-table-id-3");
-  equal((await cbaTableGetItem(cbaTableQuery, 3)).id, "cba-table-id-4");
+  equal(await cbaTableItemsLength(cbaTableQuery), amount);
+
+  for (let index = 0; index < amount; index++)
+    equal((await cbaTableGetItem(cbaTableQuery, index)).id, `cba-table-id-${index + 1}`);
 }
 
 async function updateSpecificAction(id, data, type, value)

@@ -132,8 +132,6 @@ function keepHighlightingPlayingAction()
   if(bg.allowPlay || bg.paused)
   {
     projects.selectRow(bg.playingProjectId);
-
-    console.log(bg.playingActionIndex);
     if (bg.playingActionIndex >= 0)
     {
       const {id} = actionsComp.items[bg.playingActionIndex];
