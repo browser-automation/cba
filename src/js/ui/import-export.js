@@ -1,54 +1,67 @@
-require("./analytics");
-require("./ui/import-export");
+const {load} = require("../db/collections");
 
-function optionsLoad() {
-  $("#importBtn").click(importStorage);
-  $("#exportBtn").click(exportStorage);
-  $("#extVer").html("v. "+chrome.app.getDetails().version);
-  
-  $("#navigation .navigation").click(function() {
-    localStorage.setItem("settings", this.id.substring(6));
-    navigationManage();
-  });
-  navigationManage();
-  
+const exportList = document.querySelector("#exportList");
+const importList = document.querySelector("#importList");
+
+const importInput = document.querySelector("#automImport");
+const exportOutput = document.querySelector("#automExport");
+
+async function loadExportList()
+{
+  const projects = await load();
+  const expandItems = (item) => {
+    item.expanded = true;
+    return item;
+  };
+
+  exportList.items = projects.map(expandItems);
 }
 
-function writeHelpMessage(helpMsg, color) {
-  $("#helpMessage").html(helpMsg);
-  $("#helpMessage").css('color', color);
-}
+async function loadImportList()
+{
+  const projects = await load();
+  const removeSubitem = (item) => {
+    if (item.subItems)
+      delete item.subItems;
+    return item;
+  };
 
-
-function funcEditSelected(id) {
-  var actionObj = jQuery("#functionsTableEdit").jqGrid('getRowData',id);
-  $("#funcName").val(actionObj.name);
-  $("#funcData").val(actionObj.data);
-  $("#funcEvType").val(actionObj.evType);
-  $("#funcNewValue").val(actionObj.newValue);
-  $("#funcEvType").change();
-}
-
-function exportStorage(projObj) {
-  if(projObj["isProject"] == true) {
-    var dataObj = JSON.parse(localStorage.getItem("data"));
-    var projectsArray = dataObj[projObj["group"]].projects;
-    var actions = "";
-    for(i=0;i<projectsArray.length;i++) {
-      if(projectsArray[i].name == projObj["project"]) {
-        actions = projectsArray[i];
-      }
-    }
-    
-    $("#automExport").val(JSON.stringify(actions));
+  const importItems = projects.map(removeSubitem);
+  if (importItems[0].id !== "root") {
+    importItems.unshift({id: "root", text: "Root", type: "group"});
   }
-  else {
-    var dataObj = JSON.parse(localStorage.getItem("data"));
-    var group = dataObj[projObj["project"]];
-    $("#automExport").val(JSON.stringify(group));
-  }
+  importList.items = importItems;
 }
 
+async function importProjects()
+{
+  console.log("import project", importInput.value);
+}
+
+async function exportProjects()
+{
+  const item = exportList.getSelectedItem();
+  if (item.expanded)
+    item.expanded = false;
+  if (item.selected)
+    item.selected = false;
+
+  exportOutput.value = JSON.stringify(item);
+}
+
+loadExportList();
+loadImportList();
+document.querySelector("#importProjects").addEventListener("click", importProjects)
+exportList.addEventListener("select", exportProjects);
+
+browser.storage.onChanged.addListener(({collections}) => {
+  if (collections) {
+    loadExportList();
+    loadImportList();
+  }
+});
+
+/*
 function importStorage() {
   var dataObj = JSON.parse(localStorage.getItem("data"));
   var importData = JSON.parse($("#automImport").val());
@@ -138,33 +151,4 @@ function importStorage() {
   }
 }
 
-
-function navigationManage() {
-  var selectedSetting = 1;
-  if(localStorage.getItem("settings") == null) {
-    localStorage.setItem("settings", 1);
-  }
-  else {
-    selectedSetting = parseInt(localStorage.getItem("settings"));
-  }
-  
-  for(var i = 0; i < $('.navigation').length; i++) {
-        if(parseInt($('.navigation')[i].id.substring(6))==selectedSetting) {
-          $('#navLnk'+(i+1)).addClass("selected");
-        } else {
-          $('#navLnk'+(i+1)).removeClass("selected");
-        }
-    }
-    
-    for(var i = 0; i < $('.settingContainer').length; i++) {
-        if(parseInt($('.settingContainer')[i].id.substring(7))==selectedSetting) {
-          $('#setting'+(i+1)).show();
-          if(i+1==1){
-          }
-        } else {
-          $('#setting'+(i+1)).hide();
-        }
-    }
-}
-
-$(document).ready(optionsLoad);
+*/

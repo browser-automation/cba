@@ -5,8 +5,10 @@
     <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="js/ui/jquery.jqGrid.min.js"></script>
     <script type="text/javascript" src="js/ui/jquery-ui-1.8.20.custom.min.js"></script>
-    <script type="text/javascript" src="js/options.js"></script>
+    <script type="text/javascript" src="js/options.js" defer></script>
     <script type="text/javascript" src="js/popup.js"></script>
+    <script type="text/javascript" src="js/browser-polyfill.min.js"></script>
+    <script type="module" src="js/cba-components.js"></script>
 
     <link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui-1.8.1.custom.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid.css" />
@@ -33,37 +35,17 @@
     </div>
     <div id="optionsContainer">
       <div id="setting1" class="settingContainer">
-        <div class="header">
+        <h2>
           Import/Export
-        </div>
-        <hr />
-        <div class="main">
-          <div style="display:inline-table;vertical-align: top;">
-            <table id="projectsTableExport"></table>
-      
-          </div>
-          <div style="display:inline-table">
-            <textarea id="automExport" rows="12" cols="48"></textarea>
-          </div>
-          <div style="display:block">
-            <br />
-            Import
-          </div>
-          <div style="display:block">
-            <div style="display:inline-table">
-              <textarea id="automImport" rows="10" cols="50"></textarea>
-            </div>
-            <div style="display:inline-table">
-              <table id="projectsTableImport"></table>
-            </div>
-          </div>
-          <input type="button" id="importBtn" value="Import" />
-          <script type="text/javascript" src="js/ui/projects_table_export.js"></script>
-          <script type="text/javascript" src="js/ui/projects_table_import.js"></script>
-        </div>
-        <div class="footer">
+        </h2>
+        <cba-list id="exportList" heading="Export" subheading="record"></cba-list>
+        <textarea id="automExport" rows="12" cols="48"></textarea>
 
-        </div>
+        <h3>Import</h3>
+        <textarea id="automImport" rows="10" cols="50"></textarea>
+
+        <cba-list id="importList" heading="Import" subheading="record"></cba-list>
+        <cba-button id="importProjects">Import</cba-button>
       </div>
 
       <div id="setting2" class="settingContainer">

@@ -15,9 +15,11 @@ async function reloadExtension()
   return backgroundPage().evaluate(() => browser.runtime.reload());
 }
 
-async function setDefaultCollections()
+async function setCollections(collections)
 {
-    const collections = [{
+  if (!collections)
+  {
+    collections = [{
       id: "group",
       text: "group",
       type: "group",
@@ -31,6 +33,7 @@ async function setDefaultCollections()
         }
       ]
     }];
+  }
   return backgroundPage().evaluate(async(collections) => await browser.storage.local.set({collections}), collections);
 }
 
@@ -428,7 +431,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
-                  resetClipboardValue, isElementExist, setDefaultCollections,
+                  resetClipboardValue, isElementExist, setCollections,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
                   getSelectedRow,setWindowLocalStorage, getWindowLocalStorage,
                   reloadExtension,
