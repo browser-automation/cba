@@ -187,6 +187,31 @@ async function getLocalStorageData(key)
   return backgroundPage().evaluate(async(key) => await browser.storage.local.get(key), key);
 }
 
+async function getGroupFromStorage(groupText)
+{
+  const {collections} = await getLocalStorageData("collections");
+  const [group] = collections.filter(({text}) => text == groupText);
+  return group
+}
+
+async function getProjectFromStorage(groupText, projectText)
+{
+  const group = await getGroupFromStorage(groupText);
+  if (!group)
+    return null;
+  if (projectText)
+  {
+    const [project] = group.subItems.filter(({text}) => text == projectText);
+    if (!project)
+      return null;
+    return project;
+  }
+  else
+  {
+    return group;
+  }
+}
+
 async function getProjectActions(groupName, projectName, num, key)
 {
   return backgroundPage().evaluate((groupName, projectName, num, key) =>
@@ -430,6 +455,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   isChecked, addCookie, getCookie,
                   getActiveElementId, setListener, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
+                  getProjectFromStorage,getGroupFromStorage,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
                   resetClipboardValue, isElementExist, setCollections,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,

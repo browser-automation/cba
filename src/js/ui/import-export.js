@@ -1,4 +1,4 @@
-const {load} = require("../db/collections");
+const {load, importProjects} = require("../db/collections");
 
 const exportList = document.querySelector("#exportList");
 const importList = document.querySelector("#importList");
@@ -33,9 +33,48 @@ async function loadImportList()
   importList.items = importItems;
 }
 
-async function importProjects()
+async function onImport()
 {
-  console.log("import project", importInput.value);
+  if (!importInput.value)
+  {
+    // TODO: Show warning
+    return;
+  }
+
+  const selectedGroup = importList.getSelectedItem();
+  if (!selectedGroup)
+  {
+    // TODO: Show warning
+    // Please selected group or Root
+    return;
+  }
+
+  const importData = JSON.parse(importInput.value);
+  let projects = "";
+  if (importData.type === "group")
+  {
+    projects = importData.subItems;
+  }
+  else if (importData.type === "project")
+  {
+    projects = [importData];
+  }
+  else
+  {
+    //TODO: show warning
+    // Imported data should be either of type group or project
+    return;
+  }
+
+  if (selectedGroup.text === "Root")
+  {
+    await importProjects(projects);
+  }
+  else
+  {
+    const groupText = selectedGroup.text;
+    await importProjects(projects, groupText);
+  }
 }
 
 async function exportProjects()
@@ -51,7 +90,7 @@ async function exportProjects()
 
 loadExportList();
 loadImportList();
-document.querySelector("#importProjects").addEventListener("click", importProjects)
+document.querySelector("#importProjects").addEventListener("click", onImport)
 exportList.addEventListener("select", exportProjects);
 
 browser.storage.onChanged.addListener(({collections}) => {
