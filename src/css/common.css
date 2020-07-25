@@ -1,0 +1,13 @@
+cba-list {
+  --icon-group: no-repeat url("/css/images/icon-group.svg");
+  --icon-project: no-repeat url("/css/images/icon-project.svg");
+}
+
+.notification {
+  display: block;
+  color: #01a735;
+}
+
+.notification.error {
+  color: #c30606;
+}

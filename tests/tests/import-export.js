@@ -7,8 +7,12 @@ const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {wait, setCollections, cbaListHasTextCount, cbaListItemSelect,
-  getValue, setValue, getProjectFromStorage, getGroupFromStorage} = require("./utils");
+  getValue, setValue, getProjectFromStorage, getGroupFromStorage,
+  getElementAttribute} = require("./utils");
 const {page} = require("../main");
+
+const {NO_GROUP_ROOT_SELECTED, NO_IMPORT_DATA, PROJECT_IMPORTED,
+  NO_PROJ_GROUP_TYPE} = require("../../src/js/ui/notification");
 
 const pageSetup = {
   path: "options.html"
@@ -164,6 +168,7 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
   await importButtonClick();
   deepEqual(await getProjectFromStorage("group", "project1"), project1);
   deepEqual(await getProjectFromStorage("group", "project2"), project2);
+  equal(await getNotificationMsg(), PROJECT_IMPORTED);
 
   setValue(importInputQuery, JSON.stringify(project1));
   await cbaListItemSelect(importListQuery, "group");
@@ -306,6 +311,32 @@ it("Importing projects with old data after selecting Root or group adds project(
   deepEqual(await getGroupFromStorage("group1"), group1_1);
 });
 
+it("Test error messages", async() =>
+{
+  await importButtonClick();
+  equal(await getNotificationMsg(), NO_IMPORT_DATA);
+
+  const project = {
+    id: "group1_project1",
+    text: "project1",
+    actions: [
+    ]
+  }
+
+  setValue(importInputQuery, JSON.stringify(project));
+  await importButtonClick();
+  equal(await getNotificationMsg(), NO_GROUP_ROOT_SELECTED);
+
+  setValue(importInputQuery, JSON.stringify(project));
+  await cbaListItemSelect(importListQuery, "Root");
+  await importButtonClick();
+  equal(await getNotificationMsg(), NO_PROJ_GROUP_TYPE);
+});
+
+function getNotificationMsg()
+{
+  return getElementAttribute("#setting1 .notification", "textContent");
+}
 
 function copyObject(obj)
 {

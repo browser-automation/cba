@@ -3,20 +3,31 @@ const NO_PROJ_GROUP_SELECTED = "Please select Group or Project";
 const NO_ACTION_SELECTED = "Please select action";
 const SELECT_PROJ_NOT_GROUP = "Please select project (not group)";
 const CHANGES_SAVED = "Changes has been saved";
+const PROJECT_IMPORTED = "The group or project is imported";
+const NO_GROUP_ROOT_SELECTED = "Please select group or 'Root'";
+const NO_IMPORT_DATA = "Please specify the import data";
+const NO_PROJ_GROUP_TYPE = "Type should either be of type 'group' or 'project'";
 
-const notification = {
-  show: (text, isError) => {
-    const notification = document.querySelector("#notification");
-    console.log(notification);
-    notification.textContent = text;
-    notification.classList.remove("error");
+class Notification {
+  constructor(query) {
+    this.notificationElement = document.querySelector(query);
+  }
+
+  show(text, isError) {
+    this.notificationElement.textContent = text;
+    this.notificationElement.classList.remove("error");
     if (isError)
-      notification.classList.add("error");
-  },
-  clean: () => notification.show(""),
-  error: (text) => notification.show(text, true),
-  NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
-  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED
+      this.notificationElement.classList.add("error");
+  }
+  clean() {
+    this.show("");
+  }
+
+  error(text) {
+    this.show(text, true);
+  }
 }
 
-module.exports = notification;
+module.exports = {Notification, NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED,
+  NO_ACTION_SELECTED, SELECT_PROJ_NOT_GROUP, CHANGES_SAVED,
+  NO_GROUP_ROOT_SELECTED, NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE, PROJECT_IMPORTED};

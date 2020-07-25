@@ -1,5 +1,10 @@
 const {load, importProjects} = require("../db/collections");
 const {migrateData, migrateProjects} = require("../background/migrate");
+const {Notification, NO_GROUP_ROOT_SELECTED,
+  NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE,
+  PROJECT_IMPORTED} = require("./notification");
+
+const notification = new Notification("#setting1 .notification");
 
 const exportList = document.querySelector("#exportList");
 const importList = document.querySelector("#importList");
@@ -36,17 +41,17 @@ async function loadImportList()
 
 async function onImport()
 {
+  notification.clean();
   if (!importInput.value)
   {
-    // TODO: Show warning
+    notification.error(NO_IMPORT_DATA);
     return;
   }
 
   const selectedGroup = importList.getSelectedItem();
   if (!selectedGroup)
   {
-    // TODO: Show warning
-    // Please selected group or Root
+    notification.error(NO_GROUP_ROOT_SELECTED);
     return;
   }
 
@@ -75,8 +80,7 @@ async function onImport()
   }
   else
   {
-    //TODO: show warning
-    // Imported data should be either of type group or project
+    notification.error(NO_PROJ_GROUP_TYPE);
     return;
   }
   
@@ -89,6 +93,7 @@ async function onImport()
     const groupText = selectedGroup.text;
     await importProjects(projects, groupText);
   }
+  notification.show(PROJECT_IMPORTED);
 }
 
 async function exportProjects()

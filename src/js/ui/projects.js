@@ -1,7 +1,7 @@
 const {load: prefefinedActionsLoad} = require("../db/predefinedActions");
-const notification = require("./notification");
 const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
-  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED} = notification;
+  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED,
+  Notification} = require("./notification");
 
 const {load, saveState} = require("../db/collections");
 
@@ -13,6 +13,7 @@ const actionEvType = document.querySelector("#actionEvType");
 const actionNewValue = document.querySelector("#actionNewValue");
 
 const bg = chrome.extension.getBackgroundPage().cba;
+const notification = new Notification("#notification");
 
 async function loadProjects()
 {

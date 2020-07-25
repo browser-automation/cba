@@ -464,4 +464,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
-                  getCurrentWindowUrl};
+                  getCurrentWindowUrl, getElementAttribute};
