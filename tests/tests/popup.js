@@ -148,6 +148,7 @@ it("'Add' button adds new empty action to the selected project", async () =>
   deepEqual(await cbaTableGetItem(cbaTableQuery, 1), item2);
 
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
   deepEqual(await cbaTableGetItem(cbaTableQuery, 0), item1);
@@ -379,7 +380,7 @@ it("Actions are being updated while playing", async() =>
   await wait(200);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
 
-  await wait(200);
+  await wait(250);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
 });
 

@@ -177,6 +177,7 @@ it("Clicking element inside catchable one should get recorded accordingly and us
   await startTestRecording();
   await page().click("#cba-path-button-nested span");
   await stopTestRecording();
+  await wait(50);
   deepEqual(await getTestProjectActions(1),
             createAction("#cba-path-button-nested", "click"));
 });

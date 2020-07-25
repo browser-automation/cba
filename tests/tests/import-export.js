@@ -205,12 +205,107 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
   deepEqual(await getGroupFromStorage("group2"), group2);
 });
 
-/*
 it("Importing projects with old data after selecting Root or group adds project(s) accordigly", async() =>
 {
-  
+  const oldProject1 = {
+    name: "project1",
+    level: "1",
+    isLeaf: true,
+    expanded: false,
+    loaded: true,
+    action: [
+      {
+        "data": "#main",
+        "evType": "change",
+        "newValue": "1"
+      },
+      {
+        "data": "",
+        "evType": "",
+        "newValue": ""
+      }
+    ]
+  };
+
+  const oldProject2 = {
+    name: "project2",
+    level: "1",
+    isLeaf: true,
+    expanded: false,
+    loaded: true,
+    action: [
+      {
+        "data": "",
+        "evType": "timer",
+        "newValue": "100"
+      }
+    ]
+  };
+
+  const oldGroup = {
+    name: "group1",
+    level: "0",
+    parent: "",
+    isLeaf: false,
+    expanded: true,
+    loaded: true,
+    projects: [oldProject1, oldProject2]
+  };
+
+  const project1 = {
+    id: "project1",
+    text: "project1",
+    type: "project",
+    actions: [
+      setAction("#main", "change", "1"),
+      setAction("", "", "")
+    ]
+  }
+  // TODO: Add id
+  const project2 = {
+    id: "project2",
+    text: "project2",
+    type: "project",
+    actions: [
+      setAction("", "timer", "100")
+    ]
+  }
+  const group = {
+    expanded: false,
+    id: "group1",
+    type: "group",
+    text: "group1",
+    subItems: [project1, project2]
+  };
+
+  setValue(importInputQuery, JSON.stringify(oldGroup));
+  await cbaListItemSelect(importListQuery, "group");
+  await importButtonClick();
+  const group1_project1 = copyObject(project1);
+  group1_project1.id = "group1_project1";
+  deepEqual(await getProjectFromStorage("group", "project1"), group1_project1);
+  const group1_project2 = copyObject(project2);
+  group1_project2.id = "group1_project2";
+  deepEqual(await getProjectFromStorage("group", "project2"), group1_project2);
+
+  setValue(importInputQuery, JSON.stringify(oldProject1));
+  await cbaListItemSelect(importListQuery, "group");
+  await importButtonClick();
+  const project1_1 = copyObject(project1);
+  project1_1.text = `project1_1`;
+  deepEqual(await getProjectFromStorage("group", "project1_1"), project1_1);
+
+  setValue(importInputQuery, JSON.stringify(oldGroup));
+  await cbaListItemSelect(importListQuery, "Root");
+  await importButtonClick();
+
+  const group1_1 = copyObject(group);
+  group1_1.id = "group1_1";
+  group1_1.subItems[0].id = "project1_1";
+  group1_1.subItems[1].id = "project2_1";
+  deepEqual(await getGroupFromStorage("group1"), group1_1);
 });
-*/
+
 
 function copyObject(obj)
 {
@@ -219,7 +314,10 @@ function copyObject(obj)
 
 function setAction(data, type, value, id)
 {
-  return {id, texts: {data, type, value}}
+  const actions = {id, texts: {data, type, value}};
+  if (!id)
+    delete actions.id
+  return actions
 }
 
 module.exports = {pageSetup};

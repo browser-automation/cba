@@ -32,8 +32,9 @@ function migrateActions(actions) {
 function migrateProjects({projects}, groupName) {
   if (projects && projects.length) {
     return projects.map(({name, action}) => {
+      const id = groupName ? `${groupName}_${name}` : name;
       return {
-        id: `${groupName}_${name}`,
+        id,
         text: name, 
         actions: migrateActions(action), type: "project"}
     });
@@ -43,20 +44,25 @@ function migrateProjects({projects}, groupName) {
   }
 }
 
+function migrateData(oldData) {
+  const collections = [];
+  for (const groupName of Object.keys(oldData)) {
+    const group = {
+      "text": groupName,
+      "id": groupName,
+      "expanded": false,
+      "subItems": migrateProjects(oldData[groupName], groupName),
+      "type": "group"
+    };
+    collections.push(group);
+  }
+  return collections;
+}
+
 async function migrate() {
   const {data, cbaFunctions} = getOldData();
   if (data) {
-    const collections = [];
-    for (const groupName of Object.keys(data)) {
-      const group = {
-        "text": groupName,
-        "id": groupName,
-        "expanded": false,
-        "subItems": migrateProjects(data[groupName], groupName),
-        "type": "group"
-      };
-      collections.push(group);
-    }
+    const collections = migrateData(data);
     await browser.storage.local.set({collections});
   }
   if (cbaFunctions) {
@@ -71,4 +77,4 @@ async function migrate() {
   }
 }
 
-module.exports = {migrate, backup};
+module.exports = {migrate, backup, migrateData, migrateProjects};

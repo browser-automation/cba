@@ -1,4 +1,5 @@
 const {load, importProjects} = require("../db/collections");
+const {migrateData, migrateProjects} = require("../background/migrate");
 
 const exportList = document.querySelector("#exportList");
 const importList = document.querySelector("#importList");
@@ -49,7 +50,20 @@ async function onImport()
     return;
   }
 
-  const importData = JSON.parse(importInput.value);
+  let importData = JSON.parse(importInput.value);
+  if ("isLeaf" in importData)
+  {
+    if (importData["isLeaf"]) {
+      const projects = [importData];
+      [importData] = migrateProjects({projects}, "");
+    }
+    else {
+      const newData = {};
+      newData[importData.name] = importData;
+      [importData] = migrateData(newData);
+    }
+  }
+
   let projects = "";
   if (importData.type === "group")
   {
@@ -65,7 +79,7 @@ async function onImport()
     // Imported data should be either of type group or project
     return;
   }
-
+  
   if (selectedGroup.text === "Root")
   {
     await importProjects(projects);
@@ -99,95 +113,3 @@ browser.storage.onChanged.addListener(({collections}) => {
     loadImportList();
   }
 });
-
-/*
-function importStorage() {
-  var dataObj = JSON.parse(localStorage.getItem("data"));
-  var importData = JSON.parse($("#automImport").val());
-  var gr = jQuery("#projectsTableImport").jqGrid('getGridParam', 'selrow');
-  var projectName = jQuery("#projectsTableImport").jqGrid('getRowData',gr).name;
-  var gr = jQuery("#projectsTableExport").jqGrid('getGridParam', 'selrow');
-  
-  if(projectName == undefined) {
-    return;
-  }
-  
-  var group = {};
-  if(projectName == "Root") {
-    for(i=0;i<100;i++) {
-      if(dataObj["group"+i] == null){
-        group["name"] = "group"+i;
-        group["level"] = "0";
-        group["parent"] = "";
-        group["isLeaf"] = false;
-        group["expanded"] = false;
-        group["loaded"] = true;
-        group["projects"] = new Array();
-        dataObj["group"+i] = group;
-        if(importData['parent'] == undefined) {
-          group["projects"].push(importData);
-        }
-        else {
-          var projectsImp = importData.projects;
-          
-          for(var i=0;i<projectsImp.length;i++) {
-            group["projects"].push(projectsImp[i]);
-          }
-        }
-        
-        break;
-      }
-    }
-    localStorage.setItem("data", JSON.stringify(dataObj));
-    
-    $("#projectsTable").jqGrid("clearGridData");
-    populateProjectsTable();
-    $("#projectsTableExport").jqGrid("clearGridData");
-    populateExportProjectsTable();
-    $("#projectsTableImport").jqGrid("clearGridData");
-    populateImportProjectsTable();
-    return;
-  }
-  
-  if(importData['parent'] == undefined) {
-    var projects = dataObj[projectName].projects;
-    for(var i=0;i<projects.length;i++) {
-      if(projects[i].name == importData.name) {
-        
-        importData.name = importData.name+"_1";
-        i=0;
-      }
-    }
-    projects.push(importData);
-    localStorage.setItem("data", JSON.stringify(dataObj));
-    
-    $("#projectsTable").jqGrid("clearGridData");
-    populateProjectsTable();
-    $("#projectsTableExport").jqGrid("clearGridData");
-    populateExportProjectsTable();
-    $("#projectsTableImport").jqGrid("clearGridData");
-    populateImportProjectsTable();
-  }else {
-    var projectsImp = importData.projects;
-    var projects = dataObj[projectName].projects;
-    for(var i=0;i<projectsImp.length;i++) {
-      for(var j=0;j<projects.length;j++) {
-        if(projectsImp[i].name == projects[j].name) {
-          projectsImp[i].name = projectsImp[i].name+"_1";
-          j = 0;
-        }
-      }
-      projects.push(projectsImp[i]);
-    }
-    localStorage.setItem("data", JSON.stringify(dataObj));
-    
-    $("#projectsTable").jqGrid("clearGridData");
-    populateProjectsTable();
-    $("#projectsTableExport").jqGrid("clearGridData");
-    populateExportProjectsTable();
-    $("#projectsTableImport").jqGrid("clearGridData");
-    populateImportProjectsTable();
-  }
-}
-
-*/

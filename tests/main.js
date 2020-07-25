@@ -10,7 +10,8 @@ function run()
 {
   for (const {file, name} of tests)
   {
-    describe(name, () => {
+    describe(name, function() {
+      this.timeout(5000);
       const {pageSetup} = require(`./tests/${file}`);
       before(async () =>
       {
