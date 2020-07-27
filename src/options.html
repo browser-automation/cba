@@ -112,34 +112,16 @@
         <div class="main">
           <div style="display:inline-table;vertical-align: top;">
             <input type="text" id="funcName" style="width:400px"/>
-            <br />
             <textarea rows="13" cols="47" id="funcData"></textarea>
-            <br />
-            <select id="funcEvType">
-              <option value="inject">inject</option>
-              <option value="cs-inject">cs-inject</option>
-              <option value="bg-inject">bg-inject</option>
-              <option value="bg-function">bg-function</option>
-              <option value="change">change</option>
-              <option value="check">check</option>
-              <option value="click">click</option>
-              <option value="submit-click">submit-click</option>
-              <option value="update">update</option>
-              <option value="timer">timer</option>
-              <option value="redirect">redirect</option>
-              <option value="copy">copy</option>
-              <option value="pause">pause</option>
-            </select>
+            <select id="funcEvType"></select>
             <input type="text" id="funcNewValue" style="width:300px"/>
-            <div style="display:block">
-              <input type="button" value="Add" id="addFunc" >
-              <input type="button" value="Delete" id="deleteFunc">
-              <input type="button" value="Save" id="saveFunc">
-            </div>
+
+            <cba-button data-action="addFunction">Add</cba-button>
+            <cba-button data-action="deleteFunction">Delete</cba-button>
+            <cba-button data-action="saveFunction">Save</cba-button>
+            <div class="notification"></div>
           </div>
-          <div style="display:inline-table">
-            <table id="functionsTableEdit"></table>
-          </div>
+          <cba-list id="functions" heading="Functions" subHeading="Name"></cba-list>
         </div>
         <div class="footer">
         </div>

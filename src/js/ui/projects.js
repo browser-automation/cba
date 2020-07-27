@@ -4,13 +4,15 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   Notification} = require("./notification");
 
 const {load, saveState} = require("../db/collections");
+const eventTypes = require("./eventTypes");
 
 const projects = document.querySelector("#projects cba-list");
 const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
 const actionData = document.querySelector("#actionData");
-const actionEvType = document.querySelector("#actionEvType");
 const actionNewValue = document.querySelector("#actionNewValue");
+
+const actionEvType = eventTypes.init("#actionEvType");
 
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");

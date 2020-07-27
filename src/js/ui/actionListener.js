@@ -7,3 +7,5 @@ function registerActionListener(callback)
       callback(action)
   });
 }
+
+module.exports = registerActionListener;

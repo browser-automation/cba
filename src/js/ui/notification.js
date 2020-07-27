@@ -7,6 +7,8 @@ const PROJECT_IMPORTED = "The group or project is imported";
 const NO_GROUP_ROOT_SELECTED = "Please select group or 'Root'";
 const NO_IMPORT_DATA = "Please specify the import data";
 const NO_PROJ_GROUP_TYPE = "Type should either be of type 'group' or 'project'";
+const NO_FUNCTION_NAME = "Please specify 'name' of the function";
+const NO_SELECTED_FUNCTION = "Please select a function";
 
 class Notification {
   constructor(query) {
@@ -30,4 +32,5 @@ class Notification {
 
 module.exports = {Notification, NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED,
   NO_ACTION_SELECTED, SELECT_PROJ_NOT_GROUP, CHANGES_SAVED,
-  NO_GROUP_ROOT_SELECTED, NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE, PROJECT_IMPORTED};
+  NO_GROUP_ROOT_SELECTED, NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE, PROJECT_IMPORTED,
+  NO_FUNCTION_NAME, NO_SELECTED_FUNCTION, CHANGES_SAVED};

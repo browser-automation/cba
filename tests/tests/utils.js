@@ -37,6 +37,56 @@ async function setCollections(collections)
   return backgroundPage().evaluate(async(collections) => await browser.storage.local.set({collections}), collections);
 }
 
+async function setPredefinedActions(predefinedActions)
+{
+  if (!predefinedActions)
+  {
+    predefinedActions = [
+      {
+        data: {
+          texts: {
+            data: "Please enter the time in milliseconds",
+            type: "timer",
+            value: "1000"
+          }
+        },
+        text: "Timer"
+      },
+      {
+        data: {
+          texts: {
+            data: "this event will let the script wait for page update",
+            type: "update",
+            value: ""
+          }
+        },
+        text: "Update"
+      },
+      {
+        data: {
+          texts: {
+            data: "<$function=removeCookie>\n<$attr=.*>",
+            type: "bg-function",
+            value: "use regular expressions to filter domains"
+          }
+        },
+        text: "Clear cookies"
+      },
+      {
+        data: {
+          texts: {
+            data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
+            type: "bg-function",
+            value: "Write to clipboard Object to access data later. Use Json in the attr."
+          }
+        },
+        text: "Clipboard"
+      }
+    ];
+  }
+  return backgroundPage().evaluate(async(predefinedActions) => await browser.storage.local.set({predefinedActions}), predefinedActions);
+}
+
 async function cbaListHasTextCount(query, text, parentText)
 {
   const items = await cbaListItemsByText(query, text, parentText);
@@ -192,6 +242,13 @@ async function getGroupFromStorage(groupText)
   const {collections} = await getLocalStorageData("collections");
   const [group] = collections.filter(({text}) => text == groupText);
   return group
+}
+
+async function getFunctionFromStorage(functionName)
+{
+  const {predefinedActions} = await getLocalStorageData("predefinedActions");
+  const [func] = predefinedActions.filter(({text}) => text == functionName);
+  return func;
 }
 
 async function getProjectFromStorage(groupText, projectText)
@@ -464,4 +521,5 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
-                  getCurrentWindowUrl, getElementAttribute};
+                  getCurrentWindowUrl, getElementAttribute,
+                  setPredefinedActions, getFunctionFromStorage};

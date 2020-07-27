@@ -4,6 +4,7 @@ const tests = [
   {file:"generic.js", name: "Running generic Tests"},
   {file:"popup.js", name: "Testing popup"},
   {file:"import-export.js", name: "Testing Import and Export in options page"},
+  {file:"functions.js", name: "Testing functions tab in options page"},
   {file:"migrate.js", name: "Testing data migration"},
 ];
 

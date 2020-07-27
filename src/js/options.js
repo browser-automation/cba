@@ -1,5 +1,6 @@
 require("./analytics");
 require("./ui/import-export");
+require("./ui/functions");
 
 function optionsLoad() {
   $("#importBtn").click(importStorage);
