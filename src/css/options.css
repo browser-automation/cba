@@ -1,3 +1,8 @@
+#popup {
+  width: 750px;
+  height: 100vh;
+}
+
 .navigationMain {
 	font-family: Arial, Helvetica, sans-serif;
 	padding-left:20px;
@@ -55,10 +60,7 @@
 	font-size: 20px;
 	width: 600;
 }
-.main {
-	height: 200px;
-	width: 750px;
-}
+
 .footer {
 	
 }

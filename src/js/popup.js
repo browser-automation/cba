@@ -13,3 +13,8 @@ function analytAllButtons() {
 }
 
 analytAllButtons();
+
+const params = (new URL(window.location)).searchParams;
+if (params.has("options")) {
+  document.body.classList.add("options");
+}

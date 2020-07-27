@@ -48,6 +48,10 @@ body {
   margin-top: 3px;
 }
 
+#actionNewValue {
+  width: 200px;
+}
+
 #logo {
   position: absolute;
   bottom: 10px;
@@ -57,4 +61,36 @@ body {
 #logo a {
   color: #444;
   text-decoration: none;
+}
+
+.options #playbackControl {
+  display: none;
+}
+
+.options #actionInput {
+  display: block;
+}
+
+.options #actionData {
+  width: 100%;
+  min-height: 100px;
+}
+
+.options #logo {
+  display: none;
+}
+
+.options #actionInput div {
+  margin: 0;
+  vertical-align: top;
+  display: flex;
+}
+
+.options #actionEvType, .options #actionNewValue {
+  margin: 0;
+  vertical-align: top;
+}
+
+.options #actionNewValue {
+  flex-grow: 2;
 }
