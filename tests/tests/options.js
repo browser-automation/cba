@@ -20,7 +20,8 @@ beforeEach(async () =>
 
 it("Extension version should be set in the header", async() =>
 {
-  equal(await getTextContent("#version"), await getExtensionVersion());
+  const version = await getExtensionVersion();
+  equal(await getTextContent("#version"), `v. ${version}`);
 });
 
 it("Last opened tab should be remembered, otherwise 'Import/export' tab should be selected", async() =>

@@ -98,6 +98,7 @@ it("Clicking 'save' button updates selected function with the specified input da
   await saveButtonClick();
 
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
   await cbaListItemSelect(functionsList, "Update");
   await ensureInputValues("Update", data, type, value);
   equal(await cbaListHasTextCount(functionsList, "Update"), 1);

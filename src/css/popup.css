@@ -63,6 +63,16 @@ body {
   text-decoration: none;
 }
 
+/* CBA tab in options */
+
+.options {
+  max-width: 720px;
+}
+
+.options #projectsManagement {
+  height: 290px;
+}
+
 .options #playbackControl {
   display: none;
 }
