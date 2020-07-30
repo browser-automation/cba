@@ -24,8 +24,6 @@ const importListQuery = "#importList";
 const importInputQuery = "#automImport";
 const exportOutputQuery = "#automExport";
 
-const importButtonQuery = "#importProjects";
-
 const importButtonClick = () => page().click("#importProjects");
 
 const defaultCollections = [{
@@ -72,6 +70,7 @@ beforeEach(async () =>
   await setCollections();
   await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
 });
 
 it("Ensure import list is populate", async() =>
@@ -335,7 +334,7 @@ it("Test error messages", async() =>
 
 function getNotificationMsg()
 {
-  return getElementAttribute("#setting1 .notification", "textContent");
+  return getElementAttribute("#panel-import .notification", "textContent");
 }
 
 function copyObject(obj)

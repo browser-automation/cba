@@ -2,43 +2,34 @@
 <html>
   <head>
     <title>Options</title>
-    <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="js/ui/jquery.jqGrid.min.js"></script>
-    <script type="text/javascript" src="js/ui/jquery-ui-1.8.20.custom.min.js"></script>
-    <script type="text/javascript" src="js/options.js" defer></script>
     <script type="text/javascript" src="js/browser-polyfill.min.js"></script>
-    <script type="text/javascript" src="js/popup.js"></script>
     <script type="module" src="js/cba-components.js"></script>
+    <script type="text/javascript" src="js/options.js" defer></script>
 
-    <link rel="stylesheet" type="text/css" media="screen" href="css/jquery-ui-1.8.1.custom.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="css/ui.jqgrid.css" />
-    <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" type="text/css" href="css/common.css" />
     <link rel="stylesheet" type="text/css" href="css/options.css" />
   </head>
   <body bgcolor="#f0f0f0">
     <div class="navigationMain">
-      <div class="navigationHeader">
+      <header class="navigationHeader">
         <div class="extName">
           CBA
         </div>
-        <div class="extVer" id="extVer">
+        <div class="extVer" id="version">
           v. 1.2
         </div>
-      </div>
-      <div class="navigationLinksCont">
-        <ul id="navigation">
-          <li id="navLnk1" class="navigation">Import/export</li>
-          <li id="navLnk2" class="navigation">CBA</li>
-          <li id="navLnk3" class="navigation">funcions</li>
-        </ul>
-      </div>
+      </header>
+      <nav>
+        <cba-tabs>
+          <cba-tab id="import-tab">Import/export</cba-tab>
+          <cba-tab id="cba-tab">CBA</cba-tab>
+          <cba-tab id="functions-tab">funcions</cba-tab>
+        </cba-tabs>
+      </nav>
     </div>
-    <div id="optionsContainer">
-      <div id="setting1" class="settingContainer">
-        <h2>
-          Import/Export
-        </h2>
+    <main id="optionsContainer">
+      <cba-panel id="panel-import" aria-labelledby="import-tab">
+        <h2>Import/Export</h2>
         <cba-list id="exportList" heading="Export" subheading="record"></cba-list>
         <textarea id="automExport" rows="12" cols="48"></textarea>
 
@@ -48,23 +39,13 @@
         <cba-list id="importList" heading="Import" subheading="record"></cba-list>
         <cba-button id="importProjects">Import</cba-button>
         <div class="notification"></div>
-      </div>
-
-      <div id="setting2" class="settingContainer">
-        <div class="header">
-          CBA
-        </div>
-        <hr />
-          <iframe src="popup.html?options=true" id="popup" frameborder="0"></iframe>
-        <div class="footer">
-        </div>
-      </div class="settingContainer">
-
-      <div id="setting3" class="settingContainer">
-        <div class="header">
-          Functions
-        </div>
-        <hr />
+      </cba-panel>
+      <cba-panel id="panel-cba" aria-labelledby="cba-tab">
+        <h2>CBA</h2>
+        <iframe src="popup.html?options=true" id="popup" frameborder="0"></iframe>
+      </cba-panel>
+      <cba-panel id="panel-functions" aria-labelledby="functions-tab">
+        <h2>Functions</h2>
         <div class="main">
           <div style="display:inline-table;vertical-align: top;">
             <input type="text" id="funcName" style="width:400px"/>
@@ -79,13 +60,7 @@
           </div>
           <cba-list id="functions" heading="Functions" subHeading="Name"></cba-list>
         </div>
-        <div class="footer">
-        </div>
-      </div>
+      </cba-panel>
     </div>
-
   </body>
-  <script type="text/javascript" src="js/ui/projects_table.js"></script>
-  <script type="text/javascript" src="js/ui/actions_table.js"></script>
-  <script type="text/javascript" src="js/ui/functions_table.js"></script>
 </html>

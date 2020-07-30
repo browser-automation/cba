@@ -15,6 +15,12 @@ async function reloadExtension()
   return backgroundPage().evaluate(() => browser.runtime.reload());
 }
 
+async function getExtensionVersion()
+{
+  const details = await backgroundPage().evaluate(() => browser.app.getDetails());
+  return details.version;
+}
+
 async function setCollections(collections)
 {
   if (!collections)
@@ -522,4 +528,5 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
-                  setPredefinedActions, getFunctionFromStorage};
+                  setPredefinedActions, getFunctionFromStorage,
+                  getExtensionVersion};

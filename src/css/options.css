@@ -1,6 +1,5 @@
-#popup {
-  width: 750px;
-  height: 100vh;
+body {
+  display: flex;
 }
 
 .navigationMain {
@@ -13,14 +12,6 @@
 .navigationHeader {
 	position:relative;
 }
-
-
-#optionsContainer {
-	font-family: Arial, Helvetica, sans-serif;
-	display: inline-table;
-	width: 200px;
-}
-
 
 .extName {
 	display: inline-table;
@@ -41,35 +32,53 @@
 	padding-left: 0px;
 }
 
-#navigation li {
-	padding-left: 5px;
-	padding-bottom: 3px;
-	padding-top: 3px;
-	font-size: 13px;
-	color: 878787;
+cba-tabs
+{
+  color: #878787;
+  width: 200px;
+  padding: 0 15px;
 }
 
-#optionsContainer, #Privacy, #about {
-	padding-left: 30px;
+cba-tab
+{
+  display: block;
+  cursor: pointer;
+  padding: 3px 5px;
 }
 
-
-.header {
-	padding-bottom:5px;
-	font-family: "Arial Narrow";
-	font-size: 20px;
-	width: 600;
+cba-tab[aria-selected]
+{
+  color: #000000;
+  background-color: #E6E6E6;
 }
 
-.footer {
-	
+main
+{
+  padding: 0 15px;
+  display: block;
+  width: 100%;
 }
 
-#navigation:hover {
-	cursor: pointer;
+main h2
+{
+  margin: 0px;
 }
 
-#navigation .selected {
-	background-color: E6E6E6;
-	color: black;
+main h2::after
+{
+  content: "";
+  display: block;
+  border-bottom: 1px solid #a8a8a8;
+  margin-top: 10px;
+}
+
+cba-list {
+  width: 200px;
+  height: 300px;
+  display: inline-block;
+}
+
+#popup {
+  width: 750px;
+  height: 100vh;
 }

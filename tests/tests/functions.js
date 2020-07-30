@@ -21,7 +21,7 @@ const pageSetup = {
 const addButtonClick = () => page().click("[data-action='addFunction']");
 const deleteButtonClick = () => page().click("[data-action='deleteFunction']");
 const saveButtonClick = () => page().click("[data-action='saveFunction']");
-const optionTabClick = () => page().click("#navLnk3");
+const optionTabClick = () => page().click("#functions-tab");
 
 const inputNameQuery = "#funcName";
 const inputDataQuery = "#funcData";
@@ -35,6 +35,7 @@ beforeEach(async () =>
   await setPredefinedActions();
   await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
   await optionTabClick();
 });
 
@@ -131,7 +132,7 @@ it("Test error messages", async() =>
 
 function getNotificationMsg()
 {
-  return getElementAttribute("#setting3 .notification", "textContent");
+  return getElementAttribute("#panel-functions .notification", "textContent");
 }
 
 async function ensureInputValues(name, data, type, value)

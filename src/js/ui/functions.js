@@ -3,7 +3,7 @@ const registerActionListener = require("./actionListener");
 const {load: prefefinedActionsLoad, saveState} = require("../db/predefinedActions");
 const {Notification, NO_FUNCTION_NAME, NO_SELECTED_FUNCTION} = require("./notification");
 
-const notification = new Notification("#setting3 .notification");
+const notification = new Notification("#panel-functions .notification");
 
 const inputEventType = eventTypes.init("#funcEvType");
 const inputName = document.querySelector("#funcName");

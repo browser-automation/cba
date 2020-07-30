@@ -4,7 +4,7 @@ const {Notification, NO_GROUP_ROOT_SELECTED,
   NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE,
   PROJECT_IMPORTED} = require("./notification");
 
-const notification = new Notification("#setting1 .notification");
+const notification = new Notification("#panel-import .notification");
 
 const exportList = document.querySelector("#exportList");
 const importList = document.querySelector("#importList");
