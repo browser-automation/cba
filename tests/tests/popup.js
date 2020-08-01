@@ -11,7 +11,7 @@ const {wait, setCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
        triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
-       getBadgeText, isDisplayNone} = require("./utils");
+       getBadgeText, isDisplayNone, cbaTableUnselectRow} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -48,8 +48,8 @@ beforeEach(async () =>
 {
   await setCollections();
   await resetCbaObject();
-  await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
 });
 
 it("'G+' button adds new group item with unique text", async() =>
@@ -176,32 +176,56 @@ it("'Add' button adds new empty action to the selected project", async () =>
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 0);
 
-  await clickAddAction();
-  await clickAddAction();
-  equal(await cbaTableItemsLength(cbaTableQuery), 2);
   const texts = {
     data: "",
     type: "",
     value: ""
   };
-  const item1 = {
+
+  await clickAddAction();
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), {
     id: "cba-table-id-1",
+    texts,
     selected: true,
-    texts
-  };
-  const item2 = {
+  });
+
+  await clickAddAction();
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
     id: "cba-table-id-2",
-    texts
-  };
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), item1);
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), item2);
+    texts,
+    selected: true,
+  });
+  equal(await cbaTableItemsLength(cbaTableQuery), 2);
 
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), item1);
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), item2);
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), {
+    id: "cba-table-id-1",
+    texts
+  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
+    id: "cba-table-id-2",
+    texts,
+    selected: true,
+  });
+
+  await cbaTableSelectRow(cbaTableQuery, "cba-table-id-1");
+  await clickAddAction();
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
+    id: "cba-table-id-3",
+    texts,
+    selected: true,
+  });
+
+  cbaTableUnselectRow(cbaTableQuery, "cba-table-id-3");
+  await clickAddAction();
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 3), {
+    id: "cba-table-id-4",
+    texts,
+    selected: true,
+  });
 });
 
 it("'Delete' button removes selected action from the selected project", async () =>

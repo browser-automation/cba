@@ -229,12 +229,22 @@ async function onAction(action)
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
+      const {id} = actionsComp.getSelectedItem();
       const {type} = selectedProject;
       if (type === "project") {
         const data = "";
         const type = "";
         const value = "";
-        actionsComp.addRow({texts: {data, type, value}});
+        actionsComp.addRow({texts: {data, type, value}}, id);
+        if (id)
+        {
+          actionsComp.selectNextRow();
+        }
+        else
+        {
+          const lastItem = actionsComp.items[actionsComp.items.length - 1];
+          actionsComp.selectRow(lastItem.id);
+        }
         selectedProject.actions = actionsComp.items;
         projects.updateRow(selectedProject, selectedProject.id);
         saveProjectsState();

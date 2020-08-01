@@ -167,6 +167,15 @@ async function getCbaTableRowHandle(query, id)
   return rootHandle.$(`tr[data-id="${id}"]`);
 }
 
+async function cbaTableUnselectRow(query, id)
+{
+  return page().evaluate(async(table, id) => {
+    const item = table.getItem(id);
+    delete item.selected;
+    return table.updateRow(item, id);
+  }, await page().$(query), id);
+}
+
 async function getShadowRoot(query)
 {
   const handle = await page().$(query);
@@ -537,4 +546,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
                   setPredefinedActions, getFunctionFromStorage,
-                  getExtensionVersion, isDisplayNone};
+                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow};
