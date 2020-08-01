@@ -327,6 +327,7 @@ it("<$unique=> placeholder should generate random number with the specified char
   const pasteQuery = "#cba-paste";
   const action1 = createAction(pasteQuery, "change", "<$unique=2>");
   await playTestProject([action1]);
+  await wait(30);
   const firstUnique = await getValue(pasteQuery);
   equal(firstUnique.length, 2);
   const action2 = createAction(pasteQuery, "change", "<$unique=2>");

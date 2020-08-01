@@ -66,6 +66,7 @@ it("Clicking 'add' button creates new function with specified input data", async
   await ensureInputValues(name, data, type, value);
 
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(30);
 
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
   await cbaListItemSelect(functionsList, "New function");
