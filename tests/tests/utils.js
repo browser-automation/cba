@@ -385,6 +385,14 @@ async function isChecked(query)
   return getElementAttribute(query, "checked");
 }
 
+async function isDisplayNone(query)
+{
+  const element = await page().$(query);
+  return page().evaluate((element) => {
+    return window.getComputedStyle(element).getPropertyValue("display") !== "none";
+  } , element);
+}
+
 async function isElementExist(query)
 {
   return page().$(query);
@@ -529,4 +537,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
                   setPredefinedActions, getFunctionFromStorage,
-                  getExtensionVersion};
+                  getExtensionVersion, isDisplayNone};

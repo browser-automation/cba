@@ -1,6 +1,6 @@
 const {load: prefefinedActionsLoad} = require("../db/predefinedActions");
 const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
-  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED,
+  SELECT_PROJ_NOT_GROUP, CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
   Notification} = require("./notification");
 
 const {load, saveState} = require("../db/collections");
@@ -16,6 +16,8 @@ const actionEvType = eventTypes.init("#actionEvType");
 
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
+
+let renamingItem = null;
 
 async function loadProjects()
 {
@@ -188,8 +190,38 @@ async function onAction(action)
       if (!selectedProject)
         return notification.error(NO_PROJ_GROUP_SELECTED);
 
-      // TODO: add errors  `The group with choosen name already exists` and
-      // `The group already has project with current name` accordingly
+      projects.setEditable(selectedProject.id, true);
+      renamingItem = selectedProject;
+      document.querySelector("#projects").classList.add("rename");
+      break;
+    }
+    case "saveProject": {
+      if (!renamingItem) {
+        location.reload();
+        document.querySelector("#projects").classList.remove("rename");
+        return;
+      }
+
+      const {text, type, id} = renamingItem;
+      const editedText = projects._getRowContent(id);
+      if (type === "project")
+      {
+        const subItems = projects.getParentItem(id).subItems;
+        if (itemsHasText(subItems, editedText) && text != editedText)
+        {
+          projects.selectRow(id);
+          return notification.error(NAME_EXISTS_PROJECT);
+        }
+      }
+      else if (itemsHasText(projects.items, editedText) && text != editedText)
+      {
+        projects.selectRow(id);
+        return notification.error(NAME_EXISTS_GROUP);
+      }
+      projects.saveEditables();
+      await saveProjectsState();
+      notification.clean();
+      document.querySelector("#projects").classList.remove("rename");
       break;
     }
     case "addAction": {
@@ -316,6 +348,11 @@ async function onAction(action)
     default:
       break;
   }
+}
+
+function itemsHasText(items, text)
+{
+  return items.filter((item) => item.text === text).length > 0;
 }
 
 function getNextTextNumber(items, prefix) {

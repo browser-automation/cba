@@ -11,11 +11,12 @@ const {wait, setCollections, cbaListHasTextCount, cbaListItemExpand,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
        triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
-       getBadgeText} = require("./utils");
+       getBadgeText, isDisplayNone} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
-       CHANGES_SAVED} = require("../../src/js/ui/notification");
+       CHANGES_SAVED, NAME_EXISTS_GROUP,
+       NAME_EXISTS_PROJECT} = require("../../src/js/ui/notification");
 
 const pageSetup = {
   path: "popup.html"
@@ -33,6 +34,7 @@ const clickAddGroup = () => page().click("[data-action='addGroup']");
 const clickAddProject = () => page().click("[data-action='addProject']");
 const clickRemoveProject = () => page().click("[data-action='removeProject']");
 const clickRenameProject = () => page().click("[data-action='renameProject']");
+const clickSaveProject = () => page().click("[data-action='saveProject']");
 
 const clickAddAction = () => page().click("[data-action='addAction']");
 const clickDeleteAction = () => page().click("[data-action='deleteAction']");
@@ -119,7 +121,54 @@ it("'-' button removes both project and group from items", async() =>
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
 });
 
-it("'Rename' button renames both project and group name in storage and projects accordingly");
+it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
+{
+  await cbaListItemExpand(cbaListQuery, "group");
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+
+  await clickAddProject();
+  await clickAddGroup();
+
+  ok(await isDisplayNone("#renameBtn"));
+  notOk(await isDisplayNone("#saveBtn"))
+
+  await clickRenameProject();
+  notOk(await isDisplayNone("#renameBtn"));
+  ok(await isDisplayNone("#saveBtn"))
+
+  page().keyboard.press("ArrowDown");
+  page().keyboard.type("1");
+  await clickSaveProject();
+  equal(await getNotificationMsg(), NAME_EXISTS_PROJECT);
+
+  page().keyboard.type("1");
+  await clickSaveProject();
+  equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 0);
+  equal(await cbaListHasTextCount(cbaListQuery, "project11", "group"), 1);
+  ok(await isDisplayNone("#renameBtn"));
+  notOk(await isDisplayNone("#saveBtn"))
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 0);
+  equal(await cbaListHasTextCount(cbaListQuery, "project11", "group"), 1);
+
+  await cbaListItemSelect(cbaListQuery, "group");
+  await clickRenameProject();
+
+  page().keyboard.press("ArrowDown");
+  page().keyboard.type("1");
+  await clickSaveProject();
+  equal(await getNotificationMsg(), NAME_EXISTS_GROUP);
+
+  page().keyboard.type("1");
+  await clickSaveProject();
+  equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
+  equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
+  equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
+});
 
 it("'Add' button adds new empty action to the selected project", async () =>
 {

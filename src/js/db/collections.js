@@ -6,8 +6,16 @@ async function load() {
 }
 
 function saveState(items) {
-  const collections = items;
+  const collections = items.map(removeEditable);
   return browser.storage.local.set({collections});
+}
+
+function removeEditable(item) {
+  if (item.editable)
+    delete item.editable;
+  if (item.subItems)
+    item.subItems = item.subItems.map(removeEditable);
+  return item;
 }
 
 async function addAction(groupId, projectId, action) {

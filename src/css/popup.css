@@ -27,6 +27,14 @@ body {
   display: block;
 }
 
+#projects.rename #renameBtn {
+  display: none;
+}
+
+#projects:not(.rename) #saveBtn {
+  display: none;
+}
+
 #actions {
   flex: 3;
 }
