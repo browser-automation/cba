@@ -26,8 +26,7 @@ module.exports =
       { from: "./src/css/icons", to: "css/icons"},
       { from: "./src/css/images", to: "css/images"},
       { from: "./src/*.*", flatten: true},
-      { from: "./src/js/*", to: "js", flatten: true },
-      { from: "./src/js/ui", to: "js/ui", flatten: true },
+      { from: "./src/js/jquery*.js", to: "js/jquery-1.7.2.min.js" },
       {from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
       to: "js" },
     ])

@@ -25,3 +25,7 @@ build:webpack:prod          # builds production version with minified files
 **Note:** When rebuilding the extension changes in background scripts might not
 be loaded in the chrome unless actual extension is reloaded in the
 `chrome://extensions` page (i.e. By clicking on the reload button).
+
+## Wiki
+
+https://github.com/browser-automation/cba-wiki/wiki
