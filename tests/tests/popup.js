@@ -6,7 +6,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {wait, setCollections, cbaListHasTextCount, cbaListItemExpand,
+const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
@@ -46,7 +46,7 @@ const clickStop = () => page().click("[data-action='stop']");
 
 beforeEach(async () =>
 {
-  await setCollections();
+  await setProjects();
   await resetCbaObject();
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);

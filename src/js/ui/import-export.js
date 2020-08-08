@@ -1,4 +1,4 @@
-const {load, importProjects} = require("../db/collections");
+const {load, importProjects, dbName} = require("../db/projects");
 const {migrateData, migrateProjects} = require("../background/migrate");
 const {Notification, NO_GROUP_ROOT_SELECTED,
   NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE,
@@ -112,8 +112,8 @@ loadImportList();
 document.querySelector("#importProjects").addEventListener("click", onImport)
 exportList.addEventListener("select", exportProjects);
 
-browser.storage.onChanged.addListener(({collections}) => {
-  if (collections) {
+browser.storage.onChanged.addListener((result) => {
+  if (result[dbName]) {
     loadExportList();
     loadImportList();
   }

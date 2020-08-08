@@ -1,4 +1,5 @@
 const {backgroundPage, page} = require("../main");
+const projectsDb = "projects";
 
 async function setWindowLocalStorage(key, data)
 {
@@ -21,11 +22,17 @@ async function getExtensionVersion()
   return details.version;
 }
 
-async function setCollections(collections)
+function setLocalStorageData(item)
 {
-  if (!collections)
+  return backgroundPage().evaluate(async(item) => await browser.storage.local.set(item), item);
+}
+
+async function setProjects(items)
+{
+  if (!items)
   {
-    collections = [{
+    const result = {};
+    result[projectsDb] = [{
       id: "group",
       text: "group",
       type: "group",
@@ -39,8 +46,14 @@ async function setCollections(collections)
         }
       ]
     }];
+    return setLocalStorageData(result);
   }
-  return backgroundPage().evaluate(async(collections) => await browser.storage.local.set({collections}), collections);
+  else
+  {
+    const result = {};
+    result[projectsDb] = items;
+    return setLocalStorageData(result);
+  }
 }
 
 async function setPredefinedActions(predefinedActions)
@@ -254,8 +267,8 @@ async function getLocalStorageData(key)
 
 async function getGroupFromStorage(groupText)
 {
-  const {collections} = await getLocalStorageData("collections");
-  const [group] = collections.filter(({text}) => text == groupText);
+  const groups = (await getLocalStorageData(projectsDb))[projectsDb];
+  const [group] = groups.filter(({text}) => text == groupText);
   return group
 }
 
@@ -303,8 +316,8 @@ async function getProjectActions(groupName, projectName, num, key)
 
 async function getTestProjectActions(num, key)
 {
-  const {collections} = await getLocalStorageData("collections");
-  const [group] = collections.filter(({id}) => id === "group");
+  const groups = (await getLocalStorageData(projectsDb))[projectsDb];
+  const [group] = groups.filter(({id}) => id === "group");
   if (!group)
     return null;
   const [project] = group.subItems.filter(({id}) => id === "project");
@@ -537,7 +550,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   focusAndType, getBadgeText, getLocalStorageData,
                   getProjectFromStorage,getGroupFromStorage,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
-                  resetClipboardValue, isElementExist, setCollections,
+                  resetClipboardValue, isElementExist, setProjects,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
                   getSelectedRow,setWindowLocalStorage, getWindowLocalStorage,
                   reloadExtension,
@@ -546,4 +559,5 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
                   setPredefinedActions, getFunctionFromStorage,
-                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow};
+                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
+                  projectsDb};

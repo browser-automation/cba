@@ -5,7 +5,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {setCollections, getTextContent, getPageUrl,
+const {setProjects, getTextContent, getPageUrl,
        resetBackgroundGlobalVar, startTestRecording, stopTestRecording,
        getTestProjectActions, focusAndType, wait, getBadgeText} = require("./utils");
 const {setTestPage, navigateTo, page} = require("../main");
@@ -44,7 +44,7 @@ const pageSetup = {
 
 beforeEach(async () =>
 {
-  await setCollections();
+  await setProjects();
   const pageUrl = await getPageUrl();
   await resetBackgroundGlobalVar(bgGlobalVarName);
 

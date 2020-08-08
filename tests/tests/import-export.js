@@ -6,7 +6,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {wait, setCollections, cbaListHasTextCount, cbaListItemSelect,
+const {wait, setProjects, cbaListHasTextCount, cbaListItemSelect,
   getValue, setValue, getProjectFromStorage, getGroupFromStorage,
   getElementAttribute} = require("./utils");
 const {page} = require("../main");
@@ -26,7 +26,7 @@ const exportOutputQuery = "#automExport";
 
 const importButtonClick = () => page().click("#importProjects");
 
-const defaultCollections = [{
+const defaultProjects = [{
   expanded: false,
   id: "group1",
   type: "group",
@@ -67,7 +67,7 @@ const defaultCollections = [{
 
 beforeEach(async () =>
 {
-  await setCollections();
+  await setProjects();
   await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);
@@ -75,7 +75,7 @@ beforeEach(async () =>
 
 it("Ensure import list is populate", async() =>
 {
-  await setCollections(defaultCollections);
+  await setProjects(defaultProjects);
   await wait(50);
 
   equal(await cbaListHasTextCount(importListQuery, "Root"), 1);
@@ -88,7 +88,7 @@ it("Ensure import list is populate", async() =>
 
 it("Ensure export list is populate", async() =>
 {
-  await setCollections(defaultCollections);
+  await setProjects(defaultProjects);
   await wait(50);
   equal(await cbaListHasTextCount(exportListQuery, "group1"), 1);
   equal(await cbaListHasTextCount(exportListQuery, "group2"), 1);
@@ -102,13 +102,13 @@ it("Selecting item from export list populates export output with project or grou
   const getExportedObj = async() => JSON.parse(await getValue(exportOutputQuery));
   const findCollection = (text, parentText) => {
     const groupText = parentText ? parentText : text;
-    const group = defaultCollections.filter((item) => item.text === groupText)[0];
+    const group = defaultProjects.filter((item) => item.text === groupText)[0];
     if (parentText)
       return group.subItems.filter((item) => item.text === text)[0];
     else
       return group;
   };
-  await setCollections(defaultCollections);
+  await setProjects(defaultProjects);
   await wait(50);
   let result = "";
 

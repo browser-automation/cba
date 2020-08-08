@@ -1,3 +1,5 @@
+const {saveState} = require("../db/projects");
+
 function getOldData()
 {
   const data = JSON.parse(localStorage.getItem("data"));
@@ -45,7 +47,7 @@ function migrateProjects({projects}, groupName) {
 }
 
 function migrateData(oldData) {
-  const collections = [];
+  const groups = [];
   for (const groupName of Object.keys(oldData)) {
     const group = {
       "text": groupName,
@@ -54,16 +56,15 @@ function migrateData(oldData) {
       "subItems": migrateProjects(oldData[groupName], groupName),
       "type": "group"
     };
-    collections.push(group);
+    groups.push(group);
   }
-  return collections;
+  return groups;
 }
 
 async function migrate() {
   const {data, cbaFunctions} = getOldData();
   if (data) {
-    const collections = migrateData(data);
-    await browser.storage.local.set({collections});
+    await saveState(migrateData(data));
   }
   if (cbaFunctions) {
     const predefinedActions = [];

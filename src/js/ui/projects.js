@@ -3,10 +3,10 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   SELECT_PROJ_NOT_GROUP, CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
   Notification} = require("./notification");
 
-const {load, saveState} = require("../db/collections");
+const {load, saveState, dbName} = require("../db/projects");
 const eventTypes = require("./eventTypes");
 
-const projects = document.querySelector("#projects cba-list");
+const projectsComp = document.querySelector("#projects cba-list");
 const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
 const actionData = document.querySelector("#actionData");
@@ -21,11 +21,11 @@ let renamingItem = null;
 
 async function loadProjects()
 {
-  projects.items = await load();
+  projectsComp.items = await load();
   if (bg.lastSelectedProjectId)
-    projects.selectRow(bg.lastSelectedProjectId);
+    projectsComp.selectRow(bg.lastSelectedProjectId);
 
-  const {type, actions} = projects.getSelectedItem();
+  const {type, actions} = projectsComp.getSelectedItem();
   if (type === "project")
     populateActions(actions);
   else
@@ -42,7 +42,7 @@ async function loadFunctions()
 function populateActions(items)
 {
   actionsComp.items = items;
-  const projectId = projects.getSelectedItem().id;
+  const projectId = projectsComp.getSelectedItem().id;
   if (bg.lastSelectedActionId && bg.lastSelectedProjectId === projectId)
     actionsComp.selectRow(bg.lastSelectedActionId);
   else
@@ -52,7 +52,7 @@ function populateActions(items)
 
 async function onProjectSelect()
 {
-  const {type, actions, id} = projects.getSelectedItem();
+  const {type, actions, id} = projectsComp.getSelectedItem();
   bg.lastSelectedProjectId = id;
   resetActionInput();
   if (type === "project")
@@ -134,7 +134,7 @@ function keepHighlightingPlayingAction(isPopupLoad)
   updatePlayButtonState();
   if(bg.allowPlay || bg.paused)
   {
-    projects.selectRow(bg.playingProjectId);
+    projectsComp.selectRow(bg.playingProjectId);
     if (bg.playingActionIndex >= 0)
     {
       const {id} = actionsComp.items[bg.playingActionIndex];
@@ -150,47 +150,47 @@ function keepHighlightingPlayingAction(isPopupLoad)
 
 function saveProjectsState()
 {
-  return saveState(projects.items);
+  return saveState(projectsComp.items);
 }
 
 async function onAction(action)
 {
   switch (action) {
     case "addGroup": {
-      const num = getNextTextNumber(projects.items, "group");
-      projects.addRow(createGroupObj(`group${num}`));
+      const num = getNextTextNumber(projectsComp.items, "group");
+      projectsComp.addRow(createGroupObj(`group${num}`));
       saveProjectsState();
       break;
     }
     case "addProject": {
-      const project = projects.getSelectedItem();
+      const project = projectsComp.getSelectedItem();
       if (!project)
         return notification.error(NO_PROJ_GROUP_SELECTED);
 
       const {type, id} = project;
-      const topItem = type == "group" ? project : projects.getParentItem(id);
+      const topItem = type == "group" ? project : projectsComp.getParentItem(id);
 
       const num = getNextTextNumber(topItem.subItems, "project");
-      projects.addRow(createProjectObj(`project${num}`), topItem.id);
+      projectsComp.addRow(createProjectObj(`project${num}`), topItem.id);
       saveProjectsState();
       break;
     }
     case "removeProject": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_GROUP_SELECTED);
 
       const {id} = selectedProject;
-      projects.deleteRow(id);
+      projectsComp.deleteRow(id);
       saveProjectsState();
       break;
     }
     case "renameProject": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_GROUP_SELECTED);
 
-      projects.setEditable(selectedProject.id, true);
+      projectsComp.setEditable(selectedProject.id, true);
       renamingItem = selectedProject;
       document.querySelector("#projects").classList.add("rename");
       break;
@@ -203,29 +203,29 @@ async function onAction(action)
       }
 
       const {text, type, id} = renamingItem;
-      const editedText = projects._getRowContent(id);
+      const editedText = projectsComp._getRowContent(id);
       if (type === "project")
       {
-        const subItems = projects.getParentItem(id).subItems;
+        const subItems = projectsComp.getParentItem(id).subItems;
         if (itemsHasText(subItems, editedText) && text != editedText)
         {
-          projects.selectRow(id);
+          projectsComp.selectRow(id);
           return notification.error(NAME_EXISTS_PROJECT);
         }
       }
-      else if (itemsHasText(projects.items, editedText) && text != editedText)
+      else if (itemsHasText(projectsComp.items, editedText) && text != editedText)
       {
-        projects.selectRow(id);
+        projectsComp.selectRow(id);
         return notification.error(NAME_EXISTS_GROUP);
       }
-      projects.saveEditables();
+      projectsComp.saveEditables();
       await saveProjectsState();
       notification.clean();
       document.querySelector("#projects").classList.remove("rename");
       break;
     }
     case "addAction": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
@@ -246,7 +246,7 @@ async function onAction(action)
           actionsComp.selectRow(lastItem.id);
         }
         selectedProject.actions = actionsComp.items;
-        projects.updateRow(selectedProject, selectedProject.id);
+        projectsComp.updateRow(selectedProject, selectedProject.id);
         saveProjectsState();
       }
       else {
@@ -255,7 +255,7 @@ async function onAction(action)
       break;
     }
     case "deleteAction": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       const selectedAction = actionsComp.getSelectedItem();
       if (!selectedAction)
         return notification.error(NO_ACTION_SELECTED);
@@ -266,7 +266,7 @@ async function onAction(action)
       if (type === "project") {
         actionsComp.deleteRow(selectedAction.id);
         selectedProject.actions = actionsComp.items;
-        projects.updateRow(selectedProject, selectedProject.id);
+        projectsComp.updateRow(selectedProject, selectedProject.id);
         saveProjectsState();
       }
       else {
@@ -275,7 +275,7 @@ async function onAction(action)
       break;
     }
     case "saveAction": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       const selectedAction = actionsComp.getSelectedItem();
       if (!selectedAction)
         return notification.error(NO_ACTION_SELECTED);
@@ -290,21 +290,21 @@ async function onAction(action)
 
         actionsComp.updateRow({texts: {data, type, value}}, selectedAction.id);
         selectedProject.actions = actionsComp.items;
-        projects.updateRow(selectedProject, selectedProject.id);
+        projectsComp.updateRow(selectedProject, selectedProject.id);
         await saveProjectsState();
         notification.show(CHANGES_SAVED);
       }
       break;
     }
     case "drop": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
       const {type} = selectedProject;
       if (type === "project") {
         selectedProject.actions = actionsComp.items;
-        projects.updateRow(selectedProject, selectedProject.id);
+        projectsComp.updateRow(selectedProject, selectedProject.id);
         saveProjectsState();
       }
       else {
@@ -313,13 +313,13 @@ async function onAction(action)
       break;
     }
     case "record": {
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
       const {type, id} = selectedProject;
       if (type === "project") {
-        const parentItem = projects._findItem("id", id, true);
+        const parentItem = projectsComp._findItem("id", id, true);
         bg.recordButtonClick(parentItem.id, id);
       }
       else {
@@ -340,7 +340,7 @@ async function onAction(action)
         return {data, type, value, id};
       };
 
-      const selectedProject = projects.getSelectedItem();
+      const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
@@ -412,16 +412,16 @@ loadProjects();
 loadFunctions();
 updateRecordButtonState();
 
-projects.addEventListener("expand", saveProjectsState);
-projects.addEventListener("select", onProjectSelect);
+projectsComp.addEventListener("expand", saveProjectsState);
+projectsComp.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
 actionsComp.addEventListener("dragndrop", ()=>
 {
   onAction("drop");
 });
 registerActionListener(onAction);
-browser.storage.onChanged.addListener(({collections}) => {
-  if (collections)
+browser.storage.onChanged.addListener((result) => {
+  if (result[dbName])
     loadProjects();
 });
 

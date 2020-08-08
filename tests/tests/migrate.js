@@ -7,7 +7,7 @@ const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {getWindowLocalStorage, setWindowLocalStorage, wait, reloadExtension,
-       getLocalStorageData} = require("./utils");
+       getLocalStorageData, projectsDb} = require("./utils");
 
 const oldData = {
   "oldGroup": {
@@ -117,7 +117,7 @@ it("Extension should move and backup old data", async() =>
 {
   const {backup} = await getLocalStorageData("backup");
   const migratedData = {
-    collections: [{
+    projects: [{
       text: "oldGroup",
       id: "oldGroup",
       type: "group",
@@ -218,6 +218,6 @@ it("Extension should move and backup old data", async() =>
 
   equal(await getWindowLocalStorage("data"), null, "Old window.localStorageo('data') is deleted");
   deepEqual(backup.data, oldData, "Old data is backed up in browser.storage.local.get('backup')");
-  deepEqual(await getLocalStorageData("collections"), migratedData, "Old data should be reconstructed moved into browser.storage.local.get('collections')");
+  deepEqual(await getLocalStorageData(projectsDb), migratedData, `Old data should be reconstructed moved into browser.storage.local.get('${projectsDb}')`);
   deepEqual(await getLocalStorageData("predefinedActions"), migratedPredefinedActions, "Old cba-functions should be reconstructed moved into browser.storage.local.get('predefinedActions')");
 });

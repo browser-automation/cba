@@ -2,7 +2,7 @@ require("../analytics");
 const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
-const {addAction} = require("../db/collections");
+const {addAction, dbName} = require("../db/projects");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -25,17 +25,19 @@ browser.runtime.onConnect.addListener((port) => {
  * check whether background page is loading for first time.
  */
 async function isFirstLoad() {
-  const data = localStorage.getItem("data");
-  const collections = await browser.storage.local.get("collections");
+  const oldDatabaseName = "data";
+  const oldDatabase = localStorage.getItem(oldDatabaseName); 
+  const newDatabase = await browser.storage.local.get(dbName);
   const predefinedActions = await browser.storage.local.get("predefinedActions");
-  if (data) {
+  if (oldDatabase) {
     await backup();
     await migrate();
     localStorage.removeItem("data");
   }
   else {
-    if (!Object.keys(collections).length) {
-      const collections = [
+    if (!Object.keys(newDatabase).length) {
+      const newDatabase = {};
+      newDatabase[dbName] = [
         {
           id: "group",
           text: "group",
@@ -52,7 +54,7 @@ async function isFirstLoad() {
         }
       ];
   
-      await browser.storage.local.set({collections});
+      await browser.storage.local.set(newDatabase);
     }
     if (!Object.keys(predefinedActions).length) {
       const predefinedActions = [
