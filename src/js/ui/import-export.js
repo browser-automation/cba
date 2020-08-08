@@ -1,4 +1,4 @@
-const {load, importProjects, dbName} = require("../db/projects");
+const projectsDb = require("../db/projects");
 const {migrateData, migrateProjects} = require("../background/migrate");
 const {Notification, NO_GROUP_ROOT_SELECTED,
   NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE,
@@ -14,7 +14,7 @@ const exportOutput = document.querySelector("#automExport");
 
 async function loadExportList()
 {
-  const projects = await load();
+  const projects = await projectsDb.load();
   const expandItems = (item) => {
     item.expanded = true;
     return item;
@@ -25,7 +25,7 @@ async function loadExportList()
 
 async function loadImportList()
 {
-  const projects = await load();
+  const projects = await projectsDb.load();
   const removeSubitem = (item) => {
     if (item.subItems)
       delete item.subItems;
@@ -86,12 +86,12 @@ async function onImport()
   
   if (selectedGroup.text === "Root")
   {
-    await importProjects(projects);
+    await projectsDb.importProjects(projects);
   }
   else
   {
     const groupText = selectedGroup.text;
-    await importProjects(projects, groupText);
+    await projectsDb.importProjects(projects, groupText);
   }
   notification.show(PROJECT_IMPORTED);
 }
@@ -113,7 +113,7 @@ document.querySelector("#importProjects").addEventListener("click", onImport)
 exportList.addEventListener("select", exportProjects);
 
 browser.storage.onChanged.addListener((result) => {
-  if (result[dbName]) {
+  if (result[projectsDb.name]) {
     loadExportList();
     loadImportList();
   }

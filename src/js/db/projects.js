@@ -1,13 +1,13 @@
-const dbName = "projects";
+const name = "projects";
 
 async function load() {
-  const result = await browser.storage.local.get(dbName);
-  return result[dbName];
+  const result = await browser.storage.local.get(name);
+  return result[name];
 }
 
 function saveState(items) {
   const result = {};
-  result[dbName] = items.map(removeEditable);
+  result[name] = items.map(removeEditable);
   return browser.storage.local.set(result);
 }
 
@@ -36,7 +36,7 @@ async function addAction(groupId, subItemId, action) {
 
 async function importProjects(subItems, groupText)
 {
-  const groups = await load(dbName);
+  const groups = await load(name);
   let group = null;
   if (!groupText)
   {
@@ -109,4 +109,4 @@ function hasId(groups, currentId)
   return false;
 }
 
-module.exports = {load, saveState, importProjects, addAction, dbName};
+module.exports = {load, saveState, importProjects, addAction, name};

@@ -3,7 +3,7 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   SELECT_PROJ_NOT_GROUP, CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
   Notification} = require("./notification");
 
-const {load, saveState, dbName} = require("../db/projects");
+const projectsDb = require("../db/projects");
 const eventTypes = require("./eventTypes");
 
 const projectsComp = document.querySelector("#projects cba-list");
@@ -21,7 +21,7 @@ let renamingItem = null;
 
 async function loadProjects()
 {
-  projectsComp.items = await load();
+  projectsComp.items = await projectsDb.load();
   if (bg.lastSelectedProjectId)
     projectsComp.selectRow(bg.lastSelectedProjectId);
 
@@ -150,7 +150,7 @@ function keepHighlightingPlayingAction(isPopupLoad)
 
 function saveProjectsState()
 {
-  return saveState(projectsComp.items);
+  return projectsDb.saveState(projectsComp.items);
 }
 
 async function onAction(action)
@@ -421,7 +421,7 @@ actionsComp.addEventListener("dragndrop", ()=>
 });
 registerActionListener(onAction);
 browser.storage.onChanged.addListener((result) => {
-  if (result[dbName])
+  if (result[projectsDb.name])
     loadProjects();
 });
 

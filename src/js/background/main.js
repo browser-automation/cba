@@ -2,7 +2,7 @@ require("../analytics");
 const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
-const {addAction, dbName} = require("../db/projects");
+const projectsDb = require("../db/projects");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -27,7 +27,7 @@ browser.runtime.onConnect.addListener((port) => {
 async function isFirstLoad() {
   const oldDatabaseName = "data";
   const oldDatabase = localStorage.getItem(oldDatabaseName); 
-  const newDatabase = await browser.storage.local.get(dbName);
+  const newDatabase = await browser.storage.local.get(projectsDb.name);
   const predefinedActions = await browser.storage.local.get("predefinedActions");
   if (oldDatabase) {
     await backup();
@@ -37,7 +37,7 @@ async function isFirstLoad() {
   else {
     if (!Object.keys(newDatabase).length) {
       const newDatabase = {};
-      newDatabase[dbName] = [
+      newDatabase[projectsDb.name] = [
         {
           id: "group",
           text: "group",
@@ -111,13 +111,15 @@ isFirstLoad();
  */
 function storeRecord(msg) {
   if(msg.evType == "redirect") {
-    return addAction(cba.recordingGroupId, cba.recordingProjectId, {texts: msg});
+    return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId,
+                                {texts: msg});
   }
   if((cba.lastEvType == "update") && (msg.evType == "update")) {
     return false;
   }
   cba.lastEvType = msg.evType;
-  return addAction(cba.recordingGroupId, cba.recordingProjectId, {texts: msg});
+  return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId,
+                              {texts: msg});
 }
 
 async function storeCurrentUrl() {
