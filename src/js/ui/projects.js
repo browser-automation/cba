@@ -1,4 +1,4 @@
-const {load: prefefinedActionsLoad} = require("../db/predefinedActions");
+const customActionsDb = require("../db/customActions");
 const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   SELECT_PROJ_NOT_GROUP, CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
   Notification} = require("./notification");
@@ -36,7 +36,7 @@ async function loadProjects()
 
 async function loadFunctions()
 {
-  functions.items = await prefefinedActionsLoad();
+  functions.items = await customActionsDb.load();
 }
 
 function populateActions(items)

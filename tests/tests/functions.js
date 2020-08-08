@@ -6,7 +6,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {wait, setPredefinedActions, getElementAttribute,
+const {wait, setCustomActions, getElementAttribute,
   getValue, cbaListItemSelect, setValue, cbaListHasTextCount,
   getFunctionFromStorage} = require("./utils");
 const {page} = require("../main");
@@ -32,7 +32,7 @@ const functionsList = "#functions";
 
 beforeEach(async () =>
 {
-  await setPredefinedActions();
+  await setCustomActions();
   await wait(50);
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);

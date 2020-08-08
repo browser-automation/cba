@@ -3,6 +3,7 @@ const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
+const customActionsDb = require("../db/customActions");
 
 window.cba = new CBA();
 //TODO: Use message passing to run the functions
@@ -28,7 +29,6 @@ async function isFirstLoad() {
   const oldDatabaseName = "data";
   const oldDatabase = localStorage.getItem(oldDatabaseName); 
   const newDatabase = await browser.storage.local.get(projectsDb.name);
-  const predefinedActions = await browser.storage.local.get("predefinedActions");
   if (oldDatabase) {
     await backup();
     await migrate();
@@ -36,8 +36,8 @@ async function isFirstLoad() {
   }
   else {
     if (!Object.keys(newDatabase).length) {
-      const newDatabase = {};
-      newDatabase[projectsDb.name] = [
+      const dbItem = {};
+      dbItem[projectsDb.name] = [
         {
           id: "group",
           text: "group",
@@ -54,10 +54,13 @@ async function isFirstLoad() {
         }
       ];
   
-      await browser.storage.local.set(newDatabase);
+      await browser.storage.local.set(dbItem);
     }
-    if (!Object.keys(predefinedActions).length) {
-      const predefinedActions = [
+
+    const customActions = await browser.storage.local.get(customActionsDb.name);
+    if (!Object.keys(customActions).length) {
+      const dbItem = {};
+      dbItem[customActionsDb.name] = [
         {
           data: {
             texts: {
@@ -99,7 +102,7 @@ async function isFirstLoad() {
           text: "Clipboard"
         }
       ];
-      await browser.storage.local.set({predefinedActions});
+      await browser.storage.local.set(dbItem);
     }
   } 
 }

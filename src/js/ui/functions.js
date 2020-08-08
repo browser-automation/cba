@@ -1,6 +1,6 @@
 const eventTypes = require("./eventTypes");
 const registerActionListener = require("./actionListener");
-const {load: prefefinedActionsLoad, saveState} = require("../db/predefinedActions");
+const customActionsDb = require("../db/customActions");
 const {Notification, NO_FUNCTION_NAME, NO_SELECTED_FUNCTION} = require("./notification");
 
 const notification = new Notification("#panel-functions .notification");
@@ -13,12 +13,12 @@ const functionsList = document.querySelector("#functions");
 
 async function loadFunctions()
 {
-  functionsList.items = await prefefinedActionsLoad();
+  functionsList.items = await customActionsDb.load();
 }
 
 function saveFunctionsState()
 {
-  return saveState(functionsList.items);
+  return customActionsDb.saveState(functionsList.items);
 }
 
 function onFunctionSelect()
@@ -93,7 +93,7 @@ function createFunctionItem()
 loadFunctions();
 functionsList.addEventListener("select", onFunctionSelect);
 registerActionListener(onAction);
-browser.storage.onChanged.addListener(({predefinedActions}) => {
-  if (predefinedActions)
+browser.storage.onChanged.addListener((result) => {
+  if (result[customActionsDb.name])
     loadFunctions();
 });

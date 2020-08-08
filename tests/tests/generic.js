@@ -6,7 +6,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {getLocalStorageData, sendCurrentTabRequest, getStyle, projectsDb, wait} = require("./utils");
+const {getLocalStorageData, sendCurrentTabRequest, getStyle, projectsDbName, wait} = require("./utils");
 const {setTestPage} = require("../main");
 const {server} = require("../config");
 
@@ -40,7 +40,7 @@ it("Starting the extension should set default actions", async() =>
       ]
     }]
   };
-  deepEqual(await getLocalStorageData(projectsDb), initialData);
+  deepEqual(await getLocalStorageData(projectsDbName), initialData);
 });
 
 it("Sending highlight and unHighlight event should outline specific element according to selector", async() =>

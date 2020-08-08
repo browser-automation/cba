@@ -1,4 +1,5 @@
 const {saveState} = require("../db/projects");
+const customActionsDb = require("../db/customActions");
 
 function getOldData()
 {
@@ -67,14 +68,14 @@ async function migrate() {
     await saveState(migrateData(data));
   }
   if (cbaFunctions) {
-    const predefinedActions = [];
+    const customActions = [];
     for (const {name, data, evType, newValue} of cbaFunctions) {
-      predefinedActions.push({
+      customActions.push({
         data: {texts: {data, type: evType, value: newValue}},
         text: name
       });
     }
-    await browser.storage.local.set({predefinedActions});
+    await customActionsDb.saveState(customActions);
   }
 }
 

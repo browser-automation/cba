@@ -1,5 +1,6 @@
 const {backgroundPage, page} = require("../main");
-const projectsDb = "projects";
+const projectsDbName = "projects";
+const customActionsDbName = "customActions";
 
 async function setWindowLocalStorage(key, data)
 {
@@ -27,12 +28,12 @@ function setLocalStorageData(item)
   return backgroundPage().evaluate(async(item) => await browser.storage.local.set(item), item);
 }
 
-async function setProjects(items)
+async function setProjects(projects)
 {
-  if (!items)
+  if (!projects)
   {
-    const result = {};
-    result[projectsDb] = [{
+    const dbItem = {};
+    dbItem[projectsDbName] = [{
       id: "group",
       text: "group",
       type: "group",
@@ -46,21 +47,22 @@ async function setProjects(items)
         }
       ]
     }];
-    return setLocalStorageData(result);
+    return setLocalStorageData(dbItem);
   }
   else
   {
-    const result = {};
-    result[projectsDb] = items;
-    return setLocalStorageData(result);
+    const dbItem = {};
+    dbItem[projectsDbName] = projects;
+    return setLocalStorageData(dbItem);
   }
 }
 
-async function setPredefinedActions(predefinedActions)
+async function setCustomActions(customActions)
 {
-  if (!predefinedActions)
+  if (!customActions)
   {
-    predefinedActions = [
+    const dbItem = {};
+    dbItem[customActionsDbName] = [
       {
         data: {
           texts: {
@@ -102,8 +104,15 @@ async function setPredefinedActions(predefinedActions)
         text: "Clipboard"
       }
     ];
+    return setLocalStorageData(dbItem);
   }
-  return backgroundPage().evaluate(async(predefinedActions) => await browser.storage.local.set({predefinedActions}), predefinedActions);
+  else
+  {
+    const dbItem = {};
+    dbItem[customActionsDbName] = customActions;
+    return setLocalStorageData(dbItem);
+  }
+  
 }
 
 async function cbaListHasTextCount(query, text, parentText)
@@ -267,15 +276,15 @@ async function getLocalStorageData(key)
 
 async function getGroupFromStorage(groupText)
 {
-  const groups = (await getLocalStorageData(projectsDb))[projectsDb];
+  const groups = (await getLocalStorageData(projectsDbName))[projectsDbName];
   const [group] = groups.filter(({text}) => text == groupText);
   return group
 }
 
 async function getFunctionFromStorage(functionName)
 {
-  const {predefinedActions} = await getLocalStorageData("predefinedActions");
-  const [func] = predefinedActions.filter(({text}) => text == functionName);
+  const customActions = await getLocalStorageData(customActionsDbName);
+  const [func] = customActions[customActionsDbName].filter(({text}) => text == functionName);
   return func;
 }
 
@@ -316,7 +325,7 @@ async function getProjectActions(groupName, projectName, num, key)
 
 async function getTestProjectActions(num, key)
 {
-  const groups = (await getLocalStorageData(projectsDb))[projectsDb];
+  const groups = (await getLocalStorageData(projectsDbName))[projectsDbName];
   const [group] = groups.filter(({id}) => id === "group");
   if (!group)
     return null;
@@ -558,6 +567,6 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
-                  setPredefinedActions, getFunctionFromStorage,
+                  setCustomActions, getFunctionFromStorage,
                   getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
-                  projectsDb};
+                  projectsDbName, customActionsDbName};
