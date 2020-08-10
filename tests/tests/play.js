@@ -404,7 +404,7 @@ function setContentFromClipboardScript(query, clipboardName)
 
 function createAction(data, type, value)
 {
-  return {data, type, value};
+  return {type, inputs: [data, value]};
 }
 
 module.exports = {pageSetup};

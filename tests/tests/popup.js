@@ -176,56 +176,35 @@ it("'Add' button adds new empty action to the selected project", async () =>
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 0);
 
-  const texts = {
-    data: "",
-    type: "",
-    value: ""
-  };
+  const createEmptyItem = (id, selected) =>
+  {
+    if (selected === undefined)
+      return {id, type: "", inputs: ["", ""]};
+    else 
+      return {id, selected, type: "", inputs: ["", ""]};
+  }
 
   await clickAddAction();
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), {
-    id: "cba-table-id-1",
-    texts,
-    selected: true,
-  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), createEmptyItem("cba-table-id-1", true));
 
   await clickAddAction();
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
-    id: "cba-table-id-2",
-    texts,
-    selected: true,
-  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), createEmptyItem("cba-table-id-2", true));
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
 
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), {
-    id: "cba-table-id-1",
-    texts
-  });
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
-    id: "cba-table-id-2",
-    texts,
-    selected: true,
-  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 0), createEmptyItem("cba-table-id-1"));
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), createEmptyItem("cba-table-id-2", true));
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-1");
   await clickAddAction();
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), {
-    id: "cba-table-id-3",
-    texts,
-    selected: true,
-  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 1), createEmptyItem("cba-table-id-3", true));
 
   cbaTableUnselectRow(cbaTableQuery, "cba-table-id-3");
   await clickAddAction();
-  deepEqual(await cbaTableGetItem(cbaTableQuery, 3), {
-    id: "cba-table-id-4",
-    texts,
-    selected: true,
-  });
+  deepEqual(await cbaTableGetItem(cbaTableQuery, 3), createEmptyItem("cba-table-id-4", true));
 });
 
 it("'Delete' button removes selected action from the selected project", async () =>
@@ -252,20 +231,20 @@ it("'Save' button updates selected action with the data from action input fields
   await addFourEmptyActions()
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
-  const data = "testAction1";
   const type = "bg-inject";
-  const value = "testValue1";
-  await setValue(inputDataQuery, data);
+  const input1 = "testAction1";
+  const input2 = "testValue1";
   await setValue(inputEventQuery, type);
-  await setValue(inputValueQuery, value);
+  await setValue(inputDataQuery, input1);
+  await setValue(inputValueQuery, input2);
 
   await clickSaveAction();
   
   equal(await getNotificationMsg(), CHANGES_SAVED)
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 });
 
 it("Selecting action populates input deselecting clears", async() =>
@@ -273,16 +252,16 @@ it("Selecting action populates input deselecting clears", async() =>
   await addFourEmptyActions();
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
-  const data = "testAction1";
   const type = "bg-inject";
-  const value = "testValue1";
+  const input1 = "testAction1";
+  const input2 = "testValue1";
 
-  await setValue(inputDataQuery, data);
+  await setValue(inputDataQuery, input1);
   await setValue(inputEventQuery, type);
-  await setValue(inputValueQuery, value);
+  await setValue(inputValueQuery, input2);
 
   await clickSaveAction();
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-1");
   equal(await getValue(inputDataQuery), "");
@@ -290,27 +269,27 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputValueQuery), "");
 
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
-  equal(await getValue(inputDataQuery), data);
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
   equal(await getValue(inputEventQuery), type);
-  equal(await getValue(inputValueQuery), value);
+  equal(await getValue(inputDataQuery), input1);
+  equal(await getValue(inputValueQuery), input2);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  equal(await getValue(inputDataQuery), data);
   equal(await getValue(inputEventQuery), type);
-  equal(await getValue(inputValueQuery), value);
+  equal(await getValue(inputDataQuery), input1);
+  equal(await getValue(inputValueQuery), input2);
 
   await cbaListItemSelect(cbaListQuery, "group");
-  equal(await getValue(inputDataQuery), "");
   equal(await getValue(inputEventQuery), "inject");
+  equal(await getValue(inputDataQuery), "");
   equal(await getValue(inputValueQuery), "");
 
   await cbaListItemSelect(cbaListQuery, "project", "group");
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data, type, value});
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 
-  equal(await getValue(inputDataQuery), "");
-  equal(await getValue(inputEventQuery), "inject");
-  equal(await getValue(inputValueQuery), "");
+  equal(await getValue(inputEventQuery), type);
+  equal(await getValue(inputDataQuery), input1);
+  equal(await getValue(inputValueQuery), input2);
 });
 
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
@@ -320,10 +299,12 @@ it("dragndropping from the functions table or self-organizing actions table shou
 
   const actionTableItemIsTimer = async(index) =>
   {
-    const data = "Please enter the time in milliseconds";
     const type = "timer";
-    const value = "1000";
-    deepEqual((await cbaTableGetItem(cbaTableQuery, index)).texts, {data, type, value});
+    const input1 = "Please enter the time in milliseconds";
+    const input2 = "1000";
+    const item = await cbaTableGetItem(cbaTableQuery, index);
+    equal(item.type, type);
+    deepEqual(item.inputs, [input1, input2]);
   };
 
   await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
@@ -341,7 +322,7 @@ it("dragndropping from the functions table or self-organizing actions table shou
   await page().reload({waitUntil: "domcontentloaded"});
   await actionTableItemIsTimer(2);
 
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 1)).texts, {data: "", type: "", value: ""});
+  itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), "", ["", ""]);
 });
 
 it("Changing action selectbox disables fields accordingly", async() =>
@@ -511,11 +492,13 @@ it("Clicking record button adds redirect event to the selected project", async()
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
   await clickRecord();
-  const data = await getCurrentWindowUrl();
   const type = "redirect";
-  const value = "";
+  const input1 = await getCurrentWindowUrl();
+  const input2 = "";
   const msgType = "RecordedEvent";
-  deepEqual((await cbaTableGetItem(cbaTableQuery, 0)).texts, {data, type, value, msgType});
+  const item = await cbaTableGetItem(cbaTableQuery, 0);
+  itemHasTypeAndInputs(item, type, [input1, input2]);
+  equal(item.msgType, msgType);
   equal(await getTextContent("#recordButton"), "recording...");
   equal(await getBadgeText(), "rec");
 
@@ -523,6 +506,12 @@ it("Clicking record button adds redirect event to the selected project", async()
   equal(await getTextContent("#recordButton"), "rec");
   equal(await getBadgeText(), "");
 });
+
+function itemHasTypeAndInputs(item, type, inputs)
+{
+  equal(item.type, type);
+  deepEqual(item.inputs, inputs);
+}
 
 async function addFourEmptyActions()
 {

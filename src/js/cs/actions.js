@@ -16,29 +16,28 @@ browser.runtime.onMessage.addListener((request, sender) => {
 
 function executeAction(recordRow, request)
 {
-  const {type, data, value} = recordRow;
-  const evType = type;
-  const newValue = value;
-  switch (evType) {
+  const {type, inputs} = recordRow;
+  const [input1, input2] = inputs;
+  switch (type) {
     case "change": {
-      const targetElement = document.querySelector(data);
+      const targetElement = document.querySelector(input1);
       targetElement.focus();
-      targetElement.value = placeholders(newValue);
+      targetElement.value = placeholders(input2);
       const event = new Event("change");
       targetElement.dispatchEvent(event, { "bubbles": true });
       break;
     }
     case "submit-click":
     case "click": {
-      document.querySelector(data).click();
+      document.querySelector(input1).click();
       break;
     }
     case "check": {
-      document.querySelector(data).checked = true;
+      document.querySelector(input1).checked = true;
       break;
     }
     case "redirect": {
-      window.location = data;
+      window.location = input1;
       break;
     }
     case "inject": {
@@ -47,7 +46,7 @@ function executeAction(recordRow, request)
       script.setAttribute("type", "application/javascript");
       script.textContent =  `
         var clipboard=${JSON.stringify(request.clipboard)};
-        ${data};
+        ${input1};
         var newdiv = document.createElement('div');
         if(document.getElementById('${clipboardId}')!= null) {
           document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
@@ -67,11 +66,11 @@ function executeAction(recordRow, request)
       break;
     }
     case "cs-inject": {
-      eval(data);
+      eval(input1);
       break;
     }
     case "copy": {
-      const targetElement = document.querySelector(data);
+      const targetElement = document.querySelector(input1);
       if(targetElement) {
         clipboard["copy"] = targetElement.innerHTML;
       }
@@ -80,7 +79,7 @@ function executeAction(recordRow, request)
     default:
       break;
   }
-  return Promise.resolve({answere: "instructOK", clipboard: clipboard});
+  return Promise.resolve({answere: "instructOK", clipboard});
 }
 
 function placeholders(checkValue) {

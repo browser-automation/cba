@@ -1,6 +1,6 @@
 const {backgroundPage, page} = require("../main");
-const projectsDbName = "projects";
-const customActionsDbName = "customActions";
+const customActionsDb = require("../../src/js/db/customActions");
+const projectsDb = require("../../src/js/db/projects");
 
 async function setWindowLocalStorage(key, data)
 {
@@ -33,7 +33,7 @@ async function setProjects(projects)
   if (!projects)
   {
     const dbItem = {};
-    dbItem[projectsDbName] = [{
+    dbItem[projectsDb.name] = [{
       id: "group",
       text: "group",
       type: "group",
@@ -52,7 +52,7 @@ async function setProjects(projects)
   else
   {
     const dbItem = {};
-    dbItem[projectsDbName] = projects;
+    dbItem[projectsDb.name] = projects;
     return setLocalStorageData(dbItem);
   }
 }
@@ -62,54 +62,13 @@ async function setCustomActions(customActions)
   if (!customActions)
   {
     const dbItem = {};
-    dbItem[customActionsDbName] = [
-      {
-        data: {
-          texts: {
-            data: "Please enter the time in milliseconds",
-            type: "timer",
-            value: "1000"
-          }
-        },
-        text: "Timer"
-      },
-      {
-        data: {
-          texts: {
-            data: "this event will let the script wait for page update",
-            type: "update",
-            value: ""
-          }
-        },
-        text: "Update"
-      },
-      {
-        data: {
-          texts: {
-            data: "<$function=removeCookie>\n<$attr=.*>",
-            type: "bg-function",
-            value: "use regular expressions to filter domains"
-          }
-        },
-        text: "Clear cookies"
-      },
-      {
-        data: {
-          texts: {
-            data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
-            type: "bg-function",
-            value: "Write to clipboard Object to access data later. Use Json in the attr."
-          }
-        },
-        text: "Clipboard"
-      }
-    ];
+    dbItem[customActionsDb.name] = customActionsDb.predefined;
     return setLocalStorageData(dbItem);
   }
   else
   {
     const dbItem = {};
-    dbItem[customActionsDbName] = customActions;
+    dbItem[customActionsDb.name] = customActions;
     return setLocalStorageData(dbItem);
   }
   
@@ -276,15 +235,15 @@ async function getLocalStorageData(key)
 
 async function getGroupFromStorage(groupText)
 {
-  const groups = (await getLocalStorageData(projectsDbName))[projectsDbName];
+  const groups = (await getLocalStorageData(projectsDb.name))[projectsDb.name];
   const [group] = groups.filter(({text}) => text == groupText);
   return group
 }
 
 async function getFunctionFromStorage(functionName)
 {
-  const customActions = await getLocalStorageData(customActionsDbName);
-  const [func] = customActions[customActionsDbName].filter(({text}) => text == functionName);
+  const customActions = await getLocalStorageData(customActionsDb.name);
+  const [func] = customActions[customActionsDb.name].filter(({text}) => text == functionName);
   return func;
 }
 
@@ -325,7 +284,7 @@ async function getProjectActions(groupName, projectName, num, key)
 
 async function getTestProjectActions(num, key)
 {
-  const groups = (await getLocalStorageData(projectsDbName))[projectsDbName];
+  const groups = (await getLocalStorageData(projectsDb.name))[projectsDb.name];
   const [group] = groups.filter(({id}) => id === "group");
   if (!group)
     return null;
@@ -335,7 +294,7 @@ async function getTestProjectActions(num, key)
     return null;
 
   const {actions} = project;
-  return key ? actions[num].texts[key] : actions[num];
+  return key ? actions[num][key] : actions[num];
 }
 
 async function addTestAction(data, evType, newValue)
@@ -568,5 +527,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
                   setCustomActions, getFunctionFromStorage,
-                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
-                  projectsDbName, customActionsDbName};
+                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow};

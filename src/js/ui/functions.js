@@ -24,11 +24,12 @@ function saveFunctionsState()
 function onFunctionSelect()
 {
   const item = functionsList.getSelectedItem();
-  const {data, type, value} = item.data.texts;
-  inputData.value = data;
-  inputEventType.value = type;
-  inputValue.value = value;
+  const {type, inputs} = item.data;
+  const [input1, input2] = inputs;
   inputName.value = item.text;
+  inputEventType.value = type;
+  inputData.value = input1;
+  inputValue.value = input2;
 }
 
 function onAction(action)
@@ -78,13 +79,13 @@ function onAction(action)
 
 function createFunctionItem()
 {
-  const data = inputData.value;
   const type = inputEventType.value;
-  const value = inputValue.value;
+  const input1 = inputData.value;
+  const input2 = inputValue.value;
   const name = inputName.value;
   return {
     data: {
-      texts: {data, type, value}
+      type, inputs: [input1, input2]
     },
     text: name
   }

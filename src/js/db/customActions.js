@@ -11,4 +11,39 @@ function saveState(items) {
   return browser.storage.local.set(result);
 }
 
-module.exports = {load, saveState, name};
+const predefined = [
+  {
+    data: {
+      type: "timer",
+      inputs: ["Please enter the time in milliseconds", "1000"],
+      info: "Please enter the time in milliseconds"
+    },
+    text: "Timer"
+  },
+  {
+    data: {
+      type: "update",
+      inputs: ["this event will let the script wait for page update", ""],
+      info: "this event will let the script wait for page update",
+    },
+    text: "Update"
+  },
+  {
+    data: {
+      type: "bg-function",
+      inputs: ["<$function=removeCookie>\n<$attr=.*>", "use regular expressions to filter domains"],
+      info: "use regular expressions to filter domains"
+    },
+    text: "Clear cookies"
+  },
+  {
+    data: {
+      type: "bg-function",
+      inputs: ['<$function=saveToClipboard>\n<$attr={"name": "value"}>', "Write to clipboard Object to access data later. Use Json in the attr"],
+      info: "Write to clipboard Object to access data later. Use Json in the attr."
+    },
+    text: "Clipboard"
+  }
+];
+
+module.exports = {load, saveState, name, predefined};

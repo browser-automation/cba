@@ -58,7 +58,7 @@ it("Starting and stoping the recording adds a redirect action", async() =>
   await startTestRecording();
   await stopTestRecording();
   equal(await getTestProjectActions(0, "type"), "redirect");
-  equal(await getTestProjectActions(0, "data"), `${server}/`);
+  deepEqual(await getTestProjectActions(0, "inputs"), [`${server}/`, ""]);
 });
 
 it("Starting recording should set 'rec' badge text and stopping recording should remove it", async() =>
@@ -185,9 +185,7 @@ it("Clicking element inside catchable one should get recorded accordingly and us
 function createAction(data, type, value="")
 {
   return {
-    texts : {
-      data, type, value, msgType: "RecordedEvent"
-    }
+    type, inputs: [data, value], msgType: "RecordedEvent"
   }
 }
 

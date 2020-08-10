@@ -27,10 +27,9 @@ async function playProject() {
 
 async function actionExecution(instruction)
 {
-  const {type, data, value} = instruction;
-  const evType = type;
-  const newValue = value;
-  switch (evType) {
+  const {type, inputs} = instruction;
+  const [input1, input2] = inputs;
+  switch (type) {
     case "redirect":
     case "submit-click": {
       messageContentScript(instruction, cba.clipboard);
@@ -42,11 +41,11 @@ async function actionExecution(instruction)
       break;
     }
     case "timer": {
-      await timeout(newValue);
+      await timeout(input2);
       break;
     }
     case "bg-function": {
-      await bgFunctionParser(data);
+      await bgFunctionParser(input1);
       break;
     }
     case "bg-inject": {
@@ -55,7 +54,7 @@ async function actionExecution(instruction)
       let sendBgInstruction = true;
       // see -> https://github.com/browser-automation/cba/issues/13
       let clipboard = cba.clipboard;
-      eval(data);
+      eval(input1);
       if (clipboard !== cba.clipboard)
         cba.clipboard = clipboard;
       if(!sendBgInstruction) {

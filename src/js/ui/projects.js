@@ -77,14 +77,16 @@ function selectFirstAction()
 
 async function onActionSelect()
 {
-  const {texts, id} = actionsComp.getSelectedItem();
-  bg.lastSelectedActionId = id;
-  if (!texts) {
+  const item = actionsComp.getSelectedItem();
+  if (!item) {
     return null;
   }
-  const {data, type, value} = texts;
-  actionData.value = data;
-  actionNewValue.value = value;
+  const {type, inputs, id} = item;
+  const [input1, input2] = inputs;
+  bg.lastSelectedActionId = id;
+
+  actionData.value = input1;
+  actionNewValue.value = input2;
   if (type)
     actionEvType.value = type;
   else
@@ -100,7 +102,7 @@ function onEventInputChange()
   actionData.disabled = false;
   const actionType = actionEvType.value;
   const disablesNewValue = ["inject", "cs-inject", "bg-inject", "bg-function",
-                            "check", "click", "submit-click", "update", 
+                            "check", "click", "submit-click", "update",
                             "redirect", "copy", "pause"];
   const disablesData = ["update", "timer", "pause"];
   if (disablesNewValue.includes(actionType))
@@ -232,10 +234,9 @@ async function onAction(action)
       const {id} = actionsComp.getSelectedItem();
       const {type} = selectedProject;
       if (type === "project") {
-        const data = "";
         const type = "";
-        const value = "";
-        actionsComp.addRow({texts: {data, type, value}}, id);
+        const inputs = ["", ""];
+        actionsComp.addRow({type, inputs}, id);
         if (id)
         {
           actionsComp.selectNextRow();
@@ -284,11 +285,10 @@ async function onAction(action)
 
       const {type} = selectedProject;
       if (type === "project") {
-        const data = actionData.value;
+        const inputs = [actionData.value, actionNewValue.value];
         const type = actionEvType.value;
-        const value = actionNewValue.value;
 
-        actionsComp.updateRow({texts: {data, type, value}}, selectedAction.id);
+        actionsComp.updateRow({type, inputs}, selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projectsComp.updateRow(selectedProject, selectedProject.id);
         await saveProjectsState();
@@ -335,11 +335,6 @@ async function onAction(action)
       break;
     }
     case "play": {
-      const uiToCbaActions = ({texts, id}) => {
-        const {data, type, value} = texts;
-        return {data, type, value, id};
-      };
-
       const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
@@ -347,7 +342,7 @@ async function onAction(action)
       const {type, actions, id} = selectedProject;
       if (type === "project" && actions) {
         const repeateValue = document.querySelector("#repeat").value;
-        bg.playButtonClick(actions.map(uiToCbaActions), repeateValue, id);
+        bg.playButtonClick(actions, repeateValue, id);
         keepHighlightingPlayingAction();
       }
       else {

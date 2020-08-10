@@ -51,26 +51,26 @@ it("Selecting function populates inputs accordingly", async() =>
 it("Clicking 'add' button creates new function with specified input data", async() =>
 {
   const name = "New function";
-  const data = "test1";
   const type = "inject";
-  const value = "test2";
-  await setInputs(name, data, type, value);
+  const input1 = "test1";
+  const input2 = "test2";
+  await setInputs(name, type, [input1, input2]);
   await addButtonClick();
 
   const func = await getFunctionFromStorage(name);
   delete func.id;
-  deepEqual(func, {text: name, data: {texts: {data, type, value}}})
+  deepEqual(func, {text: name, data: {type, inputs: [input1, input2]}})
   
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
   await cbaListItemSelect(functionsList, "New function");
-  await ensureInputValues(name, data, type, value);
+  await ensureInputValues(name, input1, type, input2);
 
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(30);
 
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
   await cbaListItemSelect(functionsList, "New function");
-  await ensureInputValues(name, data, type, value);
+  await ensureInputValues(name, input1, type, input2);
 
   await addButtonClick();
   equal(await cbaListHasTextCount(functionsList, "New function"), 2);
@@ -150,12 +150,13 @@ async function ensureInputValues(name, data, type, value)
   equal(currentValue, value);
 }
 
-async function setInputs(name, data, type, value)
+async function setInputs(name, type, inputs)
 {
+  const [input1, input2] = inputs;
   await setValue(inputNameQuery, name);
-  await setValue(inputDataQuery, data);
   await setValue(inputTypeQuery, type);
-  await setValue(inputValueQuery, value);
+  await setValue(inputDataQuery, input1);
+  await setValue(inputValueQuery, input2);
 }
 
 module.exports = {pageSetup};

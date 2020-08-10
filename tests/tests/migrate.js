@@ -6,8 +6,10 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
+const projectsDb = require("../../src/js/db/projects");
 const {getWindowLocalStorage, setWindowLocalStorage, wait, reloadExtension,
-       getLocalStorageData, projectsDbName, customActionsDbName} = require("./utils");
+       getLocalStorageData} = require("./utils");
+const customActionsDb = require("../../src/js/db/customActions");
 
 const oldData = {
   "oldGroup": {
@@ -141,18 +143,12 @@ it("Extension should move and backup old data", async() =>
           id: "oldGroup1_oldProject0",
           type: "project",
           actions: [{
-            texts: {
-              data: "Please enter the time in milliseconds",
-              type: "timer",
-              value: "70000"
-            }
+            type: "timer",
+            inputs: ["Please enter the time in milliseconds", "70000"],
           },
           {
-            texts: {
-              data: "this event will let the script wait for page update",
-              type: "update",
-              value: ""
-            }
+            type: "update",
+            inputs: ["this event will let the script wait for page update", ""],
           }]
         },
         {
@@ -160,11 +156,8 @@ it("Extension should move and backup old data", async() =>
           id: "oldGroup1_oldProject2",
           type: "project",
           actions: [{
-            texts: {
-              data: "console.log(\"heloo World\");",
-              type: "inject",
-              value: ""
-            }
+            type: "inject",
+            inputs: ["console.log(\"heloo World\");", ""]
           }]
         }
       ]
@@ -175,41 +168,29 @@ it("Extension should move and backup old data", async() =>
     customActions: [
       {
         data: {
-          texts: {
-            data: "Please enter the time in milliseconds",
-            type: "timer", 
-            value: "1000"
-          }
+          type: "timer",
+          inputs: ["Please enter the time in milliseconds", "1000"]
         },
         text: "Timer"
       },
       {
         data: {
-          texts: {
-            data: "this event will let the script wait for page update",
-            type: "update", 
-            value: ""
-          }
+          type: "update",
+          inputs: ["this event will let the script wait for page update", ""],
         },
         text: "Update"
       },
       {
         data: {
-          texts: {
-            data: "<$function=removeCookie>\n<$attr=.*>",
-            type: "bg-function", 
-            value: "use regular expressions to filter domains"
-          }
+          type: "bg-function",
+          inputs: ["<$function=removeCookie>\n<$attr=.*>", "use regular expressions to filter domains"]
         },
         text: "Clear cookies"
       },
       {
         data: {
-          texts: {
-            data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
-            type: "bg-function", 
-            value: "Write to clipboard Object to access data later. Use Json in the attr."
-          }
+          type: "bg-function",
+          inputs: ['<$function=saveToClipboard>\n<$attr={"name": "value"}>', "Write to clipboard Object to access data later. Use Json in the attr."],
         },
         text: "Clipboard"
       }
@@ -218,6 +199,6 @@ it("Extension should move and backup old data", async() =>
 
   equal(await getWindowLocalStorage("data"), null, "Old window.localStorageo('data') is deleted");
   deepEqual(backup.data, oldData, "Old data is backed up in browser.storage.local.get('backup')");
-  deepEqual(await getLocalStorageData(projectsDbName), migratedData, `Old data should be reconstructed moved into browser.storage.local.get('${projectsDbName}')`);
-  deepEqual(await getLocalStorageData(customActionsDbName), migratedCustomActions, `Old cba-functions should be reconstructed moved into browser.storage.local.get('${customActionsDbName}')`);
+  deepEqual(await getLocalStorageData(projectsDb.name), migratedData, `Old data should be reconstructed moved into browser.storage.local.get('${projectsDb.name}')`);
+  deepEqual(await getLocalStorageData(customActionsDb.name), migratedCustomActions, `Old cba-functions should be reconstructed moved into browser.storage.local.get('${customActionsDb.name}')`);
 });

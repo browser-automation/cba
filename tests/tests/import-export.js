@@ -36,8 +36,8 @@ const defaultProjects = [{
     text: "project1",
     type: "project",
     actions: [
-      setAction("group1_project1_action1", "#main", "change", "1"),
-      setAction("group1_project1_action2", "", "", "")
+      setAction("change", "#main", "1", "group1_project1_action1"),
+      setAction("", "", "", "group1_project1_action2")
     ]
   },
   {
@@ -45,7 +45,7 @@ const defaultProjects = [{
     text: "project2",
     type: "project",
     actions: [
-      setAction("group1_project2_action3", "", "", "")
+      setAction("", "", "", "group1_project2_action3")
     ]
   }]
   },
@@ -59,7 +59,7 @@ const defaultProjects = [{
       text: "project1",
       type: "project",
       actions: [
-        setAction("group2_project1_action4", "", "timer", "100")
+        setAction("timer", "", "100", "group2_project1_action4")
       ]
     }]
   }
@@ -142,8 +142,8 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
     text: "project1",
     type: "project",
     actions: [
-      setAction("group1_project1_action1", "#main", "change", "1"),
-      setAction("group1_project1_action2", "", "", "")
+      setAction("change", "#main", "1", "group1_project1_action1"),
+      setAction("", "", "", "group1_project1_action2")
     ]
   }
   const project2 = {
@@ -151,7 +151,7 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
     text: "project2",
     type: "project",
     actions: [
-      setAction("group1_project2_action1", "", "timer", "100")
+      setAction("timer", "", "100", "group1_project2_action1")
     ]
   }
   const group = {
@@ -261,7 +261,7 @@ it("Importing projects with old data after selecting Root or group adds project(
     text: "project1",
     type: "project",
     actions: [
-      setAction("#main", "change", "1"),
+      setAction("change", "#main", "1"),
       setAction("", "", "")
     ]
   }
@@ -271,7 +271,7 @@ it("Importing projects with old data after selecting Root or group adds project(
     text: "project2",
     type: "project",
     actions: [
-      setAction("", "timer", "100")
+      setAction("timer", "", "100")
     ]
   }
   const group = {
@@ -342,12 +342,12 @@ function copyObject(obj)
   return JSON.parse(JSON.stringify(obj));
 }
 
-function setAction(data, type, value, id)
+function setAction(type, input1, input2, id)
 {
-  const actions = {id, texts: {data, type, value}};
+  const actions = {id, type, inputs: [input1, input2]};
   if (!id)
-    delete actions.id
-  return actions
+    delete actions.id;
+  return actions;
 }
 
 module.exports = {pageSetup};

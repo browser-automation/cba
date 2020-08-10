@@ -12,13 +12,13 @@ function getActionDataValue(data, target)
 
 function recordAction(target, actionsData)
 {
-  for (const {queries, action, data, newValue} of actionsData) {
+  for (const {queries, type, input1, input2} of actionsData) {
     const closestTargets = queries.map(findClosest.bind(target)).filter(e => e);
     if (closestTargets.length) {
       const closestTarget = closestTargets[0];
-      return sendmsg(getActionDataValue(data, closestTarget),
-                     action,
-                     getActionDataValue(newValue, closestTarget));
+      const inputs = [getActionDataValue(input1, closestTarget),
+                      getActionDataValue(input2, closestTarget)];
+      return sendmsg(type, inputs);
     }
   }
 }
@@ -27,40 +27,40 @@ function actionRecorder({target, type})
 {
   const clickActions = [{
     queries: ["button", "input[type='button']"],
-    action: "click",
-    data: getPath,
-    newValue: ""
+    type: "click",
+    input1: getPath,
+    input2: ""
   },
   {
     queries: ["input[type=submit]", "input[type=image]"],
-    action: "submit-click",
-    data: getPath,
-    newValue: ""
+    type: "submit-click",
+    input1: getPath,
+    input2: ""
   },
   {
     queries: ["a[href^='#']", "a[href='']"],
-    action: "click",
-    data: getPath,
-    newValue: ""
+    type: "click",
+    input1: getPath,
+    input2: ""
   },
   {
     queries: ["a[href]"],
-    action: "redirect",
-    data: (closestTarget) => closestTarget.getAttribute("href"),
-    newValue: ""
+    type: "redirect",
+    input1: (closestTarget) => closestTarget.getAttribute("href"),
+    input2: ""
   }
   ];
   const changeActions = [{
     queries: ["input[type=text]", "input[type=password]", "textarea", "select"],
-    action: "change",
-    data: getPath,
-    newValue: (closestTarget) => closestTarget.value
+    type: "change",
+    input1: getPath,
+    input2: (closestTarget) => closestTarget.value
   },
   {
     queries: ["input[type=radio]", "input[type=checkbox]"],
-    action: "check",
-    data: getPath,
-    newValue: ""
+    type: "check",
+    input1: getPath,
+    input2: ""
   }];
 
   if (type === "click")
@@ -109,8 +109,8 @@ function getPath(element) {
  * evType: Type of the event (click, change, redirect) 
  * newValue: newValue as example for chaged value
  */
-function sendmsg(data, evType, newValue){
-  port.postMessage({msgType: "RecordedEvent", "data": data, "type": evType, "value" : newValue});
+function sendmsg(type, inputs){
+  port.postMessage({msgType: "RecordedEvent", type, inputs});
 }
 
 document.addEventListener("click", actionRecorder);

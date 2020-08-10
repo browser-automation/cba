@@ -60,48 +60,7 @@ async function isFirstLoad() {
     const customActions = await browser.storage.local.get(customActionsDb.name);
     if (!Object.keys(customActions).length) {
       const dbItem = {};
-      dbItem[customActionsDb.name] = [
-        {
-          data: {
-            texts: {
-              data: "Please enter the time in milliseconds",
-              type: "timer",
-              value: "1000"
-            }
-          },
-          text: "Timer"
-        },
-        {
-          data: {
-            texts: {
-              data: "this event will let the script wait for page update",
-              type: "update",
-              value: ""
-            }
-          },
-          text: "Update"
-        },
-        {
-          data: {
-            texts: {
-              data: "<$function=removeCookie>\n<$attr=.*>",
-              type: "bg-function",
-              value: "use regular expressions to filter domains"
-            }
-          },
-          text: "Clear cookies"
-        },
-        {
-          data: {
-            texts: {
-              data: '<$function=saveToClipboard>\n<$attr={"name": "value"}>',
-              type: "bg-function",
-              value: "Write to clipboard Object to access data later. Use Json in the attr."
-            }
-          },
-          text: "Clipboard"
-        }
-      ];
+      dbItem[customActionsDb.name] = customActionsDb.predefined;
       await browser.storage.local.set(dbItem);
     }
   } 
@@ -113,25 +72,22 @@ isFirstLoad();
  * Function for storing records in Local Storage
  */
 function storeRecord(msg) {
-  if(msg.evType == "redirect") {
-    return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId,
-                                {texts: msg});
+  if(msg.type == "redirect") {
+    return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, msg);
   }
-  if((cba.lastEvType == "update") && (msg.evType == "update")) {
+  if((cba.lastEvType == "update") && (msg.type == "update")) {
     return false;
   }
-  cba.lastEvType = msg.evType;
-  return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId,
-                              {texts: msg});
+  cba.lastEvType = msg.type;
+  return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, msg);
 }
 
 async function storeCurrentUrl() {
   const {url} = (await browser.tabs.query({active: true}))[0];
   await storeRecord({
                         msgType: "RecordedEvent",
-                        data: url,
                         type: "redirect",
-                        value: ""
+                        inputs: [url, ""]
                       });
 }
 
