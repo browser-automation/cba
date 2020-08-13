@@ -36,7 +36,7 @@ body {
 }
 
 #actions {
-  flex: 3;
+  width: 300px
 }
 
 #functions {
@@ -79,6 +79,10 @@ body {
 
 .options #projectsManagement {
   height: 290px;
+}
+
+.options #actions {
+  width: 400px
 }
 
 .options #playbackControl {
