@@ -116,6 +116,7 @@ beforeEach(async () =>
 {
   await setWindowLocalStorage("data", oldData);
   await setWindowLocalStorage("cba-functions", oldCbaFunctions);
+  await wait();
   await reloadExtension();
   await wait();
 });
