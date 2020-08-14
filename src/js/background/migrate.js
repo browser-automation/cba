@@ -25,7 +25,7 @@ function migrateActions(actions) {
   if (actions && actions.length) {
     return actions.map(({data, evType, newValue}) => {
       const type = evType;
-      const inputs = [data, newValue];
+      const inputs = type === "timer" ? [newValue, data] : [data, newValue];
       return {type, inputs};
     });
   }
@@ -72,8 +72,10 @@ async function migrate() {
   if (cbaFunctions) {
     const customActions = [];
     for (const {name, data, evType, newValue} of cbaFunctions) {
+      const type = evType;
+      const inputs = type == "timer" ? [newValue, data] : [data, newValue];
       customActions.push({
-        data: {type: evType, inputs: [data, newValue]},
+        data: {type, inputs},
         text: name
       });
     }

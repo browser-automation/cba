@@ -300,8 +300,8 @@ it("dragndropping from the functions table or self-organizing actions table shou
   const actionTableItemIsTimer = async(index) =>
   {
     const type = "timer";
-    const input1 = "Please enter the time in milliseconds";
-    const input2 = "1000";
+    const input1 = "1000";
+    const input2 = "Please enter the time in milliseconds";
     const item = await cbaTableGetItem(cbaTableQuery, index);
     equal(item.type, type);
     deepEqual(item.inputs, [input1, input2]);

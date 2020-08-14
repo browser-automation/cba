@@ -28,7 +28,7 @@ async function playProject() {
 async function actionExecution(instruction)
 {
   const {type, inputs} = instruction;
-  const [input1, input2] = inputs;
+  const [input1] = inputs;
   switch (type) {
     case "redirect":
     case "submit-click": {
@@ -41,7 +41,7 @@ async function actionExecution(instruction)
       break;
     }
     case "timer": {
-      await timeout(input2);
+      await timeout(input1);
       break;
     }
     case "bg-function": {

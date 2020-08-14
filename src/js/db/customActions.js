@@ -15,7 +15,7 @@ const predefined = [
   {
     data: {
       type: "timer",
-      inputs: ["Please enter the time in milliseconds", "1000"],
+      inputs: ["1000", "Please enter the time in milliseconds"],
       info: "Please enter the time in milliseconds"
     },
     text: "Timer"

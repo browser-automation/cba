@@ -59,7 +59,7 @@ const defaultProjects = [{
       text: "project1",
       type: "project",
       actions: [
-        setAction("timer", "", "100", "group2_project1_action4")
+        setAction("timer", "100", "", "group2_project1_action4")
       ]
     }]
   }
@@ -151,7 +151,7 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
     text: "project2",
     type: "project",
     actions: [
-      setAction("timer", "", "100", "group1_project2_action1")
+      setAction("timer", "100", "", "group1_project2_action1")
     ]
   }
   const group = {
@@ -271,7 +271,7 @@ it("Importing projects with old data after selecting Root or group adds project(
     text: "project2",
     type: "project",
     actions: [
-      setAction("timer", "", "100")
+      setAction("timer", "100", "")
     ]
   }
   const group = {

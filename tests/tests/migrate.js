@@ -144,7 +144,7 @@ it("Extension should move and backup old data", async() =>
           type: "project",
           actions: [{
             type: "timer",
-            inputs: ["Please enter the time in milliseconds", "70000"],
+            inputs: ["70000", "Please enter the time in milliseconds"],
           },
           {
             type: "update",
@@ -169,7 +169,7 @@ it("Extension should move and backup old data", async() =>
       {
         data: {
           type: "timer",
-          inputs: ["Please enter the time in milliseconds", "1000"]
+          inputs: ["1000", "Please enter the time in milliseconds"]
         },
         text: "Timer"
       },

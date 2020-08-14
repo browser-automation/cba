@@ -4,15 +4,14 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   Notification} = require("./notification");
 
 const projectsDb = require("../db/projects");
-const eventTypes = require("./eventTypes");
+const ActionInputs = require("./ActionInputs");
 
 const projectsComp = document.querySelector("#projects cba-list");
 const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
-const actionData = document.querySelector("#actionData");
-const actionNewValue = document.querySelector("#actionNewValue");
 
-const actionEvType = eventTypes.init("#actionEvType");
+const actionInputs = new ActionInputs("#actionEvType", "#actionData",
+                                      "#actionNewValue");
 
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
@@ -54,18 +53,11 @@ async function onProjectSelect()
 {
   const {type, actions, id} = projectsComp.getSelectedItem();
   bg.lastSelectedProjectId = id;
-  resetActionInput();
+  actionInputs.reset();
   if (type === "project")
     populateActions(actions);
   else
     populateActions([]);
-}
-
-function resetActionInput()
-{
-  actionData.value = "";
-  actionEvType.selectedIndex = 0;
-  actionNewValue.value = "";
 }
 
 function selectFirstAction()
@@ -81,38 +73,8 @@ async function onActionSelect()
   if (!item) {
     return null;
   }
-  const {type, inputs, id} = item;
-  const [input1, input2] = inputs;
-  bg.lastSelectedActionId = id;
-
-  actionData.value = input1;
-  actionNewValue.value = input2;
-  if (type)
-    actionEvType.value = type;
-  else
-    actionEvType.selectedIndex = 0;
-
-  actionEvType.dispatchEvent(new Event("change"));
-}
-
-function onEventInputChange()
-{
-  // TODO: Reset writeHelpMessage
-  actionNewValue.disabled = false;
-  actionData.disabled = false;
-  const actionType = actionEvType.value;
-  const disablesNewValue = ["inject", "cs-inject", "bg-inject", "bg-function",
-                            "check", "click", "submit-click", "update",
-                            "redirect", "copy", "pause"];
-  const disablesData = ["update", "timer", "pause"];
-  if (disablesNewValue.includes(actionType))
-  {
-    actionNewValue.disabled = true;
-  }
-  if (disablesData.includes(actionType))
-  {
-    actionData.disabled = true;
-  }
+  bg.lastSelectedActionId = item.id;
+  actionInputs.setItem(item);
 }
 
 function updateRecordButtonState() {
@@ -285,10 +247,7 @@ async function onAction(action)
 
       const {type} = selectedProject;
       if (type === "project") {
-        const inputs = [actionData.value, actionNewValue.value];
-        const type = actionEvType.value;
-
-        actionsComp.updateRow({type, inputs}, selectedAction.id);
+        actionsComp.updateRow(actionInputs.getItem(), selectedAction.id);
         selectedProject.actions = actionsComp.items;
         projectsComp.updateRow(selectedProject, selectedProject.id);
         await saveProjectsState();
@@ -419,6 +378,3 @@ browser.storage.onChanged.addListener((result) => {
   if (result[projectsDb.name])
     loadProjects();
 });
-
-actionEvType.addEventListener("change", onEventInputChange);
-onEventInputChange();

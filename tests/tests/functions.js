@@ -42,7 +42,7 @@ beforeEach(async () =>
 it("Selecting function populates inputs accordingly", async() =>
 {
   await cbaListItemSelect(functionsList, "Timer");
-  await ensureInputValues("Timer", "Please enter the time in milliseconds", "timer", "1000");
+  await ensureInputValues("Timer", "1000", "timer", "Please enter the time in milliseconds");
 
   await cbaListItemSelect(functionsList, "Update");
   await ensureInputValues("Update", "this event will let the script wait for page update", "update", "");

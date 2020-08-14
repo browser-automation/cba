@@ -52,7 +52,7 @@ beforeEach(async () =>
 
 it("Playing actions should add badge text 'play' to the icon.", async() =>
 {
-  const tests = createAction("", "timer", "150");
+  const tests = createAction("150", "timer", "");
   await playTestProject([tests]);
   equal(await getBadgeText(), "play");
   await wait(150);
@@ -224,7 +224,7 @@ it("Timer should wait for specified amount of milliseconds before proceeding wit
   const injectText = "Injected text";
   const query = "#cba-text";
   const action1 = createAction(gotoRedirectPageScript(), "inject", "");
-  const action2 = createAction("", "timer", "150");
+  const action2 = createAction("150", "timer", "");
   const action3 = createAction(setTextContentScript(query, injectText), "inject", injectText);
   await playTestProject([action1, action2, action3]);
   await wait();
