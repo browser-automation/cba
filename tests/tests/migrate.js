@@ -48,6 +48,11 @@ const oldData = {
           "evType": "update",
           "newValue": "",
           "name": "Update"
+        },
+        {
+          "data": "#cba-copy",
+          "evType": "copy",
+          "newValue": ""
         }
       ],
       "name": "oldProject0",
@@ -149,6 +154,10 @@ it("Extension should move and backup old data", async() =>
           {
             type: "update",
             inputs: ["this event will let the script wait for page update", ""],
+          },
+          {
+            type: "copy-html",
+            inputs: ["#cba-copy", ""],
           }]
         },
         {

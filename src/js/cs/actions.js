@@ -65,6 +65,13 @@ function executeAction(recordRow, request)
     case "copy": {
       const targetElement = document.querySelector(input1);
       if(targetElement) {
+        clipboard["copy"] = targetElement.textContent;
+      }
+      break;
+    }
+    case "copy-html": {
+      const targetElement = document.querySelector(input1);
+      if(targetElement) {
         clipboard["copy"] = targetElement.innerHTML;
       }
       break;

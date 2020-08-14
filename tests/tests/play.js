@@ -33,7 +33,7 @@ const pageSetup = {
     <form action="/redirect">
       <input type="submit" id="cba-submit">Submit form</input>
     </form>
-    <span id="cba-copy">Copy me</span>
+    <span id="cba-copy">Copy <b>me</b></span>
     <input id="cba-paste" type="text"></input>
   `,
   path: server
@@ -242,7 +242,7 @@ it("Redirect should redirect to specific page and wait for page load before proc
   equal(await getTextContent(query), injectText);
 });
 
-it("Copy action should save element content into the clipboard and <$clipboard=copy> can be used to paste value", async() =>
+it("Copy action should save element text content into the clipboard and <$clipboard=copy> can be used to paste value", async() =>
 {
   const pasteQuery = "#cba-paste";
   const action1 = createAction("#cba-copy", "copy", "");
@@ -250,6 +250,16 @@ it("Copy action should save element content into the clipboard and <$clipboard=c
   await playTestProject([action1, action2]);
   await wait();
   equal(await getValue(pasteQuery), "Copy me");
+});
+
+it("Copy-html action should save element content into the clipboard and <$clipboard=copy> can be used to paste value", async() =>
+{
+  const pasteQuery = "#cba-paste";
+  const action1 = createAction("#cba-copy", "copy-html", "");
+  const action2 = createAction(pasteQuery, "change", "<$clipboard=copy>");
+  await playTestProject([action1, action2]);
+  await wait();
+  equal(await getValue(pasteQuery), "Copy <b>me</b>");
 });
 
 it("Pause action pauses the workflow until the project is played again and set '||' badge text", async() =>

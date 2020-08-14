@@ -24,7 +24,7 @@ async function backup() {
 function migrateActions(actions) {
   if (actions && actions.length) {
     return actions.map(({data, evType, newValue}) => {
-      const type = evType;
+      const type = evType === "copy" ? "copy-html": evType;
       const inputs = type === "timer" ? [newValue, data] : [data, newValue];
       return {type, inputs};
     });
