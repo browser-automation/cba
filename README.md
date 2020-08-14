@@ -29,10 +29,8 @@ be loaded in the chrome unless actual extension is reloaded in the
 ## Testing
 
 ```bash
-npm test                # Run all tests
-npm run test:puppeteer  # Run only puppeteer tests
-npm run test:eslint     # Run Eslint tests
-npm run test:stylelint  # Run Style linters
+npm test                # Run puppeteer test
+npm run test:pages      # Starts server with test page used by puppeteer
 ```
 
 ## Publishing
