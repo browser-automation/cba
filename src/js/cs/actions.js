@@ -1,16 +1,9 @@
 let clipboard = {};
 
 browser.runtime.onMessage.addListener((request, sender) => {
-  if(request.action == "execute") {
+  if(request.action == "executeAction") {
     clipboard = request.clipboard;
-    if(request.instruction.evType == "timer") {
-      setTimeout(() => {
-        return Promise.resolve({answere: "instructOK", clipboard: clipboard});
-      }, request.instruction.newValue);
-    }
-    else {
-      return executeAction(request.instruction, request);
-    }
+    return executeAction(request.instruction, request);
   }
 });
 
