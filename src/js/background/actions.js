@@ -52,11 +52,9 @@ async function actionExecution(instruction)
       let sendInstruction = () => "";
       const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
       let sendBgInstruction = true;
-      // see -> https://github.com/browser-automation/cba/issues/13
-      let clipboard = cba.clipboard;
+      const clipboard = cba.clipboard;
       eval(input1);
-      if (clipboard !== cba.clipboard)
-        cba.clipboard = clipboard;
+      cba.clipboard = clipboard;
       if(!sendBgInstruction) {
         return new Promise((resolve) => {
           sendInstruction = resolve;
