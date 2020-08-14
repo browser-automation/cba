@@ -26,6 +26,22 @@ build:webpack:prod          # builds production version with minified files
 be loaded in the chrome unless actual extension is reloaded in the
 `chrome://extensions` page (i.e. By clicking on the reload button).
 
+## Testing
+
+```bash
+npm test                # Run all tests
+npm run test:puppeteer  # Run only puppeteer tests
+npm run test:eslint     # Run Eslint tests
+npm run test:stylelint  # Run Style linters
+```
+
+## Publishing
+
+Command below bundles the extension into `cba.zip` file:
+```bash
+npm run build
+```
+
 ## Wiki
 
 https://github.com/browser-automation/cba-wiki/wiki
