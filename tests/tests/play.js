@@ -33,6 +33,7 @@ const pageSetup = {
     <form action="/redirect">
       <input type="submit" id="cba-submit">Submit form</input>
     </form>
+    <a id="cba-anchor-redirect" href="/redirect">Redirect</a>
     <span id="cba-copy">Copy <b>me</b></span>
     <input id="cba-paste" type="text"></input>
   `,
@@ -201,6 +202,17 @@ it("submit-click should wait for the page load before proceeding with next actio
   const injectText = "Injected text";
   const query = "#cba-text";
   const action1 = createAction("#cba-submit", "submit-click", "");
+  const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
+  await playTestProject([action1, action2]);
+  await wait();
+  equal(await getTextContent(query), injectText);
+});
+
+it("submit-click on an anchor element redirects to the new page", async() =>
+{
+  const injectText = "Injected text";
+  const query = "#cba-text";
+  const action1 = createAction("#cba-anchor-redirect", "submit-click", "");
   const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
   await playTestProject([action1, action2]);
   await wait();
