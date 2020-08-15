@@ -341,6 +341,7 @@ it("Changing action selectbox disables fields accordingly", async() =>
     "timer": [true, false],
     "redirect": [false, true],
     "copy": [false, true],
+    "copy-html": [false, true],
     "pause": [true, true],
   }
 

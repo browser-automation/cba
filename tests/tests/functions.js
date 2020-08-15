@@ -8,7 +8,7 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {wait, setCustomActions, getElementAttribute,
   getValue, cbaListItemSelect, setValue, cbaListHasTextCount,
-  getFunctionFromStorage} = require("./utils");
+  getFunctionFromStorage, changeValue, isDisabled} = require("./utils");
 const {page} = require("../main");
 
 const {NO_FUNCTION_NAME,
@@ -42,10 +42,38 @@ beforeEach(async () =>
 it("Selecting function populates inputs accordingly", async() =>
 {
   await cbaListItemSelect(functionsList, "Timer");
-  await ensureInputValues("Timer", "1000", "timer", "Please enter the time in milliseconds");
+  await ensureInputValues("Timer", "Please enter the time in milliseconds", "timer", "1000");
 
   await cbaListItemSelect(functionsList, "Update");
   await ensureInputValues("Update", "this event will let the script wait for page update", "update", "");
+});
+
+it("Changing action selectbox disables fields accordingly", async() =>
+{
+  // [data, value]
+  const disableState = {
+    "inject": [false, true],
+    "cs-inject": [false, true],
+    "bg-inject": [false, true],
+    "bg-function": [false, true],
+    "change": [false, false],
+    "check": [false, true],
+    "click": [false, true],
+    "submit-click": [false, true],
+    "update": [true, true],
+    "timer": [true, false],
+    "redirect": [false, true],
+    "copy": [false, true],
+    "copy-html": [false, true],
+    "pause": [true, true],
+  }
+
+  for (const type in disableState) {
+    const [dataVisible, valueVisible] = disableState[type];
+    await changeValue(inputTypeQuery, type);
+    equal(await isDisabled(inputDataQuery), dataVisible, `${type}'s data should${dataVisible ? "": " not"} be disabled`);
+    equal(await isDisabled(inputValueQuery), valueVisible, `${type}'s value should${valueVisible ? "": " not"} be disabled`);
+  }
 });
 
 it("Clicking 'add' button creates new function with specified input data", async() =>

@@ -1,17 +1,18 @@
 const actionTypes = ["inject", "cs-inject", "bg-inject", "bg-function", "change",
                      "check", "click", "submit-click", "update", "timer",
-                     "redirect", "copy", "pause"];
+                     "redirect", "copy", "copy-html", "pause"];
 const secondaryDisabled = ["inject", "cs-inject", "bg-inject", "bg-function",
                       "check", "click", "submit-click", "update",
-                      "redirect", "copy", "pause"];
+                      "redirect", "copy", "copy-html", "pause"];
 const mainDisabled = ["update", "timer", "pause"];
 const revertInputs = ["timer"];
 
 class ActionInputs {
-    constructor(type, main, secondary) {
+    constructor(type, main, secondary, functionName) {
       this.typeInput = document.querySelector(type);
       this.mainInput = document.querySelector(main);
       this.secondaryInput = document.querySelector(secondary);
+      this.functionNameInput = document.querySelector(functionName);
       this.typeInput.addEventListener("change", this.onTypeChange.bind(this));
       this._populateTypes();
     }
@@ -41,8 +42,20 @@ class ActionInputs {
       this.secondaryInput.value = value;
     }
 
+    get _functionName() {
+      return this.functionNameInput.value;
+    }
+
+    set _functionName(value) {
+      this.functionNameInput.value = value;
+    }
+
     isReverse() {
       return revertInputs.includes(this._type);
+    }
+
+    isFunction() {
+      return this.functionNameInput;
     }
 
     _populateTypes() {
@@ -62,13 +75,28 @@ class ActionInputs {
 
     getItem() {
       const inputs = [this._main, this._secondary];
-      return {
+      const data = {
         type: this._type,
         inputs: this.isReverse() ? inputs.reverse() : inputs
+      };
+      if (this.isFunction()) {
+        return {data, text: this._functionName};
+      }
+      else {
+        return data;
       }
     }
 
-    setItem({type, inputs}) {
+    setItem(item) {
+      let text, type, inputs = "";
+      if (this.isFunction() && item.data) {
+        ({type, inputs} = item.data);
+        text = item.text;
+      }
+      else {
+        ({type, inputs} = item);
+      }
+
       if (type)
         this._type = type;
       else
@@ -86,6 +114,9 @@ class ActionInputs {
         this._main = inputs[0] || "";
         this._secondary = inputs[1] || "";
       }
+
+      if (text)
+        this._functionName = text;
     }
 
     onTypeChange() {

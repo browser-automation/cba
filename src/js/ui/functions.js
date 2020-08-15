@@ -1,14 +1,12 @@
-const eventTypes = require("./eventTypes");
 const registerActionListener = require("./actionListener");
 const customActionsDb = require("../db/customActions");
 const {Notification, NO_FUNCTION_NAME, NO_SELECTED_FUNCTION} = require("./notification");
+const ActionInputs = require("./ActionInputs");
 
 const notification = new Notification("#panel-functions .notification");
+const actionInputs = new ActionInputs("#funcEvType", "#funcData",
+                                      "#funcNewValue", "#funcName");
 
-const inputEventType = eventTypes.init("#funcEvType");
-const inputName = document.querySelector("#funcName");
-const inputData = document.querySelector("#funcData");
-const inputValue = document.querySelector("#funcNewValue");
 const functionsList = document.querySelector("#functions");
 
 async function loadFunctions()
@@ -24,19 +22,14 @@ function saveFunctionsState()
 function onFunctionSelect()
 {
   const item = functionsList.getSelectedItem();
-  const {type, inputs} = item.data;
-  const [input1, input2] = inputs;
-  inputName.value = item.text;
-  inputEventType.value = type;
-  inputData.value = input1;
-  inputValue.value = input2;
+  actionInputs.setItem(item);
 }
 
 function onAction(action)
 {
   switch (action) {
     case "addFunction": {
-      const item = createFunctionItem();
+      const item = actionInputs.getItem();
       if (!item.text) {
         notification.error(NO_FUNCTION_NAME);
         return;
@@ -63,7 +56,7 @@ function onAction(action)
         return;
       }
 
-      const item = createFunctionItem();
+      const item = actionInputs.getItem();
       if (!item.text) {
         notification.error(NO_FUNCTION_NAME);
         return;
@@ -74,20 +67,6 @@ function onAction(action)
     }
     default:
       break;
-  }
-}
-
-function createFunctionItem()
-{
-  const type = inputEventType.value;
-  const input1 = inputData.value;
-  const input2 = inputValue.value;
-  const name = inputName.value;
-  return {
-    data: {
-      type, inputs: [input1, input2]
-    },
-    text: name
   }
 }
 
