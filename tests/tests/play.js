@@ -197,22 +197,22 @@ it("Click action toggle the checkbox", async() =>
   notOk(await isChecked(query))
 });
 
-it("submit-click should wait for the page load before proceeding with next actions", async() =>
+it("click-update should wait for the page load before proceeding with next actions", async() =>
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  const action1 = createAction("#cba-submit", "submit-click", "");
+  const action1 = createAction("#cba-submit", "click-update", "");
   const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
   await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent(query), injectText);
 });
 
-it("submit-click on an anchor element redirects to the new page", async() =>
+it("click-update on an anchor element redirects to the new page", async() =>
 {
   const injectText = "Injected text";
   const query = "#cba-text";
-  const action1 = createAction("#cba-anchor-redirect", "submit-click", "");
+  const action1 = createAction("#cba-anchor-redirect", "click-update", "");
   const action2 = createAction(setTextContentScript(query, injectText), "inject", "");
   await playTestProject([action1, action2]);
   await wait();

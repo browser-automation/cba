@@ -33,7 +33,7 @@ function actionRecorder({target, type})
   },
   {
     queries: ["input[type=submit]", "input[type=image]"],
-    type: "submit-click",
+    type: "click-update",
     input1: getPath,
     input2: ""
   },

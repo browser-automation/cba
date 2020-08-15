@@ -90,16 +90,16 @@ it("Clicking anchor with empty/missing href or beginning with # should add a cli
             createAction("#cba-empty-link", "click"));
 });
 
-it("Clicking input[type=submit], input[type=image] should create submit-click action using target selector", async() =>
+it("Clicking input[type=submit], input[type=image] should create click-update action using target selector", async() =>
 {
   await startTestRecording();
   await page().click("input[type=submit]");
   await page().click("input[type=image]");
   await stopTestRecording();
   deepEqual(await getTestProjectActions(1),
-            createAction("#cba-input-submit", "submit-click"));
+            createAction("#cba-input-submit", "click-update"));
   deepEqual(await getTestProjectActions(2),
-            createAction("#cba-input-image", "submit-click"));
+            createAction("#cba-input-image", "click-update"));
 });
 
 it("Changing input[type=text], input[type=password], textarea, select should create change action using target selector", async() =>

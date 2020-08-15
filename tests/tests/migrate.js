@@ -53,6 +53,11 @@ const oldData = {
           "data": "#cba-copy",
           "evType": "copy",
           "newValue": ""
+        },
+        {
+          "data": "#submit",
+          "evType": "submit-click",
+          "newValue": ""
         }
       ],
       "name": "oldProject0",
@@ -159,6 +164,10 @@ it("Extension should move and backup old data", async() =>
           {
             type: "copy-html",
             inputs: ["#cba-copy", ""],
+          },
+          {
+            type: "click-update",
+            inputs: ["#submit", ""],
           }]
         },
         {

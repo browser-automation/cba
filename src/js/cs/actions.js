@@ -20,7 +20,7 @@ function executeAction(recordRow, request)
       targetElement.dispatchEvent(event, { "bubbles": true });
       break;
     }
-    case "submit-click":
+    case "click-update":
     case "click": {
       document.querySelector(input1).click();
       break;

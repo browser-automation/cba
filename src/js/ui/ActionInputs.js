@@ -1,8 +1,8 @@
 const actionTypes = ["inject", "cs-inject", "bg-inject", "bg-function", "change",
-                     "check", "click", "submit-click", "update", "timer",
+                     "check", "click", "click-update", "update", "timer",
                      "redirect", "copy", "copy-html", "pause"];
 const secondaryDisabled = ["inject", "cs-inject", "bg-inject", "bg-function",
-                      "check", "click", "submit-click", "update",
+                      "check", "click", "click-update", "update",
                       "redirect", "copy", "copy-html", "pause"];
 const mainDisabled = ["update", "timer", "pause"];
 const revertInputs = ["timer"];

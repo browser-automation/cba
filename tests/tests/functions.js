@@ -59,7 +59,7 @@ it("Changing action selectbox disables fields accordingly", async() =>
     "change": [false, false],
     "check": [false, true],
     "click": [false, true],
-    "submit-click": [false, true],
+    "click-update": [false, true],
     "update": [true, true],
     "timer": [true, false],
     "redirect": [false, true],

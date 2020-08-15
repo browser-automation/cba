@@ -31,7 +31,7 @@ async function actionExecution(instruction)
   const [input1] = inputs;
   switch (type) {
     case "redirect":
-    case "submit-click": {
+    case "click-update": {
       messageContentScript(instruction, cba.clipboard);
       await waitForUpdate();
       break;
