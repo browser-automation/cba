@@ -39,6 +39,33 @@ async function reloadCurrentTab(){
   await browser.tabs.reload(id);
 }
 
+async function requestService(type, url, data, resolveJson = true)
+{
+  const response = await request(url, type, data, null, resolveJson);
+  if (response)
+    cba.clipboard["serviceAnswer"] = response;
+}
+
+async function request(url, type, data = "", contentType, resolveJson = true)
+{
+  const requestData = {};
+  if (type)
+    requestData.method = type;
+  if (contentType) {
+    requestData.header = {
+      "Content-Type": contentType
+    };
+  }
+  if (type !== "GET")
+    requestData.body = data
+
+  let response = await fetch(url, requestData);
+  if (resolveJson)
+    response = await response.json();
+  return response;
+}
+
 module.exports = {removeCookie, saveToClipboard,
                   panelCreation, windowCreation,
-                  removeCurrentWindow, reloadCurrentTab};
+                  removeCurrentWindow, reloadCurrentTab,
+                  requestService};
