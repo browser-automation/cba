@@ -12,6 +12,7 @@ const actionsComp = document.querySelector("#actions");
 
 const actionInputs = new ActionInputs("#actionEvType", "#actionData",
                                       "#actionNewValue");
+actionInputs.setTooltip("#actionInfo");
 
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");

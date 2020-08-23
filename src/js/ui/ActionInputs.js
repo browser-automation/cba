@@ -1,6 +1,4 @@
-const actionTypes = ["inject", "cs-inject", "bg-inject", "bg-function", "change",
-                     "check", "click", "click-update", "update", "timer",
-                     "redirect", "copy", "copy-html", "pause"];
+const actionTypes = require("./actionsTypes");
 const secondaryDisabled = ["inject", "cs-inject", "bg-inject", "bg-function",
                       "check", "click", "click-update", "update",
                       "redirect", "copy", "copy-html", "pause"];
@@ -13,8 +11,10 @@ class ActionInputs {
       this.mainInput = document.querySelector(main);
       this.secondaryInput = document.querySelector(secondary);
       this.functionNameInput = document.querySelector(functionName);
+      this.tooltip = null;
       this.typeInput.addEventListener("change", this.onTypeChange.bind(this));
       this._populateTypes();
+      this.onTypeChange();
     }
 
     get _type() {
@@ -59,12 +59,22 @@ class ActionInputs {
     }
 
     _populateTypes() {
-      for (const actionType of actionTypes) {
+      for (const {name} of actionTypes) {
         const option = document.createElement("option");
-        option.value = actionType;
-        option.textContent = actionType;
+        option.value = name;
+        option.textContent = name;
         this.typeInput.appendChild(option);
       }
+    }
+
+    setTooltip(query) {
+      this.tooltip = document.querySelector(query);
+      this.setTooltipInfo();
+    }
+
+    setTooltipInfo() {
+      const {link, description} = actionTypes.filter(({name}) => name === this._type)[0];
+      this.tooltip.setData(description, link, "Learn more");
     }
 
     reset() {
@@ -123,6 +133,10 @@ class ActionInputs {
       this.mainInput.disabled = false;
       this.secondaryInput.disabled = false;
       const type = this._type;
+      if (this.tooltip)
+      {
+        this.setTooltipInfo();
+      }
 
       if (secondaryDisabled.includes(type))
       {
