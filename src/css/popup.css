@@ -1,5 +1,5 @@
 body {
-  max-width: 600px;
+  width: 550px;
   background-color: #f0f0f0;
 }
 
@@ -15,7 +15,7 @@ body {
 #projects {
   display: flex;
   flex-direction: column;
-  width: 160px;
+  width: 140px;
 }
 
 #projects cba-list {
@@ -24,7 +24,7 @@ body {
 
 #projects .controls {
   margin-top: 5px;
-  display: block;
+  display: flex;
 }
 
 #projects.rename #renameBtn {
@@ -71,10 +71,34 @@ body {
   text-decoration: none;
 }
 
+#actionInfo img
+{
+  width: 14px;
+  height: 14px;
+}
+
+cba-button
+{
+  display: inline;
+}
+
+#actionsControl cba-button,
+#playbackControl cba-button
+{
+  width: 50px;
+}
+
+#playButtonTooltip img
+{
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+}
+
 /* CBA tab in options */
 
 .options {
-  max-width: 720px;
+  width: 720px;
 }
 
 .options #projectsManagement {

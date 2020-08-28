@@ -10,12 +10,18 @@ const projectsComp = document.querySelector("#projects cba-list");
 const functions = document.querySelector("#functions");
 const actionsComp = document.querySelector("#actions");
 
+const playButtonTooltip = document.querySelector("#playButtonTooltip");
+
 const actionInputs = new ActionInputs("#actionEvType", "#actionData",
                                       "#actionNewValue");
 actionInputs.setTooltip("#actionInfo");
 
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
+
+const warningText = "Current project contains some powerful action types, before running please ensure you trust those.";
+const warningLink = "https://chrome-automation.com/bg-inject";
+const warningLinkText = "Learn more";
 
 let renamingItem = null;
 
@@ -50,11 +56,29 @@ function populateActions(items)
   onActionSelect();
 }
 
+function projectHasActio(id, type)
+{
+  const project = projectsComp.getItem(id);
+  if (project.type !== "project" || !project.actions)
+    return false;
+
+  return project.actions.filter((action) => action.type === type).length > 0;
+}
+
 async function onProjectSelect()
 {
   const {type, actions, id} = projectsComp.getSelectedItem();
   bg.lastSelectedProjectId = id;
   actionInputs.reset();
+  if (projectHasActio(id, "bg-inject") || projectHasActio(id, "cs-inject")) {
+    playButtonTooltip.setData(warningText, warningLink, warningLinkText);
+    playButtonTooltip.enable();
+  }
+  else {
+    playButtonTooltip.setData("");
+    playButtonTooltip.disable();
+  }
+
   if (type === "project")
     populateActions(actions);
   else
