@@ -9,7 +9,6 @@ body
 
 #sidebar
 {
-  padding-left: 20px;
   width: 200px;
   display: inline-table;
 }
@@ -46,7 +45,6 @@ main
 cba-tabs
 {
   color: #878787;
-  width: 200px;
   padding: 0 15px;
 }
 
@@ -110,9 +108,16 @@ cba-panel h2::after
   max-width: 400px;
 }
 
-#panel-functions #funcData,
 #panel-functions #funcName,
-#panel-functions #funcNewValue
+#panel-functions #funcLink
+{
+  width: 50%;
+}
+
+
+#panel-functions #funcData,
+#panel-functions #funcNewValue,
+#panel-functions #funcDescription
 {
   width: 100%;
 }

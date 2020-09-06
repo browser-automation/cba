@@ -53,11 +53,15 @@
         <h2>Functions</h2>
         <div class="flexContainer">
           <div id="functions-input">
-            <input type="text" id="funcName"/>
-            <textarea rows="13" cols="47" id="funcData"></textarea>
+            <div class="flexContainer">
+              <input type="text" id="funcName" placeholder="Name"/>
+              <input type="text" id="funcLink" placeholder="Link (optional)"/>
+            </div>
+            <input type="text" id="funcDescription" placeholder="Description (optional)"/>
+            <textarea rows="13" cols="47" id="funcData" placeholder="Input"></textarea>
             <div class="flexContainer">
               <select id="funcEvType"></select>
-              <input type="text" id="funcNewValue"/>
+              <input type="text" id="funcNewValue" placeholder="Input"/>
             </div>
             <div>
               <cba-button data-action="addFunction">Add</cba-button>

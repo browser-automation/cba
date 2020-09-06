@@ -40,6 +40,7 @@ body {
 }
 
 #functions {
+  --tooltip-icon: url("/css/images/info.svg#default");
   flex: 1;
 }
 
@@ -69,6 +70,11 @@ body {
 #logo a {
   color: #444;
   text-decoration: none;
+}
+
+#actionInfo
+{
+  vertical-align: middle;
 }
 
 #actionInfo img
@@ -130,6 +136,10 @@ cba-button
   margin: 0;
   vertical-align: top;
   display: flex;
+}
+
+.options #actionInfo {
+  display: none;
 }
 
 .options #actionEvType, .options #actionNewValue {

@@ -12,8 +12,9 @@ const actionsComp = document.querySelector("#actions");
 
 const playButtonTooltip = document.querySelector("#playButtonTooltip");
 
-const actionInputs = new ActionInputs("#actionEvType", "#actionData",
-                                      "#actionNewValue");
+const actionInputs = new ActionInputs({type: "#actionEvType",
+                                       inputs: ["#actionData",
+                                                "#actionNewValue"]});
 actionInputs.setTooltip("#actionInfo");
 
 const bg = chrome.extension.getBackgroundPage().cba;
@@ -71,11 +72,15 @@ async function onProjectSelect()
   bg.lastSelectedProjectId = id;
   actionInputs.reset();
   if (projectHasActio(id, "bg-inject") || projectHasActio(id, "cs-inject")) {
-    playButtonTooltip.setData(warningText, warningLink, warningLinkText);
+    const heading = "bg-inject & cs-inject";
+    const text = warningText;
+    const link = warningLink;
+    const linkText = warningLinkText;
+    playButtonTooltip.setData({heading, text, link, linkText});
     playButtonTooltip.enable();
   }
   else {
-    playButtonTooltip.setData("");
+    playButtonTooltip.setData({});
     playButtonTooltip.disable();
   }
 

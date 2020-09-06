@@ -6,11 +6,15 @@ const mainDisabled = ["update", "timer", "pause"];
 const revertInputs = ["timer"];
 
 class ActionInputs {
-    constructor(type, main, secondary, functionName) {
+    constructor(data) {
+      const {type, inputs, text, info = {}} = data;
+      const [main, secondary] = inputs;
       this.typeInput = document.querySelector(type);
       this.mainInput = document.querySelector(main);
       this.secondaryInput = document.querySelector(secondary);
-      this.functionNameInput = document.querySelector(functionName);
+      this.functionNameInput = document.querySelector(text);
+      this.functionDescriptionInput = document.querySelector(info.description);
+      this.functionLinkInput = document.querySelector(info.link);
       this.tooltip = null;
       this.typeInput.addEventListener("change", this.onTypeChange.bind(this));
       this._populateTypes();
@@ -50,6 +54,22 @@ class ActionInputs {
       this.functionNameInput.value = value;
     }
 
+    get _functionDescription() {
+      return this.functionDescriptionInput.value;
+    }
+
+    set _functionDescription(value) {
+      this.functionDescriptionInput.value = value;
+    }
+
+    get _functionLink() {
+      return this.functionLinkInput.value;
+    }
+
+    set _functionLink(value) {
+      this.functionLinkInput.value = value;
+    }
+
     isReverse() {
       return revertInputs.includes(this._type);
     }
@@ -73,8 +93,11 @@ class ActionInputs {
     }
 
     setTooltipInfo() {
-      const {link, description} = actionTypes.filter(({name}) => name === this._type)[0];
-      this.tooltip.setData(description, link, "Learn more");
+      const {link, description, name} = actionTypes.filter(({name}) => name === this._type)[0];
+      const heading = name;
+      const text = description;
+      const linkText = "Learn more";
+      this.tooltip.setData({heading, text, link, linkText});
     }
 
     reset() {
@@ -90,7 +113,9 @@ class ActionInputs {
         inputs: this.isReverse() ? inputs.reverse() : inputs
       };
       if (this.isFunction()) {
-        return {data, text: this._functionName};
+        return {data, text: this._functionName,
+                info: {description: this._functionDescription,
+                       link: this._functionLink}};
       }
       else {
         return data;
@@ -98,10 +123,10 @@ class ActionInputs {
     }
 
     setItem(item) {
-      let text, type, inputs = "";
+      let text, type, inputs = "", info;
       if (this.isFunction() && item.data) {
         ({type, inputs} = item.data);
-        text = item.text;
+        ({info = {}, text} = item);
       }
       else {
         ({type, inputs} = item);
@@ -127,6 +152,10 @@ class ActionInputs {
 
       if (text)
         this._functionName = text;
+      if (info && info.description)
+        this._functionDescription = info.description;
+      if (info && info.link)
+        this._functionLink = info.link;
     }
 
     onTypeChange() {

@@ -24,6 +24,8 @@ const saveButtonClick = () => page().click("[data-action='saveFunction']");
 const optionTabClick = () => page().click("#functions-tab");
 
 const inputNameQuery = "#funcName";
+const inputDescriptionQuery = "#funcDescription";
+const inputLinkQuery = "#funcLink";
 const inputDataQuery = "#funcData";
 const inputTypeQuery = "#funcEvType";
 const inputValueQuery = "#funcNewValue";
@@ -41,11 +43,21 @@ beforeEach(async () =>
 
 it("Selecting function populates inputs accordingly", async() =>
 {
-  await cbaListItemSelect(functionsList, "Timer");
-  await ensureInputValues("Timer", "Please enter the time in milliseconds", "timer", "1000");
+  const link = "";
 
+  await cbaListItemSelect(functionsList, "Timer");
+  const timerType = "timer";
+  const timerInput1 = "Please enter the time in milliseconds";
+  const timerInput2 = "1000";
+  const timerDescription = "Stops workflow of project for mentioned period in milliseconds then continue with it.";
+  await ensureInputValues("Timer", timerDescription, link, timerInput1, timerType, timerInput2);
+
+  const updateType = "update";
+  const updateInput1 = "this event will let the script wait for page update";
+  const updateInput2 = "";
+  const updateDescription = "This action will let the execution flow wait for page update/load and then continue with it.";
   await cbaListItemSelect(functionsList, "Update");
-  await ensureInputValues("Update", "this event will let the script wait for page update", "update", "");
+  await ensureInputValues("Update", updateDescription, link, updateInput1, updateType, updateInput2);
 });
 
 it("Changing action selectbox disables fields accordingly", async() =>
@@ -82,23 +94,28 @@ it("Clicking 'add' button creates new function with specified input data", async
   const type = "inject";
   const input1 = "test1";
   const input2 = "test2";
-  await setInputs(name, type, [input1, input2]);
+  const description = "Function description";
+  const link = "https://example.com";
+  
+  const info = {description, link};
+  const inputs = [input1, input2];
+  await setInputs(name, type, inputs, info);
   await addButtonClick();
 
   const func = await getFunctionFromStorage(name);
   delete func.id;
-  deepEqual(func, {text: name, data: {type, inputs: [input1, input2]}})
+  deepEqual(func, {text: name, data: {type, inputs: inputs}, info})
   
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
   await cbaListItemSelect(functionsList, "New function");
-  await ensureInputValues(name, input1, type, input2);
+  await ensureInputValues(name, description, link, input1, type, input2);
 
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(30);
 
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
   await cbaListItemSelect(functionsList, "New function");
-  await ensureInputValues(name, input1, type, input2);
+  await ensureInputValues(name, description, link, input1, type, input2);
 
   await addButtonClick();
   equal(await cbaListHasTextCount(functionsList, "New function"), 2);
@@ -121,15 +138,19 @@ it("Clicking 'save' button updates selected function with the specified input da
   const data = "new Data";
   const type = "inject";
   const value = "New value";
+  const description = "New Description";
+  const link = "https://chrome-automation.com"
   await setValue(inputDataQuery, data);
   await setValue(inputTypeQuery, type);
   await setValue(inputValueQuery, value);
+  await setValue(inputDescriptionQuery, description);
+  await setValue(inputLinkQuery, link);
   await saveButtonClick();
 
   await page().reload({waitUntil: "domcontentloaded"});
   await wait(50);
   await cbaListItemSelect(functionsList, "Update");
-  await ensureInputValues("Update", data, type, value);
+  await ensureInputValues("Update", description, link, data, type, value);
   equal(await cbaListHasTextCount(functionsList, "Update"), 1);
 
   await setValue(inputNameQuery, "New function");
@@ -140,7 +161,7 @@ it("Clicking 'save' button updates selected function with the specified input da
   equal(await cbaListHasTextCount(functionsList, "New function"), 1);
 
   await cbaListItemSelect(functionsList, "New function");
-  await ensureInputValues("New function", data, type, value);
+  await ensureInputValues("New function", description, link, data, type, value);
 });
 
 it("Test error messages", async() =>
@@ -165,26 +186,33 @@ function getNotificationMsg()
   return getElementAttribute("#panel-functions .notification", "textContent");
 }
 
-async function ensureInputValues(name, data, type, value)
+async function ensureInputValues(name, description, link, data, type, value)
 {
   const currentName = await getValue(inputNameQuery);
   const currentData = await getValue(inputDataQuery);
   const currentType = await getValue(inputTypeQuery);
   const currentValue = await getValue(inputValueQuery);
+  const currentDescription = await getValue(inputDescriptionQuery);
+  const currentLink = await getValue(inputLinkQuery);
 
   equal(currentName, name);
+  equal(currentDescription, description);
+  equal(currentLink, link)
   equal(currentData, data);
   equal(currentType, type);
   equal(currentValue, value);
 }
 
-async function setInputs(name, type, inputs)
+async function setInputs(name, type, inputs, info)
 {
   const [input1, input2] = inputs;
+  const {description, link} = info;
   await setValue(inputNameQuery, name);
   await setValue(inputTypeQuery, type);
   await setValue(inputDataQuery, input1);
   await setValue(inputValueQuery, input2);
+  await setValue(inputDescriptionQuery, description);
+  await setValue(inputLinkQuery, link);
 }
 
 module.exports = {pageSetup};

@@ -4,8 +4,11 @@ const {Notification, NO_FUNCTION_NAME, NO_SELECTED_FUNCTION} = require("./notifi
 const ActionInputs = require("./ActionInputs");
 
 const notification = new Notification("#panel-functions .notification");
-const actionInputs = new ActionInputs("#funcEvType", "#funcData",
-                                      "#funcNewValue", "#funcName");
+const actionInputs = new ActionInputs({type: "#funcEvType",
+                                       inputs: ["#funcData", "#funcNewValue"],
+                                       text: "#funcName",
+                                       info: {description: "#funcDescription",
+                                              link: "#funcLink"}});
 
 const functionsList = document.querySelector("#functions");
 
