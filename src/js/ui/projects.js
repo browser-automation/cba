@@ -66,23 +66,33 @@ function projectHasActio(id, type)
   return project.actions.filter((action) => action.type === type).length > 0;
 }
 
+async function initPlayButtonTooltip()
+{
+  const heading = "bg-inject & cs-inject";
+  const text = warningText;
+  const link = warningLink;
+  const linkText = warningLinkText;
+  playButtonTooltip.setData({heading, text, link, linkText});
+  await setPlayButtonTooltip();
+}
+
+async function setPlayButtonTooltip()
+{
+  const {id} = await projectsComp.getSelectedItem();
+  if (projectHasActio(id, "bg-inject") || projectHasActio(id, "cs-inject")) {
+    playButtonTooltip.enable();
+  }
+  else {
+    playButtonTooltip.disable();
+  }
+}
+
 async function onProjectSelect()
 {
   const {type, actions, id} = projectsComp.getSelectedItem();
   bg.lastSelectedProjectId = id;
   actionInputs.reset();
-  if (projectHasActio(id, "bg-inject") || projectHasActio(id, "cs-inject")) {
-    const heading = "bg-inject & cs-inject";
-    const text = warningText;
-    const link = warningLink;
-    const linkText = warningLinkText;
-    playButtonTooltip.setData({heading, text, link, linkText});
-    playButtonTooltip.enable();
-  }
-  else {
-    playButtonTooltip.setData({});
-    playButtonTooltip.disable();
-  }
+  await setPlayButtonTooltip();
 
   if (type === "project")
     populateActions(actions);
@@ -395,6 +405,7 @@ function registerActionListener(callback)
 loadProjects();
 loadFunctions();
 updateRecordButtonState();
+initPlayButtonTooltip();
 
 projectsComp.addEventListener("expand", saveProjectsState);
 projectsComp.addEventListener("select", onProjectSelect);

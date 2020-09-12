@@ -83,6 +83,55 @@ async function cbaListHasTextCount(query, text, parentText)
     return items.length;
 }
 
+async function _getCbaTooltipContainer(query)
+{
+  const rootHandle = await getShadowRoot(query)
+  return rootHandle.$(`#tooltip`);
+}
+
+async function _getCbaTooltipTextContent(tooltipQuery, query)
+{
+  const tooltipHandle = await _getCbaTooltipContainer(tooltipQuery);
+  const handle = await tooltipHandle.$(query);
+  return await (await handle.getProperty("textContent")).jsonValue();
+}
+
+async function _getHandleAttribute(handle, attribute)
+{
+  return handle.evaluate((node, attribute) => node.getAttribute(attribute), attribute)
+}
+
+async function cbaTooltipGetHeader(query)
+{
+  return _getCbaTooltipTextContent(query, "h4");
+}
+
+async function cbaTooltipGetParagraph(query)
+{
+  return _getCbaTooltipTextContent(query, "p");
+}
+
+async function cbaTooltipGetLink(query)
+{
+  const tooltipHandle = await _getCbaTooltipContainer(query);
+  return _getHandleAttribute(await tooltipHandle.$("a"), "href");
+}
+
+async function hoverElement(query)
+{
+  const handle = await page().$(query);
+  return handle.hover();
+}
+
+async function cbaListGetTooltipText(cbaListQuery, id)
+{
+  const rowHandle = await getCbaListRowHandle(cbaListQuery, id);
+  const tooltipHandle = await rowHandle.$("cba-tooltip");
+  const tooltipShadowHandle = await tooltipHandle.evaluateHandle((cbaTooltip) => cbaTooltip.shadowRoot);
+  const textHandle = await tooltipShadowHandle.$("#tooltip p");
+  return await (await textHandle.getProperty("textContent")).jsonValue();
+}
+
 async function cbaListItemsByText(query, text, parentText)
 {
   return page().evaluate(async(query, text, parentText) => {
@@ -527,4 +576,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
                   getCurrentWindowUrl, getElementAttribute,
                   setCustomActions, getFunctionFromStorage,
-                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow};
+                  getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
+                  cbaTooltipGetHeader, cbaTooltipGetParagraph,
+                  cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
+                  cbaListItemsByText};

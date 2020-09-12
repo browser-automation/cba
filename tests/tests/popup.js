@@ -11,12 +11,16 @@ const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
        getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
        triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
-       getBadgeText, isDisplayNone, cbaTableUnselectRow} = require("./utils");
+       getBadgeText, isDisplayNone, cbaTableUnselectRow, cbaTooltipGetHeader,
+       cbaTooltipGetParagraph, cbaTooltipGetLink, hoverElement,
+       cbaListGetTooltipText, cbaListItemsByText} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
        CHANGES_SAVED, NAME_EXISTS_GROUP,
        NAME_EXISTS_PROJECT} = require("../../src/js/ui/notification");
+
+const {predefined} = require("../../src/js/db/customActions");
 
 const pageSetup = {
   path: "popup.html"
@@ -29,6 +33,9 @@ const cbaFunctionsQuery = "#functions";
 const inputDataQuery = "#actionData";
 const inputEventQuery = "#actionEvType";
 const inputValueQuery = "#actionNewValue";
+
+const actionInfoQuery = "#actionInfo";
+const playButtonTooltipQuery = "#playButtonTooltip";
 
 const clickAddGroup = () => page().click("[data-action='addGroup']");
 const clickAddProject = () => page().click("[data-action='addProject']");
@@ -506,6 +513,74 @@ it("Clicking record button adds redirect event to the selected project", async()
   await clickStop();
   equal(await getTextContent("#recordButton"), "rec");
   equal(await getBadgeText(), "");
+});
+
+it("Selecting a project that has 'bg-inject' or 'cs-inject' action enables cba-tooltip on play button and dissable otherwise", async() =>
+{
+  const projects = [{
+    id: "group",
+    text: "group",
+    type: "group",
+    expanded: false,
+    subItems: [
+      {
+        id: "project",
+        text: "project",
+        type: "project",
+        actions: [{type: "cs-inject", inputs: ["alert('Hello from CBA!')", ""]}]
+      },
+      {
+        id: "project1",
+        text: "project1",
+        type: "project",
+        actions: [{type: "bg-inject", inputs: ["alert('Hello from CBA!')", ""]}]
+      },
+      {
+        id: "project2",
+        text: "project2",
+        type: "project",
+        actions: [{type: "inject", inputs: ["alert('Hello from CBA!')", ""]}]
+      }
+    ]
+  }];
+  await setProjects(projects);
+
+  await cbaListItemExpand(cbaListQuery, "group");
+
+  ok(await isDisabled(playButtonTooltipQuery));
+
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  notOk(await isDisabled(playButtonTooltipQuery));
+
+  await cbaListItemSelect(cbaListQuery, "project1", "group");
+  notOk(await isDisabled(playButtonTooltipQuery));
+  await cbaListItemSelect(cbaListQuery, "project2", "group");
+  ok(await isDisabled(playButtonTooltipQuery));
+});
+
+
+it("Functions cba-list items contain tooltip with description about each of them", async() =>
+{
+  for (const {info, text} of predefined) {
+    const [item] = await cbaListItemsByText(cbaFunctionsQuery, text); 
+    const {description} = info;
+    await cbaListGetTooltipText(cbaFunctionsQuery, item.id);
+    equal(await cbaListGetTooltipText(cbaFunctionsQuery, item.id), description);
+  }
+});
+
+it("Changing action updates information with the action information accordingly.", async() =>
+{
+  const actionTypes = require("../../src/js/ui/actionsTypes");
+  for (const {name, description, link} of actionTypes)
+  {
+    await changeValue(inputEventQuery, name);
+    await hoverElement(inputEventQuery);
+    await hoverElement(actionInfoQuery);
+    equal(await cbaTooltipGetHeader(actionInfoQuery), name);
+    equal(await cbaTooltipGetParagraph(actionInfoQuery), description);
+    equal(await cbaTooltipGetLink(actionInfoQuery), link);
+  }
 });
 
 function itemHasTypeAndInputs(item, type, inputs)
