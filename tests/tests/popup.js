@@ -13,7 +13,8 @@ const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
        getBadgeText, isDisplayNone, cbaTableUnselectRow, cbaTooltipGetHeader,
        cbaTooltipGetParagraph, cbaTooltipGetLink, hoverElement,
-       cbaListGetTooltipText, cbaListItemsByText} = require("./utils");
+       cbaListGetTooltipText, cbaListItemsByText,
+       cbaListhoverRowInfo} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -558,14 +559,14 @@ it("Selecting a project that has 'bg-inject' or 'cs-inject' action enables cba-t
   ok(await isDisabled(playButtonTooltipQuery));
 });
 
-
 it("Functions cba-list items contain tooltip with description about each of them", async() =>
 {
   for (const {info, text} of predefined) {
-    const [item] = await cbaListItemsByText(cbaFunctionsQuery, text); 
+    const [item] = await cbaListItemsByText(cbaFunctionsQuery, text);
+    await hoverElement(actionInfoQuery);
+    await cbaListhoverRowInfo(cbaFunctionsQuery, item.id);
     const {description} = info;
-    await cbaListGetTooltipText(cbaFunctionsQuery, item.id);
-    equal(await cbaListGetTooltipText(cbaFunctionsQuery, item.id), description);
+    equal(await cbaListGetTooltipText(cbaFunctionsQuery), description);
   }
 });
 

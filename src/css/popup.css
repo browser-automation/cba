@@ -19,7 +19,7 @@ body {
 }
 
 #projects cba-list {
-  flex: 1;
+  height: 88%;
 }
 
 #projects .controls {

@@ -123,13 +123,19 @@ async function hoverElement(query)
   return handle.hover();
 }
 
-async function cbaListGetTooltipText(cbaListQuery, id)
+async function cbaListGetTooltipText(cbaListQuery)
 {
-  const rowHandle = await getCbaListRowHandle(cbaListQuery, id);
-  const tooltipHandle = await rowHandle.$("cba-tooltip");
-  const tooltipShadowHandle = await tooltipHandle.evaluateHandle((cbaTooltip) => cbaTooltip.shadowRoot);
-  const textHandle = await tooltipShadowHandle.$("#tooltip p");
+  const cbaListShadowHandle = await getShadowRoot(cbaListQuery);
+  const textHandle = await cbaListShadowHandle.$("#tooltip p");
   return await (await textHandle.getProperty("textContent")).jsonValue();
+}
+
+async function cbaListhoverRowInfo(cbaListQuery, id)
+{
+  const rowHandel = await getCbaListRowHandle(cbaListQuery, id);
+  await rowHandel.hover();
+  const handle = await rowHandel.$(".hasInfo");
+  return handle.hover();
 }
 
 async function cbaListItemsByText(query, text, parentText)
@@ -579,4 +585,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,
                   cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
-                  cbaListItemsByText};
+                  cbaListItemsByText, cbaListhoverRowInfo};
