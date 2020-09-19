@@ -6,10 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:webpack:prod && cd dist/;zip -r ../cba.zip .;cd ..",
-    "import:components": "cba-components --single-bundle --prod --output dist",
-    "build:webpack": "npm run import:components && webpack --config webpack.config.js",
-    "build:webpack:watch": "npm run import:components && webpack --config webpack.config.js --watch",
-    "build:webpack:prod": "npm run import:components && webpack --config webpack.config.js --prod"
+    "build:webpack": "webpack --config webpack.config.js",
+    "build:webpack:watch": "webpack --config webpack.config.js --watch",
+    "build:webpack:prod": "webpack --config webpack.config.js --prod"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,6 @@
   },
   "homepage": "https://github.com/Manvel/cba#readme",
   "dependencies": {
-    "cba-components": "^1.0.1",
     "copy-webpack-plugin": "^5.1.1",
     "csso": "^4.0.2",
     "webpack": "^4.41.6"
