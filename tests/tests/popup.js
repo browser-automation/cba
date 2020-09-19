@@ -563,7 +563,6 @@ it("Functions cba-list items contain tooltip with description about each of them
 {
   for (const {info, text} of predefined) {
     const [item] = await cbaListItemsByText(cbaFunctionsQuery, text);
-    await hoverElement(actionInfoQuery);
     await cbaListhoverRowInfo(cbaFunctionsQuery, item.id);
     const {description} = info;
     equal(await cbaListGetTooltipText(cbaFunctionsQuery), description);
