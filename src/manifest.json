@@ -19,7 +19,6 @@
       "16": "css/icons/16x16.png",
       "48": "css/icons/48x48.png"
    },
-   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDEnrWBubM6CR589wovSUHRsFFp5RGVbBXGqUt0eRF5U9FOy4UwhV1I1Y+jdEE6Ii2joogv0YMznbAP1tMP24WenqBIcOB22COzirTxmzhpOQmXTEFo4FqdvSlIH9Mnx/PlfK/x7xPojMv7ZIGD85XjzBUl79QbRnw1YIbr6Big9QIDAQAB",
    "manifest_version": 2,
    "name": "Chromium browser automation",
    "options_page": "options.html",
