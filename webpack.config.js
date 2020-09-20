@@ -2,6 +2,8 @@ const path = require("path");
 const argv = require("minimist")(process.argv.slice(2));
 const CopyPlugin = require('copy-webpack-plugin');
 const csso = require("csso");
+const uglify = require("uglify-es");
+const {extname} = require("path");
 
 module.exports =
 {
@@ -16,9 +18,10 @@ module.exports =
   plugins: [
     new CopyPlugin([
       { from: './src/css', to: "css" ,
-        transform: (content) => argv.prod ? csso.minify(content).css : content},
+        transform: (content, file) => argv.prod && extname(file) === ".css" ? csso.minify(content).css : content},
       { from: "./src/*.*", flatten: true},
-      { from: "./src/js", to: "js" },
+      { from: "./src/js", to: "js",
+        transform: (content, file) => argv.prod && extname(file) === ".js" ? uglify.minify(content.toString()).code : content},
     ])
   ]
 };
