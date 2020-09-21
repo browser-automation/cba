@@ -22,7 +22,7 @@
    "manifest_version": 2,
    "name": "Chromium browser automation",
    "options_page": "options.html",
-   "permissions": [ "cookies", "http://*/*", "https://*/*", "contextMenus", "tabs" ],
+   "permissions": [ "cookies", "http://*/*", "https://*/*", "tabs" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "8.3.6"
 }
