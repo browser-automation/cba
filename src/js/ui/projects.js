@@ -51,7 +51,7 @@ function populateActions(items)
   actionsComp.items = items;
   const projectId = projectsComp.getSelectedItem().id;
   if (bg.lastSelectedActionId && bg.lastSelectedProjectId === projectId)
-    actionsComp.selectRow(bg.lastSelectedActionId);
+    actionsComp.selectRow(bg.lastSelectedActionId, false);
   else
     selectFirstAction();
   onActionSelect();
