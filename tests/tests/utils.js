@@ -537,7 +537,7 @@ async function getCookie(url, name)
 
 async function wait(milliseconds = 200)
 {
-  return page().waitFor(milliseconds);
+  return page().waitForTimeout(milliseconds);
 }
 
 async function getPageUrl()
