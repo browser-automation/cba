@@ -1,7 +1,16 @@
 const path = require("path");
 const argv = require("minimist")(process.argv.slice(2));
 const CopyPlugin = require('copy-webpack-plugin');
-const csso = require("csso");
+const {minify} = require("csso");
+const {extname} = require("path");
+
+const transformCss = (content, file) =>
+{
+  if (argv.prod && extname(file) === ".css")
+    return minify(content).css;
+  else
+    return content;
+}
 
 module.exports =
 {
@@ -22,7 +31,7 @@ module.exports =
   plugins: [
     new CopyPlugin([
       { from: './src/css/*', to: "css", flatten: true,
-        transform: (content) => argv.prod ? csso.minify(content).css : content},
+        transform: transformCss},
       { from: "./src/css/icons", to: "css/icons"},
       { from: "./src/css/images", to: "css/images"},
       { from: "./src/*.*", flatten: true},
