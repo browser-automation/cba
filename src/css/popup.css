@@ -91,7 +91,7 @@ cba-button
 #actionsControl cba-button,
 #playbackControl cba-button
 {
-  width: 50px;
+  min-width: 50px;
 }
 
 #playButtonTooltip img
