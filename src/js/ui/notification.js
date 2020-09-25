@@ -11,6 +11,7 @@ const NO_FUNCTION_NAME = "Please specify 'name' of the function";
 const NO_SELECTED_FUNCTION = "Please select a function";
 const NAME_EXISTS_GROUP = "The group with choosen name already exists";
 const NAME_EXISTS_PROJECT = "The group already has project with current name";
+const PROJECT_EDIT = "Please click 'save' below projects list to finish renaming";
 
 class Notification {
   constructor(query) {
@@ -36,4 +37,4 @@ module.exports = {Notification, NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED,
   NO_ACTION_SELECTED, SELECT_PROJ_NOT_GROUP, CHANGES_SAVED,
   NO_GROUP_ROOT_SELECTED, NO_IMPORT_DATA, NO_PROJ_GROUP_TYPE, PROJECT_IMPORTED,
   NO_FUNCTION_NAME, NO_SELECTED_FUNCTION, CHANGES_SAVED, NAME_EXISTS_GROUP,
-  NAME_EXISTS_PROJECT};
+  NAME_EXISTS_PROJECT, PROJECT_EDIT};

@@ -18,8 +18,8 @@ const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
-       CHANGES_SAVED, NAME_EXISTS_GROUP,
-       NAME_EXISTS_PROJECT} = require("../../src/js/ui/notification");
+       CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
+       PROJECT_EDIT} = require("../../src/js/ui/notification");
 
 const {predefined} = require("../../src/js/db/customActions");
 
@@ -176,6 +176,37 @@ it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
   await page().reload({waitUntil: "domcontentloaded"});
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
   equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
+});
+
+it("During rename, buttons other than 'save' show notification about edit and don't execute", async() =>
+{
+  await cbaListItemExpand(cbaListQuery, "group");
+  await cbaListItemSelect(cbaListQuery, "group");
+  await clickRenameProject();
+
+  await clickRemoveProject();
+  equal(await cbaListHasTextCount(cbaListQuery, "group"), 1);
+
+  await clickAddGroup();
+  equal(await cbaListHasTextCount(cbaListQuery, "group1"), 0);
+
+  equal(await getNotificationMsg(), PROJECT_EDIT);
+  notOk(await isDisplayNone("#renameBtn"));
+  ok(await isDisplayNone("#saveBtn"))
+
+  await clickSaveProject();
+
+  equal(await getNotificationMsg(), "");
+  ok(await isDisplayNone("#renameBtn"));
+  notOk(await isDisplayNone("#saveBtn"));
+
+  await clickRenameProject();
+  notOk(await isDisplayNone("#renameBtn"));
+  ok(await isDisplayNone("#saveBtn"))
+  await clickSaveProject();
+
+  ok(await isDisplayNone("#renameBtn"));
+  notOk(await isDisplayNone("#saveBtn"));
 });
 
 it("'Add' button adds new empty action to the selected project", async () =>

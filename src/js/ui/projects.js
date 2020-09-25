@@ -1,7 +1,7 @@
 const customActionsDb = require("../db/customActions");
 const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   SELECT_PROJ_NOT_GROUP, CHANGES_SAVED, NAME_EXISTS_GROUP, NAME_EXISTS_PROJECT,
-  Notification} = require("./notification");
+  Notification, PROJECT_EDIT} = require("./notification");
 
 const projectsDb = require("../db/projects");
 const ActionInputs = require("./ActionInputs");
@@ -159,6 +159,13 @@ function saveProjectsState()
 
 async function onAction(action)
 {
+  // updating projects during rename can cause unexpected behavior, ex. updating
+  // storage with old item name, it's easier to ignore actions while editing.
+  if (renamingItem && action !== "saveProject") {
+    notification.error(PROJECT_EDIT);
+    projectsComp.selectRow(projectsComp.getSelectedItem().id);
+    return;
+  }
   switch (action) {
     case "addGroup": {
       const num = getNextTextNumber(projectsComp.items, "group");
@@ -226,6 +233,7 @@ async function onAction(action)
       await saveProjectsState();
       notification.clean();
       document.querySelector("#projects").classList.remove("rename");
+      renamingItem = null;
       break;
     }
     case "addAction": {
