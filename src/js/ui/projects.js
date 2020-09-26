@@ -20,8 +20,9 @@ actionInputs.setTooltip("#actionInfo");
 const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
 
+const warningHeading = "bg-inject & cs-inject";
 const warningText = "Current project contains some powerful action types, before running please ensure you trust those.";
-const warningLink = "https://chrome-automation.com/bg-inject";
+const warningLink = "https://chrome-automation.com/powerful-actions";
 const warningLinkText = "Learn more";
 
 let renamingItem = null;
@@ -57,21 +58,22 @@ function populateActions(items)
   onActionSelect();
 }
 
-function projectHasActio(id, type)
+function projectHasAction(id, types)
 {
   const project = projectsComp.getItem(id);
   if (project.type !== "project" || !project.actions)
     return false;
 
-  return project.actions.filter((action) => action.type === type).length > 0;
+  const filterTypes = (action) => types.indexOf(action.type) >= 0;
+  return project.actions.filter(filterTypes).length > 0;
 }
 
 async function initPlayButtonTooltip()
 {
-  const heading = "bg-inject & cs-inject";
   const text = warningText;
   const link = warningLink;
   const linkText = warningLinkText;
+  const heading = warningHeading;
   playButtonTooltip.setData({heading, text, link, linkText});
   await setPlayButtonTooltip();
 }
@@ -79,7 +81,7 @@ async function initPlayButtonTooltip()
 async function setPlayButtonTooltip()
 {
   const {id} = await projectsComp.getSelectedItem();
-  if (projectHasActio(id, "bg-inject") || projectHasActio(id, "cs-inject")) {
+  if (projectHasAction(id, ["bg-inject", "cs-inject"])) {
     playButtonTooltip.enable();
   }
   else {
