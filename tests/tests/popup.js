@@ -14,7 +14,7 @@ const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        getBadgeText, isDisplayNone, cbaTableUnselectRow, cbaTooltipGetHeader,
        cbaTooltipGetParagraph, cbaTooltipGetLink, hoverElement,
        cbaListGetTooltipText, cbaListItemsByText,
-       cbaListhoverRowInfo} = require("./utils");
+       cbaListhoverRowInfo, cbaTooltipClickAction} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -547,7 +547,7 @@ it("Clicking record button adds redirect event to the selected project", async()
   equal(await getBadgeText(), "");
 });
 
-it("Selecting a project that has 'bg-inject' or 'cs-inject' action enables cba-tooltip on play button and dissable otherwise", async() =>
+it("Selecting a project that has 'bg-inject' or 'cs-inject' shows powerful actions tooltip unless 'Hide message' is clicked", async() =>
 {
   const projects = [{
     id: "group",
@@ -587,6 +587,15 @@ it("Selecting a project that has 'bg-inject' or 'cs-inject' action enables cba-t
   await cbaListItemSelect(cbaListQuery, "project1", "group");
   notOk(await isDisabled(playButtonTooltipQuery));
   await cbaListItemSelect(cbaListQuery, "project2", "group");
+  ok(await isDisabled(playButtonTooltipQuery));
+
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  notOk(await isDisabled(playButtonTooltipQuery));
+  await hoverElement(playButtonTooltipQuery);
+  await cbaTooltipClickAction(playButtonTooltipQuery);
+  ok(await isDisabled(playButtonTooltipQuery));
+
+  await cbaListItemSelect(cbaListQuery, "project1", "group");
   ok(await isDisabled(playButtonTooltipQuery));
 });
 

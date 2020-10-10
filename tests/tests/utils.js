@@ -117,6 +117,13 @@ async function cbaTooltipGetLink(query)
   return _getHandleAttribute(await tooltipHandle.$("a"), "href");
 }
 
+async function cbaTooltipClickAction(query)
+{
+  const tooltipHandle = await _getCbaTooltipContainer(query);
+  const actionHandle = await tooltipHandle.$("a:not([target='_blank'])");
+  return actionHandle.click();
+}
+
 async function hoverElement(query)
 {
   const handle = await page().$(query);
@@ -585,4 +592,5 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,
                   cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
-                  cbaListItemsByText, cbaListhoverRowInfo};
+                  cbaTooltipClickAction, cbaListItemsByText,
+                  cbaListhoverRowInfo};

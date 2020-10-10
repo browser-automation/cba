@@ -4,6 +4,7 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
   Notification, PROJECT_EDIT} = require("./notification");
 
 const projectsDb = require("../db/projects");
+const prefs = require("../db/prefs");
 const ActionInputs = require("./ActionInputs");
 
 const projectsComp = document.querySelector("#projects cba-list");
@@ -24,6 +25,7 @@ const warningHeading = "bg-inject & cs-inject";
 const warningText = "Current project contains some powerful action types, before running please ensure you trust those.";
 const warningLink = "https://chrome-automation.com/powerful-actions";
 const warningLinkText = "Learn more";
+const warningActionText = "Hide message";
 
 let renamingItem = null;
 
@@ -74,14 +76,27 @@ async function initPlayButtonTooltip()
   const link = warningLink;
   const linkText = warningLinkText;
   const heading = warningHeading;
-  playButtonTooltip.setData({heading, text, link, linkText});
+  const actionText = warningActionText;
+  const action = hideWarningMessage;
+  playButtonTooltip.setData({heading, text, link, linkText, actionText,
+                             action});
   await setPlayButtonTooltip();
+}
+
+async function hideWarningMessage()
+{
+  await prefs.set("hidePowerfulActionWarning", true);
+  playButtonTooltip.disable();
 }
 
 async function setPlayButtonTooltip()
 {
   const {id} = await projectsComp.getSelectedItem();
-  if (projectHasAction(id, ["bg-inject", "cs-inject"])) {
+  if (await prefs.get("hidePowerfulActionWarning") == true)
+  {
+    playButtonTooltip.disable();
+  }
+  else if (projectHasAction(id, ["bg-inject", "cs-inject"])) {
     playButtonTooltip.enable();
   }
   else {
