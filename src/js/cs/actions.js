@@ -78,7 +78,7 @@ async function executeAction(recordRow, request)
       break;
     }
     case "cs-inject": {
-      await eval("(async () => {" + input1 + "})()");
+      await eval(`(async () => {${input1}})()`);
       break;
     }
     case "copy": {
