@@ -73,7 +73,8 @@ beforeEach(async () =>
 it("Playing actions should add badge text 'play' to the icon.", async() =>
 {
   const tests = createAction("150", "timer", "");
-  await playTestProject([tests]);
+  playTestProject([tests]);
+  await wait(20);
   equal(await getBadgeText(), "play");
   await wait(150);
   equal(await getBadgeText(), "");
@@ -97,6 +98,26 @@ it("cs-inject function runs specified script in content script", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
+it("cs-inject action executes script with async(await) code before moving to the next action", async() =>
+{
+  const evType = "cs-inject";
+  const valuePromise = "Promise action is played";
+  const dataPromise = `
+    await new Promise(r => setTimeout(()=>
+    {
+      ${setTextContentScript("#changeContent", valuePromise)}
+      r();
+    }, 50));
+  `;
+  const actionPromise = createAction(dataPromise, evType, "");
+
+  const valueSync = "Sync is played after async in previous action";
+  const dataSync = setTextContentScript("#changeContent", valueSync, true);
+  const actionSync = createAction(dataSync, evType, "");
+  await playTestProject([actionPromise, actionSync]);
+  equal(await getTextContent("#changeContent"), valuePromise+valueSync);
+});
+
 it("Jquery is accessible through cs-inject", async() =>
 {
   const newText = "Jquery in CS injected text";
@@ -114,6 +135,30 @@ it("bg-inject function runs specified script in background page", async() =>
   const action = createAction(data, evType, "");
   await playTestProject([action]);
   equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
+});
+
+it("bg-inject action executes script with async(await) code before moving to the next action", async() =>
+{
+  const evType = "bg-inject";
+
+  const valuePromise = "Promise action is played";
+  const dataPromise = `
+    window["${bgGlobalVarName}"] = [];
+    await new Promise(r => setTimeout(()=>
+    {
+      window["${bgGlobalVarName}"].push("${valuePromise}");
+      r();
+    }, 50));
+  `;
+  const actionPromise = createAction(dataPromise, evType, "");
+
+  const valueSync = "Sync is played after async in previous action";
+  const dataSync = `window["${bgGlobalVarName}"].push("${valueSync}");`;
+  const actionSync = createAction(dataSync, evType, "");
+  await playTestProject([actionPromise, actionSync]);
+
+  const backgroundGlobalVar = await getBackgroundGlobalVar(bgGlobalVarName);
+  deepEqual(await backgroundGlobalVar, [valuePromise, valueSync]);
 });
 
 it("bg-function should execute predefined function and play next action when/if defined in function", async() =>
@@ -433,9 +478,14 @@ function gotoRedirectPageScript()
   return `window.location.pathname = "/redirect";`
 }
 
-function setTextContentScript(query, newText)
+function setTextContentScript(query, newText, concatenate)
 {
-  return `document.querySelector("${query}").textContent = "${newText}";`;
+  const elementTextContent = `document.querySelector("${query}").textContent`;
+  if (concatenate)
+  {
+    return `${elementTextContent} = ${elementTextContent} + "${newText}";`;
+  }
+  return `${elementTextContent} = "${newText}";`;
 }
 
 function setContentFromClipboardScript(query, clipboardName)

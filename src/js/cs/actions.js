@@ -26,7 +26,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
   }
 });
 
-function executeAction(recordRow, request)
+async function executeAction(recordRow, request)
 {
   const {type, inputs} = recordRow;
   const [input1, input2] = inputs;
@@ -78,7 +78,7 @@ function executeAction(recordRow, request)
       break;
     }
     case "cs-inject": {
-      eval(input1);
+      await eval("(async () => {" + input1 + "})()");
       break;
     }
     case "copy": {

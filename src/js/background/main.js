@@ -139,5 +139,5 @@ async function playButtonClick(actions, repeatVal, currProjectId) {
   }
   const [tab] = await browser.tabs.query({active: true});
   cba.playingTabId = tab.id;
-  playProject();
+  await playProject();
 }

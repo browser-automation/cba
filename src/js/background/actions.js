@@ -72,7 +72,7 @@ async function actionExecution(instruction)
       const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
       let sendBgInstruction = true;
       const clipboard = cba.clipboard;
-      eval(input1);
+      await eval("(async () => {" + input1 + "})()");
       cba.clipboard = clipboard;
       if(!sendBgInstruction) {
         return new Promise((resolve) => {
