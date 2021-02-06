@@ -101,7 +101,7 @@ it("cs-inject function runs specified script in content script", async() =>
 it("cs-inject action executes script with async(await) code before moving to the next action", async() =>
 {
   const evType = "cs-inject";
-  const valuePromise = "Promise action is played";
+  const valuePromise = "Promise action has been played";
   const dataPromise = `
     await new Promise(r => setTimeout(()=>
     {
@@ -111,7 +111,7 @@ it("cs-inject action executes script with async(await) code before moving to the
   `;
   const actionPromise = createAction(dataPromise, evType, "");
 
-  const valueSync = "Sync is played after async in previous action";
+  const valueSync = "Sync action has been played after async one";
   const dataSync = setTextContentScript("#changeContent", valueSync, true);
   const actionSync = createAction(dataSync, evType, "");
   await playTestProject([actionPromise, actionSync]);
@@ -141,7 +141,7 @@ it("bg-inject action executes script with async(await) code before moving to the
 {
   const evType = "bg-inject";
 
-  const valuePromise = "Promise action is played";
+  const valuePromise = "Promise action has been played";
   const dataPromise = `
     window["${bgGlobalVarName}"] = [];
     await new Promise(r => setTimeout(()=>
@@ -152,7 +152,7 @@ it("bg-inject action executes script with async(await) code before moving to the
   `;
   const actionPromise = createAction(dataPromise, evType, "");
 
-  const valueSync = "Sync is played after async in previous action";
+  const valueSync = "Sync action has been played after async one";
   const dataSync = `window["${bgGlobalVarName}"].push("${valueSync}");`;
   const actionSync = createAction(dataSync, evType, "");
   await playTestProject([actionPromise, actionSync]);
