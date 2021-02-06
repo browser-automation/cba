@@ -398,7 +398,7 @@ async function addTestAction(data, evType, newValue)
 async function playTestProject(actions, repeate = "1")
 {
   await backgroundPage().evaluate((actions, repeate) =>  {
-    cba.playButtonClick(actions, repeate)
+    return cba.playButtonClick(actions, repeate)
   }, actions, repeate);
 }
 
