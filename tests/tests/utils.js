@@ -262,6 +262,14 @@ async function getCurrentWindowUrl()
   });
 }
 
+async function stopPropagation(query, eventType)
+{
+  const handle = await page().$(query);
+  return handle.evaluate((element, eventType) => {
+    element.addEventListener(eventType, (e) => e.stopPropagation());
+  }, eventType);
+}
+
 async function triggerDrop(query, id, data)
 {
   const handle = await getCbaTableRowHandle(query, id);
@@ -612,4 +620,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,
                   cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
                   cbaTooltipClickAction, cbaListItemsByText,
-                  cbaListhoverRowInfo};
+                  cbaListhoverRowInfo, stopPropagation};
