@@ -26,7 +26,8 @@ const ok = assert.ok;
 const notOk = (value) => ok(!value);
 const {setProjects, getTextContent, getPageUrl,
        resetBackgroundGlobalVar, startTestRecording, stopTestRecording,
-       getTestProjectActions, focusAndType, wait, getBadgeText} = require("./utils");
+       getTestProjectActions, focusAndType, wait, getBadgeText,
+       stopPropagation} = require("./utils");
 const {setTestPage, navigateTo, page} = require("../main");
 const {server} = require("../config");
 
@@ -199,6 +200,23 @@ it("Clicking element inside catchable one should get recorded accordingly and us
   await wait(50);
   deepEqual(await getTestProjectActions(1),
             createAction("#cba-path-button-nested", "click"));
+});
+
+it("Clicking or changing element that has canceled event propagation should still record action", async() =>
+{
+  await stopPropagation("#cba-button", "click");
+  await stopPropagation("#cba-input-text", "change");
+
+  const inputTextValue = "New value";
+  await startTestRecording();
+  await page().click("#cba-button");
+  await focusAndType("#cba-input-text", inputTextValue);
+  await page().keyboard.press("Tab");
+  await stopTestRecording();
+  deepEqual(await getTestProjectActions(1),
+            createAction("#cba-button", "click"));
+  deepEqual(await getTestProjectActions(2),
+            createAction("#cba-input-text", "change", inputTextValue));
 });
 
 function createAction(data, type, value="")

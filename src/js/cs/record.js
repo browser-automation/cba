@@ -132,5 +132,5 @@ function sendmsg(type, inputs){
   port.postMessage({msgType: "RecordedEvent", type, inputs});
 }
 
-document.addEventListener("click", actionRecorder);
-document.addEventListener("change", actionRecorder);
+document.addEventListener("click", actionRecorder, true);
+document.addEventListener("change", actionRecorder, true);
