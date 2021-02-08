@@ -28,7 +28,7 @@ const notOk = (value) => ok(!value);
 const {playTestProject, addTestAction, getTextContent, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
-       getBadgeText, setListener, getSelectedValue, resetClipboardValue,
+       getBadgeText, setListeners, getSelectedValue, resetClipboardValue,
        isElementExist} = require("./utils");
 const {setTestPage, navigateTo} = require("../main");
 const {server} = require("../config");
@@ -215,11 +215,10 @@ it("Change action updates value of a textbox, focuses and fires a change event",
   const evType = "change";
   const action = createAction(query, evType, newText);
   let changeEvent = null;
-  setListener(query, "change", (e) =>
+  await setListeners(query, ["change"], (e) =>
   {
     changeEvent = e;
   });
-  await wait();
   await playTestProject([action]);
   equal(await getValue(query), newText);
   equal(await getActiveElementId(), id);
@@ -259,6 +258,21 @@ it("Click action toggle the checkbox", async() =>
   ok(await isChecked(query));
   await playTestProject([action]);
   notOk(await isChecked(query))
+});
+
+it("click action fire mousedown, click and mouseup events respectively", async() =>
+{
+  const query = "#cba-click";
+  let eventNames = [];
+  await setListeners(query, ["mousedown", "click", "mouseup"], (e) =>
+  {
+    const [eventName] = JSON.parse(e).args;
+    eventNames.push(eventName);
+  });
+  deepEqual(eventNames, []);
+  await playTestProject([createAction(query, "click", "")]);
+  await wait();
+  deepEqual(eventNames, ["mousedown", "click", "mouseup"]);
 });
 
 it("click-update should wait for the page load before proceeding with next actions", async() =>
