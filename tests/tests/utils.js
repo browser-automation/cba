@@ -534,17 +534,26 @@ async function getBadgeText()
   });
 }
 
-// Usage: await setListener("#id", "change", (e) => {});
-async function setListener(query, listener, callback)
+// Usage: await setListeners("#id", ["mousedown", "click"], (e) => {});
+async function setListeners(query, listeners, callback)
 {
+  // unset to avoid `window['onCustomEvent'] already exists` error on reset.
+  if (await page()._pageBindings.has("onCustomEvent"))
+  {
+    await page()._pageBindings.delete("onCustomEvent");
+  }
   await page().exposeFunction("onCustomEvent", (e) => {
     callback(e);
   });
 
-  await page().evaluate((query, listener) =>
+  await page().evaluate((query, listeners) =>
   {
-    document.querySelector(query).addEventListener(listener, window.onCustomEvent);
-  }, query, listener);
+    const element = document.querySelector(query);
+    for (const listener of listeners)
+    {
+      element.addEventListener(listener, () => window.onCustomEvent(listener));
+    }
+  }, query, listeners);
 }
 
 async function addCookie(url, name, value)
@@ -603,7 +612,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getValue, setValue, changeValue, isDisabled,
                   isChecked, addCookie, getCookie,
-                  getActiveElementId, setListener, addTestAction, getPageUrl,
+                  getActiveElementId, setListeners, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   getProjectFromStorage,getGroupFromStorage,
                   sendCurrentTabRequest, getStyle, getSelectedValue,

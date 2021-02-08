@@ -41,7 +41,11 @@ async function executeAction(recordRow, request)
     }
     case "click-update":
     case "click": {
-      document.querySelector(input1).click();
+      const targetElement = document.querySelector(input1);
+      const options = { "bubbles": true };
+      targetElement.dispatchEvent(new MouseEvent("mousedown"), options);
+      targetElement.click();
+      targetElement.dispatchEvent(new MouseEvent("mouseup"), options);
       break;
     }
     case "check": {
