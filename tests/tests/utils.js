@@ -537,6 +537,7 @@ async function getBadgeText()
 // Usage: await setListeners("#id", ["mousedown", "click"], (e) => {});
 async function setListeners(query, listeners, callback)
 {
+  // unset to avoid `window['onCustomEvent'] already exists` error on reset.
   if (await page()._pageBindings.has("onCustomEvent"))
   {
     await page()._pageBindings.delete("onCustomEvent");
