@@ -96,11 +96,16 @@ async function migrate() {
   if (cbaFunctions) {
     const customActions = [];
     for (const {name, data, evType, newValue} of cbaFunctions) {
+      const [predefined] = customActionsDb.predefined
+                                          .filter(({text}) => text === name);
+      const input2 = newValue ? newValue : "";
       const type = evType;
-      const inputs = type == "timer" ? [newValue, data] : [data, newValue];
+      const inputs = type == "timer" ? [input2, data] : [data, input2];
+      const info = predefined ? predefined.info : {description: ""};
       customActions.push({
         data: {type, inputs},
-        text: name
+        text: name,
+        info
       });
     }
     await customActionsDb.saveState(customActions);
