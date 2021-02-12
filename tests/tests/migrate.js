@@ -134,6 +134,11 @@ const oldCbaFunctions =
     msgType:"apiEvent",
     newValue:"Write to clipboard Object to access data later. Use Json in the attr."
   },
+  {
+    name: "Inject alert",
+    data: "alert('Helllo World');",
+    evType:"inject"
+  },
 ];
 
 beforeEach(async () =>
@@ -209,28 +214,50 @@ it("Extension should move and backup old data", async() =>
           type: "timer",
           inputs: ["1000", "Please enter the time in milliseconds"]
         },
-        text: "Timer"
+        text: "Timer",
+        info: {
+          description: "Stops workflow of project for mentioned period in milliseconds then continue with it."
+        }
       },
       {
         data: {
           type: "update",
           inputs: ["this event will let the script wait for page update", ""],
         },
-        text: "Update"
+        text: "Update",
+        info: {
+          description: "This action will let the execution flow wait for page update/load and then continue with it."
+        }
       },
       {
         data: {
           type: "bg-function",
           inputs: ["<$function=removeCookie>\n<$attr=.*>", "use regular expressions to filter domains"]
         },
-        text: "Clear cookies"
+        text: "Clear cookies",
+        info: {
+          description: "Clear browser cookie(s) for domains matching corresponding regular expression in `<$attr=.*>`, ex.: `<$attr=google.com>`"
+        }
       },
       {
         data: {
           type: "bg-function",
           inputs: ['<$function=saveToClipboard>\n<$attr={"name": "value"}>', "Write to clipboard Object to access data later. Use Json in the attr."],
         },
-        text: "Clipboard"
+        text: "Clipboard",
+        info: {
+          description: "Write to clipboard Object to access data later. Use Json in the attr."
+        }
+      },
+      {
+        data: {
+          type: "inject",
+          inputs: ["alert('Helllo World');", ""]
+        },
+        info: {
+          description: ""
+        },
+        text: "Inject alert"
       }
     ]
   };
