@@ -44,6 +44,14 @@ npm run build
 
 https://github.com/browser-automation/cba/wiki
 
+## Installing CBA 8.3.7
+
+After release of `9.0.0` several users reported CBA being broken, that is most
+probably because of the [current
+issue](https://github.com/browser-automation/cba/issues/85). Until the mentioned
+issue is fixed you can downgrade to the old version of CBA [by following current
+steps](https://github.com/browser-automation/cba/wiki/Installing-CBA-8.3.7).
+
 ## Contribution
 
 ### Reporting bugs, suggestions and questions
