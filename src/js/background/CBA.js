@@ -80,7 +80,7 @@ class CBA {
     this.allowPlay = 1;
   }
 
-  async getTabId() {
+  async getPlayingTabId() {
     if (this.playingTabId)
       return this.playingTabId;
 

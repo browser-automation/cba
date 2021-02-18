@@ -101,7 +101,7 @@ async function actionExecution(instruction)
 async function messageContentScript(instruction, clipboard)
 {
   const message = {"action": "executeAction" ,instruction, clipboard};
-  const playingTabId = await cba.getTabId();
+  const playingTabId = await cba.getPlayingTabId();
   await browser.tabs.sendMessage(playingTabId, message).then(playResponse);
 }
 
@@ -151,7 +151,7 @@ function timeout(ms) {
 
 async function waitForUpdate()
 {
-  const playingTabId = await cba.getTabId();
+  const playingTabId = await cba.getPlayingTabId();
   let onUpdate;
   return new Promise((resolve) =>
   {
