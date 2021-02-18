@@ -566,11 +566,11 @@ it("Clicking record button adds redirect event to the selected project", async()
   equal(await getBadgeText(), "");
 });
 
-it("Click action continue flow when element doesn't exist", async() =>
+it("click and bg-function actions doesn't stop project execution on error", async() =>
 {
   await addEmptyActions(3);
   await updateSpecificAction("cba-table-id-1", "#non-existing", "click", "");
-  await updateSpecificAction("cba-table-id-2", "<$function=something>", "bg-function", "90");
+  await updateSpecificAction("cba-table-id-2", "<$function=invalidMethod>", "bg-function", "90");
   await updateSpecificAction("cba-table-id-3", "", "timer", "90");
 
   await clickPlay();
