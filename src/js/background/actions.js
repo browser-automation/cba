@@ -32,7 +32,6 @@ async function playProject() {
       await actionExecution(instruction);
     }
     catch(e) {
-      console.error(e);
       // We want to continue playing project when action has error.
     }
     await playProject();
