@@ -512,7 +512,7 @@ async function resetCbaObject()
     cba.playingActionIndex = -1;
     cba.instructArray;
     cba.defInstructArray;
-    cba.playingTabId = 0;
+    cba.playingTabId = null;
     cba.instruction;
     cba.selectedProjectId;
     cba.lastEvType;

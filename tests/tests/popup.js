@@ -570,12 +570,12 @@ it("click and bg-function actions doesn't stop project execution on error", asyn
 {
   await addEmptyActions(3);
   await updateSpecificAction("cba-table-id-1", "#non-existing", "click", "");
-  await updateSpecificAction("cba-table-id-2", "<$function=invalidMethod>", "bg-function", "90");
-  await updateSpecificAction("cba-table-id-3", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-2", "<$function=invalidMethod>", "bg-function", "");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "150");
 
   await clickPlay();
 
-  await wait(30);
+  await wait(100);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
   equal(await getBadgeText(), "play");
 

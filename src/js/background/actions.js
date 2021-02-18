@@ -32,6 +32,7 @@ async function playProject() {
       await actionExecution(instruction);
     }
     catch(e) {
+      console.error(e);
       // We want to continue playing project when action has error.
     }
     await playProject();
@@ -101,7 +102,8 @@ async function actionExecution(instruction)
 async function messageContentScript(instruction, clipboard)
 {
   const message = {"action": "executeAction" ,instruction, clipboard};
-  await browser.tabs.sendMessage(cba.playingTabId, message).then(playResponse);
+  const playingId = await cba.getTabId();
+  await browser.tabs.sendMessage(playingId, message).then(playResponse);
 }
 
 async function playResponse(response) {
@@ -148,13 +150,14 @@ function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function waitForUpdate()
+async function waitForUpdate()
 {
+  const playingId = await cba.getTabId();
   let onUpdate;
   return new Promise((resolve) =>
   {
     onUpdate = (tabId , info) => {
-      if(tabId == cba.playingTabId && info.status == "complete")
+      if(tabId == playingId && info.status == "complete")
         resolve();
     };
     browser.tabs.onUpdated.addListener(onUpdate);
