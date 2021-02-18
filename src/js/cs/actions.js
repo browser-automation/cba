@@ -26,6 +26,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
       return executeAction(request.instruction, request);
     }
     catch(e) {
+      console.error(e);
       return Promise.resolve({answere: "instructOK", clipboard});
     }
   }
