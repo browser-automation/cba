@@ -26,7 +26,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
       return executeAction(request.instruction, request);
     }
     catch(e) {
-      // We want to continue playing project when actio has error.
+      // We want to continue playing project when action has error.
       return Promise.resolve({answere: "instructOK", clipboard});
     }
   }

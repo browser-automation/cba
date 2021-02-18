@@ -32,7 +32,7 @@ async function playProject() {
       await actionExecution(instruction);
     }
     catch(e) {
-      // We want to continue playing project when actio has error.
+      // We want to continue playing project when action has error.
     }
     await playProject();
   }
