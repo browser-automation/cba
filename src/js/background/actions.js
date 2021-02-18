@@ -28,7 +28,12 @@ async function playProject() {
     const [instruction] = cba.instructArray.splice(0, 1);
     cba.playingActionIndex = (cba.defInstructArray.length - cba.instructArray.length) - 1;
 
-    await actionExecution(instruction);
+    try {
+      await actionExecution(instruction);
+    }
+    catch(e) {
+      // We want to continue playing project when action has error.
+    }
     await playProject();
   }
   else if(cba.projectRepeat > 1) {
