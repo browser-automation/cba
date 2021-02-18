@@ -22,7 +22,12 @@ let clipboard = {};
 browser.runtime.onMessage.addListener((request, sender) => {
   if(request.action == "executeAction") {
     clipboard = request.clipboard;
-    return executeAction(request.instruction, request);
+    try {
+      return executeAction(request.instruction, request);
+    }
+    catch(e) {
+      return Promise.resolve({answere: "instructOK", clipboard});
+    }
   }
 });
 

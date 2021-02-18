@@ -566,6 +566,23 @@ it("Clicking record button adds redirect event to the selected project", async()
   equal(await getBadgeText(), "");
 });
 
+it("Click action continue flow when element doesn't exist", async() =>
+{
+  await addEmptyActions(3);
+  await updateSpecificAction("cba-table-id-1", "#non-existing", "click", "");
+  await updateSpecificAction("cba-table-id-2", "<$function=something>", "bg-function", "90");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "90");
+
+  await clickPlay();
+
+  await wait(30);
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
+  equal(await getBadgeText(), "play");
+
+  await wait(100);
+  equal(await getBadgeText(), "");
+});
+
 it("Selecting a project that has 'bg-inject' or 'cs-inject' shows powerful actions tooltip unless 'Hide message' is clicked", async() =>
 {
   const projects = [{
