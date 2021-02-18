@@ -28,7 +28,7 @@ class CBA {
     this.recordingGroupId = null;
     this.instructArray;
     this.defInstructArray;
-    this.playingTabId = 0;
+    this.playingTabId = null;
     this.instruction;
     this.selectedProjectId;
     this.lastEvType;
@@ -78,6 +78,14 @@ class CBA {
   restore() {
     this.paused = 0;
     this.allowPlay = 1;
+  }
+
+  async getPlayingTabId() {
+    if (this.playingTabId)
+      return this.playingTabId;
+
+    const [activeTab] = await browser.tabs.query({active: true});
+    return activeTab.id;
   }
 }
 
