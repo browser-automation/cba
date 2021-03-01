@@ -366,12 +366,12 @@ it("dragndropping from the functions table or self-organizing actions table shou
   };
 
   await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
-  await actionTableItemIsTimer(1);
+  await actionTableItemIsTimer(0);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  await actionTableItemIsTimer(1);
+  await actionTableItemIsTimer(0);
 
-  const {id} = await cbaTableGetItem(cbaTableQuery, 1);
+  const {id} = await cbaTableGetItem(cbaTableQuery, 0);
   const tableRowHandle = await getCbaTableRowHandle(cbaTableQuery, id);
 
   await triggerDrop(cbaTableQuery, "cba-table-id-3", await triggerDragStart(tableRowHandle));
