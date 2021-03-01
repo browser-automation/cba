@@ -405,7 +405,7 @@ function itemsHasText(items, text)
 
 function getNextTextNumber(items, prefix) {
   if (!items || !items.length)
-    return null;
+    return 1;
 
   let num = 1;
   while (items.filter(({text}) => text === `${prefix}${num}`).length > 0)
