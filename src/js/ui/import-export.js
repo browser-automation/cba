@@ -52,7 +52,7 @@ async function loadImportList()
   };
 
   const importItems = projects.map(removeSubitem);
-  if (importItems[0].id !== "root") {
+  if (!importItems.length || importItems[0].id !== "root") {
     importItems.unshift({id: "root", text: "Root", type: "group"});
   }
   importList.items = importItems;
