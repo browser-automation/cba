@@ -197,6 +197,18 @@ it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
   equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
 });
 
+it("'Enter' key saves project name when renaming", async() =>
+{
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  await clickRenameProject();
+
+  page().keyboard.type("1");
+  page().keyboard.press("Enter");
+
+  await page().reload({waitUntil: "domcontentloaded"});
+  equal(await cbaListHasTextCount(cbaListQuery, "project1", "group"), 0);
+});
+
 it("During rename, buttons other than 'save' show notification about edit and don't execute", async() =>
 {
   await cbaListItemExpand(cbaListQuery, "group");

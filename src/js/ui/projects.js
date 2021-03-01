@@ -452,6 +452,13 @@ updateRecordButtonState();
 initPlayButtonTooltip();
 
 projectsComp.addEventListener("expand", saveProjectsState);
+projectsComp.addEventListener("keydown", ({key}) =>
+{
+  if (key === "Enter")
+  {
+    onAction("saveProject");
+  }
+});
 projectsComp.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
 actionsComp.addEventListener("dragndrop", ()=>
