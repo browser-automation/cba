@@ -1,6 +1,10 @@
 # Chromium browser automation
 
-Extension for automating chromium browser.
+Browser extension for automating chromium
+browser with more than **43 000** weekly users and **250 000** downloads.
+
+- Stable version: https://chrome.google.com/webstore/detail/chromium-browser-automati/jmbmjnojfkcohdpkpjmeeijckfbebbon
+- Website: https://chrome-automation.com
 
 ## Installation
 
