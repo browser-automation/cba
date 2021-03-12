@@ -1,11 +1,16 @@
 # Chromium browser automation
 
-Browser extension for automating chromium
-browser with more than **43 000** weekly users and **250 000** downloads.
+Browser extension for automating chromium browser with more than **43 000**
+weekly users and **250 000** downloads.
 
 - Stable version: https://chrome.google.com/webstore/detail/chromium-browser-automati/jmbmjnojfkcohdpkpjmeeijckfbebbon
 - Website: https://chrome-automation.com
+- Documentation: https://chrome-automation.com/documentation
+- Tutorials: https://chrome-automation.com/tutorial
 
+Check out [the blog post about rewriting
+CBA](https://manvel.me/projects/cba/rewriting), to learn more about why CBA was
+created, what is new and what are our future plans for the project.
 ## Installation
 
 ```bash
