@@ -50,6 +50,7 @@ async function executeAction(recordRow, request)
       const targetElement = document.querySelector(input1);
       const options = { "bubbles": true };
       targetElement.dispatchEvent(new MouseEvent("mousedown"), options);
+      targetElement.focus();
       targetElement.click();
       targetElement.dispatchEvent(new MouseEvent("mouseup"), options);
       break;
