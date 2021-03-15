@@ -453,8 +453,8 @@ async function highlight(type, [query], highlight = true)
     const action = highlight ? "highlight" : "unHighlight";
     const selector = query;
     const [tab] = await browser.tabs.query({active: true});
-    if (tab.url !== window.location.href)
-      await browser.tabs.sendMessage(tab.id, {action ,selector}); // TODO: Ensure no error is thrown when no content script
+    if (tab.url.startsWith("http"))
+      await browser.tabs.sendMessage(tab.id, {action ,selector});
   }
 }
 
