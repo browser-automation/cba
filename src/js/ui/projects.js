@@ -446,6 +446,18 @@ function registerActionListener(callback)
   });
 }
 
+async function highlight(type, [query], highlight = true)
+{
+  if (actionInputs.isHighlight(type))
+  {
+    const action = highlight ? "highlight" : "unHighlight";
+    const selector = query;
+    const [tab] = await browser.tabs.query({active: true});
+    if (tab.url !== window.location.href)
+      await browser.tabs.sendMessage(tab.id, {action ,selector}); // TODO: Ensure no error is thrown when no content script
+  }
+}
+
 loadProjects();
 loadFunctions();
 updateRecordButtonState();
@@ -461,6 +473,18 @@ projectsComp.addEventListener("keydown", ({key}) =>
 });
 projectsComp.addEventListener("select", onProjectSelect);
 actionsComp.addEventListener("select", onActionSelect);
+actionsComp.addEventListener("rowmouseover", ({detail}) =>
+{
+  const {type, inputs} = actionsComp.getItem(detail.rowId);
+  highlight(type, inputs);
+});
+
+actionsComp.addEventListener("rowmouseout", ({detail}) =>
+{
+  const {type, inputs} = actionsComp.getItem(detail.rowId);
+  highlight(type, inputs, false);
+});
+
 actionsComp.addEventListener("dragndrop", ()=>
 {
   onAction("drop");

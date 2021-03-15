@@ -23,6 +23,8 @@ const secondaryDisabled = ["inject", "cs-inject", "bg-inject", "bg-function",
                       "redirect", "copy", "copy-html", "pause"];
 const mainDisabled = ["update", "timer", "pause"];
 const revertInputs = ["timer"];
+const higlight = ["change", "check", "click", "click-update", "copy",
+                  "copy-html"];
 
 class ActionInputs {
     constructor(data) {
@@ -95,6 +97,10 @@ class ActionInputs {
 
     isFunction() {
       return this.functionNameInput;
+    }
+
+    isHighlight(name) {
+      return higlight.includes(name);
     }
 
     _populateTypes() {
