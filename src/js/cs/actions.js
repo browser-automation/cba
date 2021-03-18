@@ -26,6 +26,7 @@ browser.runtime.onMessage.addListener((request, sender) => {
       return executeAction(request.instruction, request);
     }
     catch(e) {
+      console.error(e);
       // We want to continue playing project when action has error.
       return Promise.resolve({answere: "instructOK", clipboard});
     }
@@ -40,9 +41,23 @@ async function executeAction(recordRow, request)
     case "change": {
       const targetElement = document.querySelector(input1);
       targetElement.focus();
-      targetElement.value = placeholders(input2);
-      const event = new Event("change");
-      targetElement.dispatchEvent(event, { "bubbles": true });
+      const editableTarget = targetElement.closest('div[contenteditable="true"]');
+      if (editableTarget)
+      {
+        targetElement.dispatchEvent(new KeyboardEvent('keydown',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false}));
+        targetElement.dispatchEvent(new KeyboardEvent('keypress',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false }));
+        targetElement.dispatchEvent(new KeyboardEvent('keyup',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false}));
+        
+        targetElement.innerHTML = targetElement.innerHTML + placeholders(input2);
+        const event = new Event("input");
+        targetElement.dispatchEvent(event, { "bubbles": true });
+      }
+      else
+      {
+        targetElement.value = placeholders(input2);
+        const event = new Event("change");
+        targetElement.dispatchEvent(event, { "bubbles": true });
+      }
       break;
     }
     case "click-update":
