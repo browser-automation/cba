@@ -41,23 +41,23 @@ async function executeAction(recordRow, request)
     case "change": {
       const targetElement = document.querySelector(input1);
       targetElement.focus();
-      const editableTarget = targetElement.closest('div[contenteditable="true"]');
-      if (editableTarget)
+      const eventOptions = {"bubbles": true};
+      targetElement.dispatchEvent(new KeyboardEvent("keydown",eventOptions));
+      const editableParent = targetElement.closest('[contenteditable="true"]');
+      if (editableParent)
       {
-        targetElement.dispatchEvent(new KeyboardEvent('keydown',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false}));
-        targetElement.dispatchEvent(new KeyboardEvent('keypress',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false }));
-        targetElement.dispatchEvent(new KeyboardEvent('keyup',{"bubbles": true, 'key':input2, "charCode": input2.charCodeAt(0), "keyCode": input2.charCodeAt(0), "cancelable": false}));
-        
-        targetElement.innerHTML = targetElement.innerHTML + placeholders(input2);
+        targetElement.innerHTML = placeholders(input2);
         const event = new Event("input");
-        targetElement.dispatchEvent(event, { "bubbles": true });
+        targetElement.dispatchEvent(event, eventOptions);
       }
       else
       {
         targetElement.value = placeholders(input2);
         const event = new Event("change");
-        targetElement.dispatchEvent(event, { "bubbles": true });
+        targetElement.dispatchEvent(event, eventOptions);
       }
+      targetElement.dispatchEvent(new KeyboardEvent("keypress",eventOptions));
+      targetElement.dispatchEvent(new KeyboardEvent("keyup",eventOptions));
       break;
     }
     case "click-update":

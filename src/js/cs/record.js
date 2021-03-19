@@ -82,7 +82,7 @@ function actionRecorder({target, type})
     input2: ""
   }];
 
-  const inputActions = [{
+  const blurActions = [{
     queries: ["[contenteditable='true']"],
     type: "change",
     input1: getPath,
@@ -94,7 +94,7 @@ function actionRecorder({target, type})
   if (type === "change")
     recordAction(target, changeActions);
   if (type === "blur")
-    recordAction(target, inputActions);
+    recordAction(target, blurActions);
 }
 
 /*
