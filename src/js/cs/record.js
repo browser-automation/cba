@@ -86,14 +86,14 @@ function actionRecorder({target, type})
     queries: ["[contenteditable='true']"],
     type: "change",
     input1: getPath,
-    input2: (closestTarget) => closestTarget.textContent
+    input2: (closestTarget) => closestTarget.innerHTML
   }];
 
   if (type === "click")
     recordAction(target, clickActions);
   if (type === "change")
     recordAction(target, changeActions);
-  if (type === "input")
+  if (type === "blur")
     recordAction(target, inputActions);
 }
 
@@ -143,4 +143,4 @@ function sendmsg(type, inputs){
 
 document.addEventListener("click", actionRecorder, true);
 document.addEventListener("change", actionRecorder, true);
-document.addEventListener("input", actionRecorder, true);
+document.addEventListener("blur", actionRecorder, true);
