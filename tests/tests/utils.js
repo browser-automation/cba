@@ -423,6 +423,11 @@ async function getTextContent(query)
   return getElementAttribute(query, "textContent");
 }
 
+async function getInnerHTML(query)
+{
+  return getElementAttribute(query, "innerHTML");
+}
+
 async function getValue(query)
 {
   return getElementAttribute(query, "value");
@@ -610,8 +615,8 @@ async function sendCurrentTabRequest(request)
 module.exports = {playTestProject, getBackgroundGlobalVar,
                   resetBackgroundGlobalVar, wait, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
-                  getTextContent, getValue, setValue, changeValue, isDisabled,
-                  isChecked, addCookie, getCookie,
+                  getTextContent, getInnerHTML, getValue, setValue, changeValue,
+                  isDisabled, isChecked, addCookie, getCookie,
                   getActiveElementId, setListeners, addTestAction, getPageUrl,
                   focusAndType, getBadgeText, getLocalStorageData,
                   getProjectFromStorage,getGroupFromStorage,
