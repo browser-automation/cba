@@ -26,7 +26,6 @@ browser.runtime.onMessage.addListener((request, sender) => {
       return executeAction(request.instruction, request);
     }
     catch(e) {
-      console.error(e);
       // We want to continue playing project when action has error.
       return Promise.resolve({answere: "instructOK", clipboard});
     }
@@ -42,7 +41,6 @@ async function executeAction(recordRow, request)
       const targetElement = document.querySelector(input1);
       targetElement.focus();
       const eventOptions = {"bubbles": true};
-      targetElement.dispatchEvent(new KeyboardEvent("keydown",eventOptions));
       const editableParent = targetElement.closest('[contenteditable="true"]');
       if (editableParent)
       {
@@ -56,8 +54,6 @@ async function executeAction(recordRow, request)
         const event = new Event("change");
         targetElement.dispatchEvent(event, eventOptions);
       }
-      targetElement.dispatchEvent(new KeyboardEvent("keypress",eventOptions));
-      targetElement.dispatchEvent(new KeyboardEvent("keyup",eventOptions));
       break;
     }
     case "click-update":
