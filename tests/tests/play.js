@@ -25,7 +25,7 @@ const deepEqual = assert.deepStrictEqual;
 const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, addTestAction, getTextContent, getValue,
+const {playTestProject, addTestAction, getTextContent, getInnerHTML, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
        getBadgeText, setListeners, getSelectedValue, resetClipboardValue,
@@ -55,6 +55,7 @@ const pageSetup = {
     <a id="cba-anchor-redirect" href="/redirect">Redirect</a>
     <span id="cba-copy">Copy <b>me</b></span>
     <input id="cba-paste" type="text"></input>
+    <div id="cba-editable" contenteditable="true"><p></p></div>
   `,
   path: server
 }
@@ -238,6 +239,16 @@ it("Change action updates value of selectbox and textarea", async() =>
   await playTestProject([action1, action2]);
   equal(await getSelectedValue(selectboxQuery), "2");
   equal(await getValue(textareaQuery), newText);
+});
+
+it("Change action updates value of element with contenteditable=true parent attribute", async() =>
+{
+  const evType = "change";
+  const eitableQuery = "#cba-editable p";
+  const newText = "Injected value";
+  const action = createAction(eitableQuery, evType, newText);
+  await playTestProject([action]);
+  equal(await getInnerHTML("#cba-editable"), `<p>${newText}</p>`);
 });
 
 it("Check action checks the checkbox", async() =>

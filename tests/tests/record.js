@@ -58,6 +58,7 @@ const pageSetup = {
       <button id="cba-path-button">click me</button>
       <button id="cba-path-button-nested"><span>click me</span></button>
     </div>
+    <div id="cba-editable" contenteditable="true"><p>Editable content</p></div>
   `,
   path: server
 }
@@ -154,6 +155,20 @@ it("Changing input[type=radio], input[type=checkbox] should create check action 
             createAction("#cba-radio", "check"));
   deepEqual(await getTestProjectActions(2),
             createAction("#cba-checkbox", "check"));
+});
+
+it("Changing content of the contenteditable element, should create change action using target selector", async() =>
+{
+  const value = "Content change";
+  const initialValue = await getTextContent("[contenteditable=true]");
+  await startTestRecording();
+
+  await focusAndType("[contenteditable=true]", value);
+  await page().keyboard.press("Tab");
+  await stopTestRecording();
+  const input2 = `<p>${value}${initialValue}</p>`;
+  deepEqual(await getTestProjectActions(1),
+            createAction("#cba-editable", "change", input2));
 });
 
 it("Clicking button, input[type='button'] should create click action using target selector", async() =>

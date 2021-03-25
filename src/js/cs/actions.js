@@ -40,9 +40,20 @@ async function executeAction(recordRow, request)
     case "change": {
       const targetElement = document.querySelector(input1);
       targetElement.focus();
-      targetElement.value = placeholders(input2);
-      const event = new Event("change");
-      targetElement.dispatchEvent(event, { "bubbles": true });
+      const eventOptions = {"bubbles": true};
+      const editableParent = targetElement.closest('[contenteditable="true"]');
+      if (editableParent)
+      {
+        targetElement.innerHTML = placeholders(input2);
+        const event = new Event("input");
+        targetElement.dispatchEvent(event, eventOptions);
+      }
+      else
+      {
+        targetElement.value = placeholders(input2);
+        const event = new Event("change");
+        targetElement.dispatchEvent(event, eventOptions);
+      }
       break;
     }
     case "click-update":
@@ -50,6 +61,7 @@ async function executeAction(recordRow, request)
       const targetElement = document.querySelector(input1);
       const options = { "bubbles": true };
       targetElement.dispatchEvent(new MouseEvent("mousedown"), options);
+      targetElement.focus();
       targetElement.click();
       targetElement.dispatchEvent(new MouseEvent("mouseup"), options);
       break;

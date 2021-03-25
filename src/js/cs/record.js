@@ -45,7 +45,7 @@ function recordAction(target, actionsData)
 function actionRecorder({target, type})
 {
   const clickActions = [{
-    queries: ["button", "input[type='button']"],
+    queries: ["button", "input[type='button'], [contenteditable='true']"],
     type: "click",
     input1: getPath,
     input2: ""
@@ -82,10 +82,19 @@ function actionRecorder({target, type})
     input2: ""
   }];
 
+  const blurActions = [{
+    queries: ["[contenteditable='true']"],
+    type: "change",
+    input1: getPath,
+    input2: (closestTarget) => closestTarget.innerHTML
+  }];
+
   if (type === "click")
     recordAction(target, clickActions);
-  if(type === "change")
+  if (type === "change")
     recordAction(target, changeActions);
+  if (type === "blur")
+    recordAction(target, blurActions);
 }
 
 /*
@@ -134,3 +143,4 @@ function sendmsg(type, inputs){
 
 document.addEventListener("click", actionRecorder, true);
 document.addEventListener("change", actionRecorder, true);
+document.addEventListener("blur", actionRecorder, true);
