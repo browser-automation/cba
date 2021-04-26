@@ -271,19 +271,20 @@ it("Click action toggle the checkbox", async() =>
   notOk(await isChecked(query))
 });
 
-it("click action fire mousedown, click and mouseup events respectively", async() =>
+it("click action fire, pointerdown, mousedown, click, mouseup and pointerup  events respectively", async() =>
 {
+  const eventNames = ["pointerdown", "mousedown", "click", "mouseup", "pointerup"];
   const query = "#cba-click";
-  let eventNames = [];
-  await setListeners(query, ["mousedown", "click", "mouseup"], (e) =>
+  let matchedEventNames = [];
+  await setListeners(query, eventNames, (e) =>
   {
     const [eventName] = JSON.parse(e).args;
-    eventNames.push(eventName);
+    matchedEventNames.push(eventName);
   });
-  deepEqual(eventNames, []);
+  deepEqual(matchedEventNames, []);
   await playTestProject([createAction(query, "click", "")]);
   await wait();
-  deepEqual(eventNames, ["mousedown", "click", "mouseup"]);
+  deepEqual(matchedEventNames, eventNames);
 });
 
 it("click-update should wait for the page load before proceeding with next actions", async() =>

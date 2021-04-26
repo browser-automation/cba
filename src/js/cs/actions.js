@@ -60,10 +60,12 @@ async function executeAction(recordRow, request)
     case "click": {
       const targetElement = document.querySelector(input1);
       const options = { "bubbles": true };
+      targetElement.dispatchEvent(new MouseEvent("pointerdown"), options);
       targetElement.dispatchEvent(new MouseEvent("mousedown"), options);
       targetElement.focus();
       targetElement.click();
       targetElement.dispatchEvent(new MouseEvent("mouseup"), options);
+      targetElement.dispatchEvent(new MouseEvent("pointerup"), options);
       break;
     }
     case "check": {
