@@ -26,7 +26,8 @@ async function init()
   {
     prefs = {
       // Hide tooltip for powerful actions
-      hidePowerfulActionWarning: false
+      hidePowerfulActionWarning: false,
+      allowProjectUrlPlayback: false
     }
     return browser.storage.local.set({prefs});
   }
