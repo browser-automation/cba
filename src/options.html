@@ -21,7 +21,8 @@
         <cba-tabs>
           <cba-tab id="import-tab">Import/export</cba-tab>
           <cba-tab id="cba-tab">CBA</cba-tab>
-          <cba-tab id="functions-tab">funcions</cba-tab>
+          <cba-tab id="functions-tab">Funcions</cba-tab>
+          <cba-tab id="advanced-tab">Advanced</cba-tab>
         </cba-tabs>
       </nav>
     </div>
@@ -74,6 +75,20 @@
           </div>
         </div>
         <div class="notification"></div>
+      </cba-panel>
+      <cba-panel id="panel-advanced" aria-labelledby="advanced-tab">
+        <h2>Advanced options</h2>
+        <form>
+          <div>
+            <label><input type="checkbox" name="allowProjectUrlPlayback"> Allow project URL playback
+              <cba-tooltip
+               text="TBA"
+               arrow="y">
+               <img src="/css/images/info.svg#default" />
+              </cba-tooltip>
+            </label>
+          </div>
+        </form>
       </cba-panel>
     </div>
   </body>
