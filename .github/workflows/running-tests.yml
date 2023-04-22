@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Use Node.js
       # https://github.com/actions/setup-node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       env:
         PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
     - run: npm install
