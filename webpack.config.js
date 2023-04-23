@@ -48,16 +48,16 @@ module.exports =
     minimize: false
   },
   plugins: [
-    new CopyPlugin([
-      { from: './src/css/*', to: "css", flatten: true,
+    new CopyPlugin({patterns: [
+      { from: './src/css/*', to: "css/[name][ext]",
         transform: transformCss},
       { from: "./src/css/icons", to: "css/icons"},
       { from: "./src/css/images", to: "css/images"},
-      { from: "./src/*.*", flatten: true},
+      { from: "./src/*.*", to: "[name][ext]"},
       { from: "./src/js/jquery*.js", to: "js/jquery-1.7.2.min.js" },
       {from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
       to: "js" },
-    ])
+    ]})
   ]
 };
 
