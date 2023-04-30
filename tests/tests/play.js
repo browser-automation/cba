@@ -278,8 +278,7 @@ it("click action fire, pointerdown, mousedown, click, mouseup and pointerup  eve
   let matchedEventNames = [];
   await setListeners(query, eventNames, (e) =>
   {
-    const [eventName] = JSON.parse(e).args;
-    matchedEventNames.push(eventName);
+    matchedEventNames.push(e);
   });
   deepEqual(matchedEventNames, []);
   await playTestProject([createAction(query, "click", "")]);
