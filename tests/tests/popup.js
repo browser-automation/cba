@@ -226,6 +226,7 @@ it("During rename, buttons other than 'save' show notification about edit and do
   ok(await isDisplayNone("#saveBtn"))
 
   await clickSaveProject();
+  await wait(30);
 
   equal(await getNotificationMsg(), "");
   ok(await isDisplayNone("#renameBtn"));
@@ -500,9 +501,10 @@ it("Actions are being updated while playing", async() =>
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
   await page().reload({waitUntil: "domcontentloaded"});
+  await wait(50);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
-  await wait(200);
+  await wait(300);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
 
   await wait(250);
