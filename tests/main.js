@@ -40,9 +40,11 @@ function run()
           "--no-sandbox"
         ]});
         page = await browser.newPage();
-        const extensionName = "Chromium browser automation";
         const targets = await browser.targets();
-        const backgroundPageTarget = targets.find(({ _targetInfo }) => _targetInfo.title.startsWith(extensionName) && _targetInfo.type === "background_page");
+        const backgroundPageTarget = targets.find((target) =>
+          target.url().startsWith("chrome-extension://") && target.type() === "background_page"
+        );
+
         backgroundPage = await backgroundPageTarget.page();
         const [,, extensionID] = backgroundPage.url().split('/');
 
