@@ -184,6 +184,8 @@ it("Importing projects after selecting Root or group adds project(s) accordigly"
   setValue(importInputQuery, JSON.stringify(group));
   await cbaListItemSelect(importListQuery, "group");
   await importButtonClick();
+  await wait(100);
+
   deepEqual(await getProjectFromStorage("group", "project1"), project1);
   deepEqual(await getProjectFromStorage("group", "project2"), project2);
   equal(await getNotificationMsg(), PROJECT_IMPORTED);

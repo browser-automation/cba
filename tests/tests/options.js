@@ -60,7 +60,7 @@ it("Last opened tab should be remembered, otherwise 'Import/export' tab should b
   equal(await getSelectedTabId(), cbaTabId);
 
   page().click(`#${functionsTabId}`);
-  await wait(50);
+  await wait(100);
   equal(await getSelectedTabId(), functionsTabId);
 
   await page().reload({waitUntil: "domcontentloaded"});
