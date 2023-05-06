@@ -20,6 +20,7 @@
 const {backgroundPage, page} = require("../main");
 const customActionsDb = require("../../src/js/db/customActions");
 const projectsDb = require("../../src/js/db/projects");
+const crypto = require("crypto");
 
 async function setWindowLocalStorage(key, data)
 {
