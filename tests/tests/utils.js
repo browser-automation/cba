@@ -20,6 +20,7 @@
 const {backgroundPage, page} = require("../main");
 const customActionsDb = require("../../src/js/db/customActions");
 const projectsDb = require("../../src/js/db/projects");
+const crypto = require("crypto");
 
 async function setWindowLocalStorage(key, data)
 {
@@ -542,23 +543,19 @@ async function getBadgeText()
 // Usage: await setListeners("#id", ["mousedown", "click"], (e) => {});
 async function setListeners(query, listeners, callback)
 {
-  // unset to avoid `window['onCustomEvent'] already exists` error on reset.
-  if (await page()._pageBindings.has("onCustomEvent"))
-  {
-    await page()._pageBindings.delete("onCustomEvent");
-  }
-  await page().exposeFunction("onCustomEvent", (e) => {
+  const customMethodName = `onCustomEvent-${crypto.randomUUID()}`;
+  await page().exposeFunction(customMethodName, (e) => {
     callback(e);
   });
 
-  await page().evaluate((query, listeners) =>
+  await page().evaluate((query, listeners, customMethodName) =>
   {
     const element = document.querySelector(query);
     for (const listener of listeners)
     {
-      element.addEventListener(listener, () => window.onCustomEvent(listener));
+      element.addEventListener(listener, () => window[customMethodName](listener));
     }
-  }, query, listeners);
+  }, query, listeners, customMethodName);
 }
 
 async function addCookie(url, name, value)

@@ -45,6 +45,7 @@ beforeEach(async () =>
 
 it("Starting the extension should set default actions", async() =>
 {
+  await wait(500);
   const initialData = {
     projects: [{
       text: "group",

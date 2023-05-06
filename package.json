@@ -28,7 +28,7 @@
     "cba-components": "github:browser-automation/cba-components#master",
     "copy-webpack-plugin": "^11.0.0",
     "csso": "^5.0.5",
-    "puppeteer": "^5.3.0",
+    "puppeteer": "^20.1.1",
     "webextension-polyfill": "^0.10.0",
     "webpack": "^5.80.0"
   },

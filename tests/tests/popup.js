@@ -236,6 +236,7 @@ it("During rename, buttons other than 'save' show notification about edit and do
   notOk(await isDisplayNone("#renameBtn"));
   ok(await isDisplayNone("#saveBtn"))
   await clickSaveProject();
+  await wait(30);
 
   ok(await isDisplayNone("#renameBtn"));
   notOk(await isDisplayNone("#saveBtn"));
@@ -504,7 +505,7 @@ it("Actions are being updated while playing", async() =>
   await wait(50);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
-  await wait(300);
+  await wait(200);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-4");
 
   await wait(250);
@@ -543,17 +544,17 @@ it("Setting repeate should repeate the project, specified amount of times", asyn
 {
   await setValue("#repeat", 2);
   await addEmptyActions(3);
-  await updateSpecificAction("cba-table-id-1", "", "timer", "90");
-  await updateSpecificAction("cba-table-id-2", "", "timer", "90");
-  await updateSpecificAction("cba-table-id-3", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-1", "", "timer", "100");
+  await updateSpecificAction("cba-table-id-2", "", "timer", "100");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "100");
 
   await clickPlay();
   await wait(110);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
   
-  await wait(310);
-  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
+  await wait(350);
   equal(await getBadgeText(), "play");
+  equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
 
   await wait(250);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
@@ -689,8 +690,10 @@ async function addEmptyActions(amount)
   await cbaListItemExpand(cbaListQuery, "group");
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
-  for (let index = 0; index < amount; index++)
+  for (let index = 0; index < amount; index++) {
     await clickAddAction();
+    await wait(50);
+  }
 
   equal(await cbaTableItemsLength(cbaTableQuery), amount);
 
