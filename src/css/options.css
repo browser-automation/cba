@@ -128,3 +128,9 @@ cba-list
   height: 300px;
   display: inline-block;
 }
+
+cba-tooltip img
+{
+  width: 14px;
+  height: 14px;
+}
