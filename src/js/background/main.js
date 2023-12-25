@@ -18,7 +18,6 @@
  */
 
 require("../analytics");
-const {migrate, backup} = require("./migrate");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
@@ -45,44 +44,35 @@ browser.runtime.onConnect.addListener((port) => {
  * check whether background page is loading for first time.
  */
 async function isFirstLoad() {
-  const oldDatabaseName = "data";
-  const oldDatabase = localStorage.getItem(oldDatabaseName); 
   const newDatabase = await browser.storage.local.get(projectsDb.name);
-  if (oldDatabase) {
-    await backup();
-    await migrate();
-    localStorage.removeItem("data");
-  }
-  else {
-    if (!Object.keys(newDatabase).length) {
-      const dbItem = {};
-      dbItem[projectsDb.name] = [
-        {
-          id: "group",
-          text: "group",
-          type: "group",
-          expanded: false,
-          subItems: [
-            {
-              id: "project",
-              text: "project",
-              type: "project",
-              actions: []
-            }
-          ]
-        }
-      ];
-  
-      await browser.storage.local.set(dbItem);
-    }
+  if (!Object.keys(newDatabase).length) {
+    const dbItem = {};
+    dbItem[projectsDb.name] = [
+      {
+        id: "group",
+        text: "group",
+        type: "group",
+        expanded: false,
+        subItems: [
+          {
+            id: "project",
+            text: "project",
+            type: "project",
+            actions: []
+          }
+        ]
+      }
+    ];
 
-    const customActions = await browser.storage.local.get(customActionsDb.name);
-    if (!Object.keys(customActions).length) {
-      const dbItem = {};
-      dbItem[customActionsDb.name] = customActionsDb.predefined;
-      await browser.storage.local.set(dbItem);
-    }
-  } 
+    await browser.storage.local.set(dbItem);
+  }
+
+  const customActions = await browser.storage.local.get(customActionsDb.name);
+  if (!Object.keys(customActions).length) {
+    const dbItem = {};
+    dbItem[customActionsDb.name] = customActionsDb.predefined;
+    await browser.storage.local.set(dbItem);
+  }
 }
 
 isFirstLoad();

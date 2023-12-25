@@ -22,21 +22,6 @@ const customActionsDb = require("../../src/js/db/customActions");
 const projectsDb = require("../../src/js/db/projects");
 const crypto = require("crypto");
 
-async function setWindowLocalStorage(key, data)
-{
-  return backgroundPage().evaluate((key, data) => localStorage.setItem(key, JSON.stringify(data)) , key, data);
-}
-
-async function getWindowLocalStorage(key)
-{
-  return backgroundPage().evaluate((key) => JSON.parse(localStorage.getItem(key)) , key);
-}
-
-async function reloadExtension()
-{
-  return backgroundPage().evaluate(() => browser.runtime.reload());
-}
-
 async function getExtensionVersion()
 {
   const details = await backgroundPage().evaluate(() => browser.app.getDetails());
@@ -620,8 +605,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   sendCurrentTabRequest, getStyle, getSelectedValue,
                   resetClipboardValue, isElementExist, setProjects,
                   cbaListHasTextCount, cbaListItemExpand, cbaListItemSelect,
-                  getSelectedRow,setWindowLocalStorage, getWindowLocalStorage,
-                  reloadExtension,
+                  getSelectedRow,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
