@@ -17,8 +17,17 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @typedef {Object} Prefs
+ * @property {boolean} hidePowerfulActionWarning - Hide tooltip for powerful actions.
+ */
+
 const name = "prefs";
 
+/**
+ * Initialize preferences.
+ * @returns {Promise<Prefs>}
+ */
 async function init()
 {
   let prefs = await load();
@@ -32,17 +41,32 @@ async function init()
   }
 }
 
+/**
+ * Loads preferences from storage.
+ * @returns {Promise<Prefs>}
+ */
 async function load() {
   const result = await browser.storage.local.get(name);
   return result[name];
 }
 
+/**
+ * Get preference.
+ * @param {keyof Prefs} pref
+ * @returns {Promise<Prefs[pref]>}
+ */
 async function get(pref)
 {
   const prefs = await load();
   return (prefs && prefs[pref]) ? prefs[pref] : false;
 }
 
+/**
+ * Set preference.
+ * @param {keyof Prefs} pref 
+ * @param {Prefs[pref]} value 
+ * @returns 
+ */
 async function set(pref, value)
 {
   const prefs = await load();

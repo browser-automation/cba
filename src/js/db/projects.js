@@ -17,13 +17,72 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+// Keep types in [sync with Wiki](https://github.com/browser-automation/cba/wiki/Storage-%7C-projects).
+
+/**
+ * @typedef {(
+ * |"Inject"
+ * |"inject-cs"
+ * |"bg-inject"
+ * |"bg-function"
+ * |"change"
+ * |"check"
+ * |"click"
+ * |"click-update"
+ * |"update"
+ * |"timer"
+ * |"redirect"
+ * |"copy-html"
+ * |"copy"
+ * |"pause"
+ * )} ActionType
+ */
+
+/**
+ * Injectable actions as seen in [Actions table](https://chrome-automation.com/actions-grid).
+ * Learn more about [Various actions](https://chrome-automation.com/actions).
+ * @typedef  {Object} Action
+ * @property {string} id - Unique Identifier.
+ * @property {ActionType} type - One of [injectable action types](https://chrome-automation.com/actions).
+ * @property {string[]} inputs - action's arguments/inputs:
+ *                               1. Query, code, timer wait time or redirection link.
+ *                               2. New input value. 
+ */
+
+/**
+ * Projects containing actions.
+ * @typedef  {Object} Project
+ * @property {Action[]} actions - Injectable actions.
+ * @property {string} id - Unique Identifier.
+ * @property {string} text - Name of the project.
+ * @property {"project"} type - Project item indication.
+ */
+
+/**
+ * [Groups, containing project](https://chrome-automation.com/project) which
+ * contain [actions](https://chrome-automation.com/actions-grid).
+ * @typedef  {Object} Group
+ * @property {boolean} expanded - expands/collapse group.
+ * @property {string} id - Unique Identifier.
+ * @property {Project[]} subItems - Sub projects.
+ * @property {string} text - Name of the group.
+ * @property {"group"} type - Group item indication.
+ */
+
 const name = "projects";
 
+/**
+ * Loads project Groups from storage.
+ * @returns {Promise<Group[]>}
+ */
 async function load() {
   const result = await browser.storage.local.get(name);
   return result[name];
 }
 
+/**
+ * @param {Group[]} items 
+ */
 function saveState(items) {
   const result = {};
   result[name] = items.map(removeEditable);
@@ -38,6 +97,12 @@ function removeEditable(item) {
   return item;
 }
 
+/**
+ * Add action to subItem and save to storage.
+ * @param {Group["id"]} groupId 
+ * @param {Project["id"]} subItemId 
+ * @param {Action} action 
+ */
 async function addAction(groupId, subItemId, action) {
   const groups = await load();
   const [group] = groups.filter(({id}) => id === groupId);
@@ -53,6 +118,12 @@ async function addAction(groupId, subItemId, action) {
   return saveState(groups);
 }
 
+/**
+ * Import project into a Group with group name.
+ * @param {Group["subItems"]} subItems 
+ * @param {Group["text"]} groupText 
+ * @returns 
+ */
 async function importProjects(subItems, groupText)
 {
   const groups = await load(name);
@@ -88,6 +159,12 @@ async function importProjects(subItems, groupText)
   return saveState(groups);
 }
 
+/**
+ * Create an empty group object.
+ * @param {Group["text"]} groupText 
+ * @param {Group["id"]} groupId 
+ * @returns {Group}
+ */
 function createGroupObj(groupText, groupId) {
   return {
     id: groupId,
@@ -98,11 +175,25 @@ function createGroupObj(groupText, groupId) {
   }
 }
 
+/**
+ * Check if project with specific name exists in Projects.
+ * 
+ * @param {Project[]} items 
+ * @param {string} value 
+ * @returns 
+ */
 function hasTextWithValue(items, value)
 {
   return items.filter(({text}) => text === value).length > 0;
 }
 
+/**
+ * Get unique text for a new project.
+ * 
+ * @param {Project[]} items 
+ * @param {string} prefix 
+ * @returns 
+ */
 function getNextText(items, prefix) {
   if (!items || !items.length)
     return null;
@@ -113,6 +204,13 @@ function getNextText(items, prefix) {
   return `${prefix}${num}`;
 }
 
+/**
+ * Check if id exists in the groups.
+ * 
+ * @param {Group[]} groups 
+ * @param {string} currentId 
+ * @returns 
+ */
 function hasId(groups, currentId)
 {
   for (const {id, subItems} of groups)
