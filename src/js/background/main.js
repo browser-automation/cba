@@ -17,17 +17,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+const browser = require("webextension-polyfill");
 require("../analytics");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
 const customActionsDb = require("../db/customActions");
 
-window.cba = new CBA();
+globalThis.cba = new CBA();
 //TODO: Use message passing to run the functions
-window.cba.playButtonClick = playButtonClick;
-window.cba.recordButtonClick = recordButtonClick;
-window.cba.stopButtonClick = stopButtonClick;
+globalThis.cba.playButtonClick = playButtonClick;
+globalThis.cba.recordButtonClick = recordButtonClick;
+globalThis.cba.stopButtonClick = stopButtonClick;
+globalThis.browser = browser;
 
 /*
  * Function for listening to connection port and get data from content script
