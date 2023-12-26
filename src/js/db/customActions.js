@@ -17,19 +17,45 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @typedef {Object} CustomActionInfo
+ * @property {string} description - Custom action description.
+ */
+
+/**
+ * Custom and predefined actions:
+ * - Used by [Functions datagrid](https://chrome-automation.com/functions-grid).
+ * - Editable in [Functions tab](https://chrome-automation.com/functions-management).
+ * 
+ * @typedef {Object} CustomAction
+ * @property {Action} data - Action.
+ * @property {CustomActionInfo} info - More information.
+ * @property {string} text - Name.
+ */
+
 const name = "customActions";
 
+/**
+ * Loads CustomActions from storage.
+ * @returns {Promise<CustomAction[]>}
+ */
 async function load() {
   const result = await browser.storage.local.get(name);
   return result[name];
 }
 
+/**
+ * @param {CustomAction[]} items 
+ */
 function saveState(items) {
   const result = {};
   result[name] = items;
   return browser.storage.local.set(result);
 }
 
+/**
+ * @type {CustomAction[]}
+ */
 const predefined = [
   {
     data: {

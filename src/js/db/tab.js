@@ -19,11 +19,18 @@
 
 const dbName = "tab";
 
+/**
+ * Load tab id from storage.
+ * @returns {Promise<string>} - Tab id.
+ */
 async function load() {
   const {tab} = await browser.storage.local.get(dbName);
   return tab;
 }
 
+/**
+ * @param {string} id - Tab id.
+ */
 function saveState(id) {
   const tab = id;
   return browser.storage.local.set({tab});
