@@ -24,6 +24,7 @@ const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
 const customActionsDb = require("../db/customActions");
 
+/** @global */
 globalThis.cba = new CBA();
 //TODO: Use message passing to run the functions
 globalThis.cba.playButtonClick = playButtonClick;
@@ -35,9 +36,11 @@ globalThis.browser = browser;
  * Function for listening to connection port and get data from content script
  */
 browser.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener(async(msg) => {
-    if(cba.allowRec) {
-      storeRecord(msg);
+  port.onMessage.addListener(async(/** @type {RpcMessages} */ msg) => {
+    if (msg.msgType == "RecordedEvent") {
+      if(cba.allowRec) {
+        storeRecord(msg);
+      }
     }
   });
 });
@@ -79,8 +82,9 @@ async function isFirstLoad() {
 
 isFirstLoad();
 
-/*
+/**
  * Function for storing records in Local Storage
+ * @param {RecordedEventMsg} msg
  */
 function storeRecord(msg) {
   if(msg.type == "redirect") {
