@@ -4,15 +4,20 @@
       "node": true,
       "es2021": true
   },
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended", "plugin:jsdoc/recommended-error"],
   "parserOptions": {
       "ecmaVersion": "latest",
       "sourceType": "module"
   },
+  "plugins": ["jsdoc"],
   "rules": {
     "global-require": "off",
     "no-cond-assign": "off",
-    "no-empty": "off"
+    "no-empty": "off",
+    "jsdoc/require-jsdoc": "off",
+    "jsdoc/require-returns": "off",
+    "jsdoc/require-returns-description": "off",
+    "jsdoc/require-param-description": "off",
   },
   "globals": {
     "cba": true,

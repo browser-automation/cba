@@ -18,7 +18,7 @@
  */
 
 /**
- * @typedef {Object} Prefs
+ * @typedef {object} Prefs
  * @property {boolean} hidePowerfulActionWarning - Hide tooltip for powerful actions.
  */
 
@@ -65,7 +65,6 @@ async function get(pref)
  * Set preference.
  * @param {keyof Prefs} pref 
  * @param {Prefs[pref]} value 
- * @returns 
  */
 async function set(pref, value)
 {

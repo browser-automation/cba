@@ -20,28 +20,13 @@
 // Keep types in [sync with Wiki](https://github.com/browser-automation/cba/wiki/Storage-%7C-projects).
 
 /**
- * @typedef {(
- * |"Inject"
- * |"inject-cs"
- * |"bg-inject"
- * |"bg-function"
- * |"change"
- * |"check"
- * |"click"
- * |"click-update"
- * |"update"
- * |"timer"
- * |"redirect"
- * |"copy-html"
- * |"copy"
- * |"pause"
- * )} ActionType
+ * @typedef {"Inject"|"inject-cs"|"bg-inject"|"bg-function"|"change"|"check"|"click"|"click-update"|"update"|"timer"|"redirect"|"copy-html"|"copy"|"pause"} ActionType
  */
 
 /**
  * Injectable actions as seen in [Actions table](https://chrome-automation.com/actions-grid).
  * Learn more about [Various actions](https://chrome-automation.com/actions).
- * @typedef  {Object} Action
+ * @typedef  {object} Action
  * @property {string} id - Unique Identifier.
  * @property {ActionType} type - One of [injectable action types](https://chrome-automation.com/actions).
  * @property {string[]} inputs - action's arguments/inputs:
@@ -51,7 +36,7 @@
 
 /**
  * Projects containing actions.
- * @typedef  {Object} Project
+ * @typedef  {object} Project
  * @property {Action[]} actions - Injectable actions.
  * @property {string} id - Unique Identifier.
  * @property {string} text - Name of the project.
@@ -61,7 +46,7 @@
 /**
  * [Groups, containing project](https://chrome-automation.com/project) which
  * contain [actions](https://chrome-automation.com/actions-grid).
- * @typedef  {Object} Group
+ * @typedef  {object} Group
  * @property {boolean} expanded - expands/collapse group.
  * @property {string} id - Unique Identifier.
  * @property {Project[]} subItems - Sub projects.
@@ -120,9 +105,8 @@ async function addAction(groupId, subItemId, action) {
 
 /**
  * Import project into a Group with group name.
- * @param {Group["subItems"]} subItems 
+ * @param {Group["subItems"]} subItems
  * @param {Group["text"]} groupText 
- * @returns 
  */
 async function importProjects(subItems, groupText)
 {
@@ -177,10 +161,8 @@ function createGroupObj(groupText, groupId) {
 
 /**
  * Check if project with specific name exists in Projects.
- * 
  * @param {Project[]} items 
  * @param {string} value 
- * @returns 
  */
 function hasTextWithValue(items, value)
 {
@@ -189,10 +171,8 @@ function hasTextWithValue(items, value)
 
 /**
  * Get unique text for a new project.
- * 
  * @param {Project[]} items 
  * @param {string} prefix 
- * @returns 
  */
 function getNextText(items, prefix) {
   if (!items || !items.length)
@@ -206,10 +186,8 @@ function getNextText(items, prefix) {
 
 /**
  * Check if id exists in the groups.
- * 
  * @param {Group[]} groups 
  * @param {string} currentId 
- * @returns 
  */
 function hasId(groups, currentId)
 {

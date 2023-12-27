@@ -17,6 +17,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/**
+ *  @typedef {import("../db/projects").ActionType} ActionType
+ */
+
+/**
+ * Projects containing actions.
+ * @typedef  {object} RecordedEventMsg
+ * @property {"RecordedEvent"} msgType - Message ID.
+ * @property {ActionType} type - One of [injectable action types](https://chrome-automation.com/actions).
+ * @property {string[]} inputs - action's arguments/inputs.
+ */
+
+/**
+ * @typedef  {RecordedEventMsg} RpcMessages
+ */ 
+
 const browser = require("webextension-polyfill");
 require("../analytics");
 const {CBA} = require("./CBA");
@@ -84,7 +100,7 @@ isFirstLoad();
 
 /**
  * Function for storing records in Local Storage
- * @param {RecordedEventMsg} msg
+ * @param {import("../types/messagePassing").RecordedEventMsg} msg
  */
 function storeRecord(msg) {
   if(msg.type == "redirect") {

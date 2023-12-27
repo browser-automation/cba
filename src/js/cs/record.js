@@ -17,6 +17,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+/**
+ *  @typedef {import("../db/projects").ActionType} ActionType
+ */
+
 const port = browser.runtime.connect({name: "recordPort"});
 
 function findClosest(query)
@@ -136,7 +140,6 @@ function getPath(element) {
  * Data: the path to the object (selector) or redirectionURL
  * evType: Type of the event (click, change, redirect) 
  * newValue: newValue as example for changed value
- * 
  * @param {ActionType} type
  * @param {string[]} inputs
  */
