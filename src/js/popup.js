@@ -22,7 +22,7 @@ require("./ui/projects");
 
 function trackButtonClick(e) {
    _gaq.push(['_trackEvent', e.target.id, 'clicked']);
-};
+}
 
 function analytAllButtons() {
   var buttons = document.querySelectorAll('cba-button');

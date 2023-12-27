@@ -21,7 +21,7 @@
 require("./record");
 require("./actions");
 
-browser.runtime.onMessage.addListener((request, sender) => {
+browser.runtime.onMessage.addListener((request) => {
   if(request.action == "highlight") {
     return setHighlight(request.selector);
   }

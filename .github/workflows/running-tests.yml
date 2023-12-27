@@ -14,6 +14,9 @@ jobs:
 
     - name: Prepare dependencies
       run: sudo apt-get install xvfb && npm install
-    
+
+    - name: Run linters
+      run: npm run lint
+
     - name: Run tests
       run: xvfb-run npm test
