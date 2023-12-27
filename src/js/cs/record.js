@@ -131,11 +131,14 @@ function getPath(element) {
   return path.length ? path.join(" > ") : false;
 }
 
-/*
+/**
  * Function for sending event to background page
  * Data: the path to the object (selector) or redirectionURL
  * evType: Type of the event (click, change, redirect) 
- * newValue: newValue as example for chaged value
+ * newValue: newValue as example for changed value
+ * 
+ * @param {ActionType} type
+ * @param {string[]} inputs
  */
 function sendmsg(type, inputs){
   port.postMessage({msgType: "RecordedEvent", type, inputs});
