@@ -19,7 +19,7 @@
 
 let clipboard = {};
 
-browser.runtime.onMessage.addListener((request, sender) => {
+browser.runtime.onMessage.addListener((request) => {
   if(request.action == "executeAction") {
     clipboard = request.clipboard;
     try {

@@ -73,7 +73,9 @@ async function actionExecution(instruction)
       break;
     }
     case "bg-inject": {
+      // eslint-disable-next-line no-unused-vars
       let sendInstruction = () => "";
+      // eslint-disable-next-line no-unused-vars
       const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
       let sendBgInstruction = true;
       const clipboard = cba.clipboard;
@@ -125,6 +127,7 @@ async function bgFunctionParser(value) {
     return false;
 
   const functionName = method[1];
+  let attribute;
   while (attribute = attributePattern.exec(value)) {
     const clipboard = clipboardPattern.exec(attribute[1]);
     if (clipboard)

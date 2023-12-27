@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npm run build:webpack && (http-server tests/pages -s -p 3001 &  mocha tests/mocha.js)",
     "test:pages": "http-server tests/pages -s -p 3000",
+    "lint": "eslint .",
     "posttest": "kill $(lsof -t -i:3001)",
     "import:components": "cba-components --single-bundle --prod --output dist",
     "build": "npm run clean && npm run build:webpack:prod && cd dist/;zip -r ../cba.zip .;cd ..",
@@ -33,6 +34,8 @@
     "webpack": "^5.89.0"
   },
   "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-plugin-jsdoc": "^46.9.1",
     "http-server": "^14.1.1",
     "mocha": "^10.2.0",
     "webpack-cli": "^5.1.4"

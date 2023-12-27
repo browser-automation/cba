@@ -40,6 +40,7 @@ be loaded in the chrome unless actual extension is reloaded in the
 ```bash
 npm test                # Run puppeteer test
 npm run test:pages      # Starts server with test page used by puppeteer
+npm run lint            # Run linter
 ```
 
 ## Publishing
