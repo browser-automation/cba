@@ -18,7 +18,11 @@
  */
 
 /**
- * @typedef {Object} CustomActionInfo
+ *  @typedef {import("./projects").Action} Action
+ */
+
+/**
+ * @typedef {object} CustomActionInfo
  * @property {string} description - Custom action description.
  */
 
@@ -26,8 +30,7 @@
  * Custom and predefined actions:
  * - Used by [Functions datagrid](https://chrome-automation.com/functions-grid).
  * - Editable in [Functions tab](https://chrome-automation.com/functions-management).
- * 
- * @typedef {Object} CustomAction
+ * @typedef {object} CustomAction
  * @property {Action} data - Action.
  * @property {CustomActionInfo} info - More information.
  * @property {string} text - Name.
