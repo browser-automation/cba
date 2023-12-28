@@ -25,9 +25,29 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
 const projectsDb = require("../db/projects");
 const prefs = require("../db/prefs");
 const ActionInputs = require("./ActionInputs");
+const {sendRpcMessage} = require("../rpc/client");
 
+/**
+ * @typedef {object} PayloadDef
+ * @property {import("../db/projects").Action[]} actions - Actions to be executed.
+ * @property {"project|group"} type - type of the list item item.
+ */
+
+/**
+ * @typedef {(import("cba-components/src/cba-list/cba-list").ListItem|import("cba-components/src/cba-list/cba-list").ListSubItem) & PayloadDef } ItemPayloadDef
+ */
+
+/**
+ * @type {import("cba-components/src/cba-list/cba-list").List}
+ */
 const projectsComp = document.querySelector("#projects cba-list");
+/**
+ * @type {import("cba-components/src/cba-list/cba-list").List}
+ */
 const functions = document.querySelector("#functions");
+/**
+ * @type {import("cba-components/src/cba-table/cba-table").Table}
+ */
 const actionsComp = document.querySelector("#actions");
 
 const playButtonTooltip = document.querySelector("#playButtonTooltip");
@@ -54,6 +74,7 @@ async function loadProjects()
   if (bg.lastSelectedProjectId)
     projectsComp.selectRow(bg.lastSelectedProjectId);
 
+  /** @type {import("../db/projects").Action} actions */
   const {type, actions} = projectsComp.getSelectedItem();
   if (type === "project")
     populateActions(actions);
@@ -378,14 +399,17 @@ async function onAction(action)
       break;
     }
     case "play": {
+      /** @type {ItemPayloadDef}  */
       const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
       const {type, actions, id} = selectedProject;
       if (type === "project" && actions) {
-        const repeateValue = document.querySelector("#repeat").value;
-        bg.playButtonClick(actions, repeateValue, id);
+        /** @type {HTMLInputElement} */
+        const inputElem = document.querySelector("#repeat");
+        const repeatTimes = inputElem.value;
+        sendRpcMessage({msgType: "PlayProject", actions, repeatTimes, id});
         keepHighlightingPlayingAction();
       }
       else {

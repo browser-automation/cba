@@ -237,7 +237,7 @@ it("Clicking or changing element that has canceled event propagation should stil
 function createAction(data, type, value="")
 {
   return {
-    type, inputs: [data, value], msgType: "RecordedEvent"
+    type, inputs: [data, value]
   }
 }
 

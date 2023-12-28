@@ -569,10 +569,8 @@ it("Clicking record button adds redirect event to the selected project", async()
   const type = "redirect";
   const input1 = await getCurrentWindowUrl();
   const input2 = "";
-  const msgType = "RecordedEvent";
   const item = await cbaTableGetItem(cbaTableQuery, 0);
   itemHasTypeAndInputs(item, type, [input1, input2]);
-  equal(item.msgType, msgType);
   equal(await getTextContent("#recordButton"), "recording...");
   equal(await getBadgeText(), "rec");
 

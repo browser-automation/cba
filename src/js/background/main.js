@@ -17,28 +17,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-/**
- *  @typedef {import("../db/projects").ActionType} ActionType
- */
+// Expose browser to global scope.
+globalThis.browser = require("webextension-polyfill");
 
-/**
- * Projects containing actions.
- * @typedef  {object} RecordedEventMsg
- * @property {"RecordedEvent"} msgType - Message ID.
- * @property {ActionType} type - One of [injectable action types](https://chrome-automation.com/actions).
- * @property {string[]} inputs - action's arguments/inputs.
- */
-
-/**
- * @typedef  {RecordedEventMsg} RpcMessages
- */ 
-
-const browser = require("webextension-polyfill");
 require("../analytics");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
 const customActionsDb = require("../db/customActions");
+const {addRpcListener} = require("../rpc/host");
 
 /** @global */
 globalThis.cba = new CBA();
@@ -46,20 +33,21 @@ globalThis.cba = new CBA();
 globalThis.cba.playButtonClick = playButtonClick;
 globalThis.cba.recordButtonClick = recordButtonClick;
 globalThis.cba.stopButtonClick = stopButtonClick;
-globalThis.browser = browser;
 
-/*
- * Function for listening to connection port and get data from content script
- */
-browser.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener(async(/** @type {RpcMessages} */ msg) => {
-    if (msg.msgType == "RecordedEvent") {
+addRpcListener(async(msg) => {
+  switch (msg.msgType) {
+    case "RecordedEvent": {
       if(cba.allowRec) {
-        storeRecord(msg);
+        await storeRecord(msg.action);
       }
+      break;
     }
-  });
-});
+    case "PlayProject": {
+      const {actions, repeatTimes, id} = msg;
+      return playButtonClick(actions, repeatTimes, id);
+    }
+  }
+})
 
 /*
  * check whether background page is loading for first time.
@@ -100,17 +88,17 @@ isFirstLoad();
 
 /**
  * Function for storing records in Local Storage
- * @param {import("../types/messagePassing").RecordedEventMsg} msg
+ * @param {import("../db/projects").Action} action
  */
-function storeRecord(msg) {
-  if(msg.type == "redirect") {
-    return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, msg);
+function storeRecord(action) {
+  if(action.type == "redirect") {
+    return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, action);
   }
-  if((cba.lastEvType == "update") && (msg.type == "update")) {
+  if((cba.lastEvType == "update") && (action.type == "update")) {
     return false;
   }
-  cba.lastEvType = msg.type;
-  return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, msg);
+  cba.lastEvType = action.type;
+  return projectsDb.addAction(cba.recordingGroupId, cba.recordingProjectId, action);
 }
 
 async function storeCurrentUrl() {
