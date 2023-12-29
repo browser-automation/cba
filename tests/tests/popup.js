@@ -28,11 +28,11 @@ const notOk = (value) => ok(!value);
 const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        cbaListItemSelect, cbaTableGetItem, cbaTableItemsLength,
        cbaTableSelectRow, setValue, changeValue, getValue, isDisabled, triggerDragStart,
-       getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, getSelectedRow,
-       triggerDrop, getNotificationMsg, getTextContent, getCurrentWindowUrl,
-       getBadgeText, isDisplayNone, cbaTableUnselectRow, cbaTooltipGetHeader,
-       cbaTooltipGetParagraph, cbaTooltipGetLink, hoverElement,
-       cbaListGetTooltipText, cbaListItemsByText,
+       getCbaListRowHandle, getCbaTableRowHandle, resetCbaObject, resetPrefs,
+       getSelectedRow, triggerDrop, getNotificationMsg, getTextContent,
+       getCurrentWindowUrl, getBadgeText, isDisplayNone, cbaTableUnselectRow,
+       cbaTooltipGetHeader, cbaTooltipGetParagraph, cbaTooltipGetLink,
+       hoverElement, cbaListGetTooltipText, cbaListItemsByText,
        cbaListhoverRowInfo, cbaTooltipClickAction} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
@@ -74,6 +74,7 @@ const clickStop = () => page().click("[data-action='stop']");
 beforeEach(async () =>
 {
   await resetCbaObject();
+  await resetPrefs();
   await setProjects();
   await pageReload()
   await wait(50);
@@ -483,7 +484,7 @@ it("Selecting project and actions is remembered after reload", async() =>
   await pageReload()
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
 
-  await resetCbaObject();
+  await resetPrefs();
   await pageReload()
   await cbaListItemExpand(cbaListQuery, "group");
   await wait();
@@ -507,7 +508,7 @@ it("Actions are being updated while playing", async() =>
   await wait(100);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
-  await pageReload()
+  await pageReload();
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
   await wait(200);

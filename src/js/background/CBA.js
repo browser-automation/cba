@@ -31,8 +31,6 @@
  * @property {number | null | undefined} playingTabId - The ID of the tab being played.
  * @property {import("../db/projects").ActionType} lastEvType - The type of the last event.
  * @property {number | string} projectRepeat - The number of times the project should be repeated.
- * @property {string=} lastSelectedProjectId - The ID of the last selected project.
- * @property {string=} lastSelectedActionId - The ID of the last selected action.
  */
 
 // @ts-check
@@ -58,10 +56,6 @@ class CBA {
   lastEvType;
   /** @type {State["projectRepeat"]} */
   projectRepeat = 1; // TODO: Accept only numbers.
-  /** @type {State["lastSelectedProjectId"]} */
-  lastSelectedProjectId;
-  /** @type {State["lastSelectedActionId"]} */
-  lastSelectedActionId;
 
   constructor() {}
 
@@ -137,8 +131,6 @@ class CBA {
       playingTabId: this.playingTabId,
       lastEvType: this.lastEvType,
       projectRepeat: this.projectRepeat,
-      lastSelectedProjectId: this.lastSelectedProjectId,
-      lastSelectedActionId: this.lastSelectedActionId,
     };
   }
 }

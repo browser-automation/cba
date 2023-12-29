@@ -73,17 +73,17 @@ let renamingItem = null;
 
 async function loadProjects()
 {
-  const cbaState = await getCbaState();
   projectsComp.items = await projectsDb.load();
-  if (cbaState.lastSelectedProjectId)
-    projectsComp.selectRow(cbaState.lastSelectedProjectId);
+  const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
+  if (lastSelectedProjectId)
+    projectsComp.selectRow(lastSelectedProjectId);
 
   /** @type {import("../db/projects").Action} actions */
   const {type, actions} = projectsComp.getSelectedItem();
   if (type === "project")
-    populateActions(actions);
+    await populateActions(actions);
   else
-    populateActions([]);
+    await populateActions([]);
 
   keepHighlightingPlayingAction(true);
 }
@@ -95,11 +95,12 @@ async function loadFunctions()
 
 async function populateActions(items)
 {
-  const cbaState = await getCbaState();
+  const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
+  const lastSelectedActionId = await prefs.get("lastSelectedActionId");
   actionsComp.items = items;
   const projectId = projectsComp.getSelectedItem().id;
-  if (cbaState.lastSelectedActionId && cbaState.lastSelectedProjectId === projectId)
-    actionsComp.selectRow(cbaState.lastSelectedActionId, false);
+  if (lastSelectedActionId && lastSelectedProjectId === projectId)
+    actionsComp.selectRow(lastSelectedActionId, false);
   else
     selectFirstAction();
   onActionSelect();
@@ -152,7 +153,7 @@ async function setPlayButtonTooltip()
 async function onProjectSelect()
 {
   const {type, actions, id} = projectsComp.getSelectedItem();
-  bg.lastSelectedProjectId = id;
+  prefs.set("lastSelectedProjectId", id);
   actionInputs.reset();
   await setPlayButtonTooltip();
 
@@ -175,7 +176,7 @@ async function onActionSelect()
   if (!item) {
     return null;
   }
-  bg.lastSelectedActionId = item.id;
+  await prefs.set("lastSelectedActionId", item.id);
   actionInputs.setItem(item);
 }
 
