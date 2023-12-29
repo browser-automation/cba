@@ -73,9 +73,10 @@ let renamingItem = null;
 
 async function loadProjects()
 {
+  const cbaState = await getCbaState();
   projectsComp.items = await projectsDb.load();
-  if (bg.lastSelectedProjectId)
-    projectsComp.selectRow(bg.lastSelectedProjectId);
+  if (cbaState.lastSelectedProjectId)
+    projectsComp.selectRow(cbaState.lastSelectedProjectId);
 
   /** @type {import("../db/projects").Action} actions */
   const {type, actions} = projectsComp.getSelectedItem();
@@ -92,12 +93,13 @@ async function loadFunctions()
   functions.items = await customActionsDb.load();
 }
 
-function populateActions(items)
+async function populateActions(items)
 {
+  const cbaState = await getCbaState();
   actionsComp.items = items;
   const projectId = projectsComp.getSelectedItem().id;
-  if (bg.lastSelectedActionId && bg.lastSelectedProjectId === projectId)
-    actionsComp.selectRow(bg.lastSelectedActionId, false);
+  if (cbaState.lastSelectedActionId && cbaState.lastSelectedProjectId === projectId)
+    actionsComp.selectRow(cbaState.lastSelectedActionId, false);
   else
     selectFirstAction();
   onActionSelect();
@@ -177,9 +179,10 @@ async function onActionSelect()
   actionInputs.setItem(item);
 }
 
-function updateRecordButtonState() {
+async function updateRecordButtonState() {
+  const cbaState = await getCbaState();
   const recordButton = document.querySelector("#recordButton");
-  if (bg.allowRec)
+  if (cbaState.allowRec)
     recordButton.textContent = "recording...";
   else
     recordButton.textContent = "rec";

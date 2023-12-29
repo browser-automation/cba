@@ -73,9 +73,9 @@ const clickStop = () => page().click("[data-action='stop']");
 
 beforeEach(async () =>
 {
-  await setProjects();
   await resetCbaObject();
-  await page().reload({waitUntil: "domcontentloaded"});
+  await setProjects();
+  await pageReload()
   await wait(50);
 });
 
@@ -92,7 +92,7 @@ it("'G+' button adds new group item with unique text", async() =>
   await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "group2"), 1);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "group1"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "group2"), 1);
@@ -118,8 +118,8 @@ it("'+' button adds new project item with unique text", async() =>
   await clickAddProject();
   await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "project2", "group"), 1);
-
-  await page().reload({waitUntil: "domcontentloaded"});
+  
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "project1", "group"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "project2", "group"), 1);
@@ -128,6 +128,7 @@ it("'+' button adds new project item with unique text", async() =>
 it("'-' button removes both project and group from items", async() =>
 {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 1);
@@ -136,7 +137,7 @@ it("'-' button removes both project and group from items", async() =>
   await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 0);
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 1);
   equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 0);
 
@@ -144,13 +145,14 @@ it("'-' button removes both project and group from items", async() =>
   await clickRemoveProject();
   await wait();
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
 });
 
 it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
 {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
   await clickAddProject();
@@ -175,7 +177,7 @@ it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
   ok(await isDisplayNone("#renameBtn"));
   notOk(await isDisplayNone("#saveBtn"))
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "project", "group"), 0);
   equal(await cbaListHasTextCount(cbaListQuery, "project11", "group"), 1);
 
@@ -192,7 +194,7 @@ it("'Rename' and 'save' buttons rename project or group accordingly", async() =>
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
   equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "group"), 0);
   equal(await cbaListHasTextCount(cbaListQuery, "group11"), 1);
 });
@@ -205,13 +207,14 @@ it("'Enter' key saves project name when renaming", async() =>
   page().keyboard.type("1");
   page().keyboard.press("Enter");
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaListHasTextCount(cbaListQuery, "project1", "group"), 0);
 });
 
 it("During rename, buttons other than 'save' show notification about edit and don't execute", async() =>
 {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "group");
   await clickRenameProject();
 
@@ -245,6 +248,7 @@ it("During rename, buttons other than 'save' show notification about edit and do
 it("'Add' button adds new empty action to the selected project", async () =>
 {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 0);
 
@@ -263,7 +267,7 @@ it("'Add' button adds new empty action to the selected project", async () =>
   deepEqual(await cbaTableGetItem(cbaTableQuery, 1), createEmptyItem("cba-table-id-2", true));
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   await wait(50);
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
@@ -293,7 +297,7 @@ it("'Delete' button removes selected action from the selected project", async ()
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await cbaTableItemsLength(cbaTableQuery), 2);
   equal((await cbaTableGetItem(cbaTableQuery, 0)).id, "cba-table-id-1");
 });
@@ -315,7 +319,7 @@ it("'Save' button updates selected action with the data from action input fields
   equal(await getNotificationMsg(), CHANGES_SAVED)
   itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 });
 
@@ -346,7 +350,7 @@ it("Selecting action populates input deselecting clears", async() =>
   equal(await getValue(inputDataQuery), input1);
   equal(await getValue(inputValueQuery), input2);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal(await getValue(inputEventQuery), type);
   equal(await getValue(inputDataQuery), input1);
   equal(await getValue(inputValueQuery), input2);
@@ -382,7 +386,7 @@ it("dragndropping from the functions table or self-organizing actions table shou
   await triggerDrop(cbaTableQuery, "cba-table-id-1", await triggerDragStart(handle));
   await actionTableItemIsTimer(0);
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   await actionTableItemIsTimer(0);
 
   const {id} = await cbaTableGetItem(cbaTableQuery, 0);
@@ -391,7 +395,7 @@ it("dragndropping from the functions table or self-organizing actions table shou
   await triggerDrop(cbaTableQuery, "cba-table-id-3", await triggerDragStart(tableRowHandle));
 
   await actionTableItemIsTimer(2);
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   await actionTableItemIsTimer(2);
 
   itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), "", ["", ""]);
@@ -466,21 +470,23 @@ it("Selecting project and actions is remembered after reload", async() =>
 {
   notOk(await getSelectedRow(cbaListQuery));
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   ok(await getSelectedRow(cbaListQuery));
   equal((await getSelectedRow(cbaListQuery)).text, "project");
 
   await addFourEmptyActions();
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
 
   await resetCbaObject();
-  await page().reload({waitUntil: "domcontentloaded"});
+  await pageReload()
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-1");
 });
@@ -491,7 +497,7 @@ it("Actions are being updated while playing", async() =>
 
   await updateSpecificAction("cba-table-id-1", "", "timer", "90");
   await updateSpecificAction("cba-table-id-2", "", "timer", "90");
-  await updateSpecificAction("cba-table-id-3", "", "timer", "190");
+  await updateSpecificAction("cba-table-id-3", "", "timer", "290");
   await updateSpecificAction("cba-table-id-4", "", "timer", "200");
   await clickPlay();
 
@@ -501,8 +507,7 @@ it("Actions are being updated while playing", async() =>
   await wait(100);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
-  await page().reload({waitUntil: "domcontentloaded"});
-  await wait(50);
+  await pageReload()
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-3");
 
   await wait(200);
@@ -563,6 +568,7 @@ it("Setting repeate should repeate the project, specified amount of times", asyn
 
 it("Clicking record button adds redirect event to the selected project", async() => {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
   await clickRecord();
@@ -627,6 +633,7 @@ it("Selecting a project that has 'bg-inject' or 'cs-inject' shows powerful actio
   await setProjects(projects);
 
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
 
   ok(await isDisabled(playButtonTooltipQuery));
 
@@ -672,6 +679,11 @@ it("Changing action updates information with the action information accordingly.
   }
 });
 
+async function pageReload() {
+  await page().reload({waitUntil: "domcontentloaded"});
+  return wait();
+}
+
 function itemHasTypeAndInputs(item, type, inputs)
 {
   equal(item.type, type);
@@ -686,6 +698,7 @@ async function addFourEmptyActions()
 async function addEmptyActions(amount)
 {
   await cbaListItemExpand(cbaListQuery, "group");
+  await wait();
   await cbaListItemSelect(cbaListQuery, "project", "group");
 
   for (let index = 0; index < amount; index++) {

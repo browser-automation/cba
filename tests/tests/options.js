@@ -45,6 +45,7 @@ it("Extension version should be set in the header", async() =>
 
 it("Last opened tab should be remembered, otherwise 'Import/export' tab should be selected", async() =>
 {
+  await wait();
   const importTabId = "import-tab";
   const cbaTabId = "cba-tab";
   const functionsTabId = "functions-tab";
@@ -56,7 +57,7 @@ it("Last opened tab should be remembered, otherwise 'Import/export' tab should b
   equal(await getSelectedTabId(), cbaTabId);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  await wait(50);
+  await wait();
   equal(await getSelectedTabId(), cbaTabId);
 
   page().click(`#${functionsTabId}`);
@@ -64,7 +65,7 @@ it("Last opened tab should be remembered, otherwise 'Import/export' tab should b
   equal(await getSelectedTabId(), functionsTabId);
 
   await page().reload({waitUntil: "domcontentloaded"});
-  await wait(50);
+  await wait();
   equal(await getSelectedTabId(), functionsTabId);
 });
 

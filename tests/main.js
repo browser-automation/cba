@@ -22,6 +22,7 @@ const extensionPath = "dist";
 const {tests, server, closeBrowser} = require("./config");
 
 let browser;
+/** @type {import("puppeteer").Page} */
 let page;
 let backgroundPage;
 
