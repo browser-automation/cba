@@ -504,14 +504,10 @@ async function resetCbaObject()
     cba.instructArray;
     cba.defInstructArray;
     cba.playingTabId = null;
-    cba.instruction;
-    cba.selectedProjectId;
     cba.lastEvType;
-    cba.currentTab;
     cba.projectRepeat = 1;
     cba.lastSelectedProjectId = null;
     cba.lastSelectedActionId = null;
-    cba.selectedProjObj = null;
     return cba;
   });
 }

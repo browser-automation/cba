@@ -29,14 +29,10 @@
  * @property {import("../db/projects").Action[]} instructArray - The array of actions being played.
  * @property {import("../db/projects").Action[]} defInstructArray - The array of actions being played.
  * @property {number | null | undefined} playingTabId - The ID of the tab being played.
- * @property {any} instruction - TODO: Remove?
- * @property {string} selectedProjectId - Selected project ID.
  * @property {import("../db/projects").ActionType} lastEvType - The type of the last event.
- * @property {any} currentTab - TODO: Remove?
  * @property {number | string} projectRepeat - The number of times the project should be repeated.
  * @property {string=} lastSelectedProjectId - The ID of the last selected project.
  * @property {string=} lastSelectedActionId - The ID of the last selected action.
- * @property {any} selectedProjObj - TODO: Remove?
  */
 
 // @ts-check
@@ -58,18 +54,14 @@ class CBA {
   defInstructArray; // Q: Do we need this?
   /** @type {State["playingTabId"]} */
   playingTabId = null;
-  instruction; // TODO: Remove?
-  selectedProjectId; // TODO: Remove?
   /** @type {State["lastEvType"]} */
   lastEvType;
-  currentTab; // TODO: Remove?
   /** @type {State["projectRepeat"]} */
   projectRepeat = 1; // TODO: Accept only numbers.
   /** @type {State["lastSelectedProjectId"]} */
   lastSelectedProjectId;
   /** @type {State["lastSelectedActionId"]} */
   lastSelectedActionId;
-  selectedProjObj; // TODO: Remove?
 
   constructor() {}
 
@@ -143,14 +135,10 @@ class CBA {
       instructArray: this.instructArray,
       defInstructArray: this.defInstructArray,
       playingTabId: this.playingTabId,
-      instruction: this.instruction,
-      selectedProjectId: this.selectedProjectId,
       lastEvType: this.lastEvType,
-      currentTab: this.currentTab,
       projectRepeat: this.projectRepeat,
       lastSelectedProjectId: this.lastSelectedProjectId,
       lastSelectedActionId: this.lastSelectedActionId,
-      selectedProjObj: this.selectedProjObj
     };
   }
 }
