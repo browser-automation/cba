@@ -30,7 +30,6 @@ const {addRpcListener, sendRpcMessageResponse} = require("../rpc/host");
 
 /** @global */
 globalThis.cba = new CBA();
-//TODO: Use message passing to run the functions
 globalThis.cba.playButtonClick = playButtonClick;
 globalThis.cba.recordButtonClick = recordButtonClick;
 globalThis.cba.stopButtonClick = stopButtonClick;
