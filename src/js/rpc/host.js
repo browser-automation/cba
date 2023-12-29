@@ -22,8 +22,7 @@
  */
 
 /**
- * @callback RpcHandler
- * @param {RpcMessages} msg
+ * @typedef {import("./types").RpcHandler} RpcHandler
  */
 
 /**
@@ -35,7 +34,7 @@ browser.runtime.onConnect.addListener((port) => {
   if (port.name !== "rpcPort") throw new Error("Unknown port.");
   port.onMessage.addListener(async(/** @type {RpcMessages} */ msg) => {
     for (const listener of listeners) {
-      listener(msg);
+      listener(msg, port);
     }
   });
 });
@@ -59,4 +58,12 @@ function removeRpcListener(handler) {
   }
 }
 
-module.exports = {addRpcListener, removeRpcListener};
+/**
+ * @param {RpcMessages} message
+ * @param {import("webextension-polyfill").Runtime.Port} port
+ */
+function sendRpcMessageResponse(message, port){
+  port.postMessage(message);
+}
+
+module.exports = {addRpcListener, removeRpcListener, sendRpcMessageResponse};

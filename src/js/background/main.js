@@ -18,6 +18,7 @@
  */
 
 // Expose browser to global scope.
+/** @global */
 globalThis.browser = require("webextension-polyfill");
 
 require("../analytics");
@@ -25,7 +26,7 @@ const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
 const customActionsDb = require("../db/customActions");
-const {addRpcListener} = require("../rpc/host");
+const {addRpcListener, sendRpcMessageResponse} = require("../rpc/host");
 
 /** @global */
 globalThis.cba = new CBA();
@@ -34,7 +35,7 @@ globalThis.cba.playButtonClick = playButtonClick;
 globalThis.cba.recordButtonClick = recordButtonClick;
 globalThis.cba.stopButtonClick = stopButtonClick;
 
-addRpcListener(async(msg) => {
+addRpcListener(async(msg, port) => {
   switch (msg.msgType) {
     case "RecordedEvent": {
       if(cba.allowRec) {
@@ -45,6 +46,11 @@ addRpcListener(async(msg) => {
     case "PlayProject": {
       const {actions, repeatTimes, id} = msg;
       return playButtonClick(actions, repeatTimes, id);
+    }
+    case "GetState": {
+      const state = cba.getState();
+      sendRpcMessageResponse({msgType: "GetStateResponse", state, id: msg.id}, port);
+      break;
     }
   }
 })

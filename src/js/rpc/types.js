@@ -22,6 +22,12 @@
  */
 
 /**
+ * @callback RpcHandler
+ * @param {RpcMessages} msg
+ * @param {import("webextension-polyfill").Runtime.Port} port
+ */
+
+/**
  * Record triggered event.
  * @typedef  {object} RpcRecordedEvent
  * @property {"RecordedEvent"} msgType - Message ID.
@@ -38,7 +44,22 @@
  */
 
 /**
- * @typedef  {RpcRecordedEvent|RpcPlayProject} RpcMessages
+ * Get CBA state.
+ * @typedef  {object} RpcGetState
+ * @property {"GetState"} msgType - Message ID.
+ * @property {string} id - unique id of the request.
+ */
+
+/**
+ * Get CBA state.
+ * @typedef  {object} RpcGetStateResponse
+ * @property {"GetStateResponse"} msgType - Message ID.
+ * @property {import("../background/CBA").State} state - CBA state.
+ * @property {string} id - unique id of the request.
+ */
+
+/**
+ * @typedef  {RpcRecordedEvent|RpcPlayProject|RpcGetState|RpcGetStateResponse} RpcMessages
  */ 
 
 module.exports = {}; // Unless specified types are not being imported.

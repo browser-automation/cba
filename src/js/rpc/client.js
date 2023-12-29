@@ -21,6 +21,15 @@
  *  @typedef {import("./types").RpcMessages} RpcMessages
  */
 
+/**
+ * @typedef {import("./types").RpcHandler} RpcHandler
+ */
+
+/**
+ * @type {RpcHandler[]}
+ */
+const listeners = [];
+
 // TODO: rename port.
 const port = browser.runtime.connect({name: "rpcPort"});
 
@@ -35,4 +44,29 @@ function sendRpcMessage(message){
   port.postMessage(message);
 }
 
-module.exports = {sendRpcMessage};
+port.onMessage.addListener((msg) => {
+  for (const listener of listeners) {
+    listener(msg, port);
+  }
+});
+
+/**
+ * Adds rpc listener.
+ * @param {RpcHandler} handler - rpc listener handler.
+ */
+function addRpcListener(handler) {
+  listeners.push(handler);
+}
+
+/**
+ * Removes rpc listener.
+ * @param {RpcHandler} handler - rpc listener handler.
+ */
+function removeRpcListener(handler) {
+  const index = listeners.indexOf(handler);
+  if (index !== -1) {
+    listeners.splice(index, 1);
+  }
+}
+
+module.exports = {sendRpcMessage, addRpcListener, removeRpcListener};
