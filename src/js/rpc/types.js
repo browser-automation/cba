@@ -44,6 +44,20 @@
  */
 
 /**
+ * Projects containing actions.
+ * @typedef  {object} RpcStopProject
+ * @property {"StopProject"} msgType - Message ID.
+ */
+
+/**
+ * Projects containing actions.
+ * @typedef  {object} RpcRecordProject
+ * @property {"RecordProject"} msgType - Message ID.
+ * @property {string} groupId - Unique groupId Identifier.
+ * @property {string} projectId - Unique projectId Identifier.
+ */
+
+/**
  * Get CBA state.
  * @typedef  {object} RpcGetState
  * @property {"GetState"} msgType - Message ID.
@@ -59,7 +73,7 @@
  */
 
 /**
- * @typedef  {RpcRecordedEvent|RpcPlayProject|RpcGetState|RpcGetStateResponse} RpcMessages
+ * @typedef  {RpcRecordedEvent|RpcPlayProject|RpcGetState|RpcGetStateResponse|RpcStopProject|RpcRecordProject} RpcMessages
  */ 
 
 module.exports = {}; // Unless specified types are not being imported.

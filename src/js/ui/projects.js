@@ -60,7 +60,6 @@ const actionInputs = new ActionInputs({type: "#actionEvType",
                                                 "#actionNewValue"]});
 actionInputs.setTooltip("#actionInfo");
 
-const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
 
 const warningHeading = "bg-inject & cs-inject";
@@ -419,7 +418,7 @@ async function onAction(action)
       const {type, id} = selectedProject;
       if (type === "project") {
         const parentItem = projectsComp._findItem("id", id, true);
-        bg.recordButtonClick(parentItem.id, id);
+        sendRpcMessage({msgType: "RecordProject", groupId: parentItem.id, projectId: id});
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
@@ -429,7 +428,7 @@ async function onAction(action)
     }
     case "stop": {
       notification.clean();
-      bg.stopButtonClick();
+      sendRpcMessage({msgType: "StopProject"});
       updateRecordButtonState();
       break;
     }

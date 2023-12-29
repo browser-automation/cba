@@ -47,6 +47,13 @@ addRpcListener(async(msg, port) => {
       const {actions, repeatTimes, id} = msg;
       return playButtonClick(actions, repeatTimes, id);
     }
+    case "StopProject": {
+      return stopButtonClick();
+    }
+    case "RecordProject": {
+      const {groupId, projectId} = msg;
+      return recordButtonClick(groupId, projectId);
+    }
     case "GetState": {
       const state = cba.getState();
       sendRpcMessageResponse({msgType: "GetStateResponse", state, id: msg.id}, port);
