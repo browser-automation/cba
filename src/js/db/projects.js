@@ -27,7 +27,7 @@
  * Injectable actions as seen in [Actions table](https://chrome-automation.com/actions-grid).
  * Learn more about [Various actions](https://chrome-automation.com/actions).
  * @typedef  {object} Action
- * @property {string} id - Unique Identifier.
+ * @property {string} [id] - Unique Identifier.
  * @property {ActionType} type - One of [injectable action types](https://chrome-automation.com/actions).
  * @property {string[]} inputs - action's arguments/inputs:
  *                               1. Query, code, timer wait time or redirection link.

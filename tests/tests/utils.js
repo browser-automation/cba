@@ -20,6 +20,7 @@
 const {backgroundPage, page} = require("../main");
 const customActionsDb = require("../../src/js/db/customActions");
 const projectsDb = require("../../src/js/db/projects");
+const prefsDb = require("../../src/js/db/prefs");
 const crypto = require("crypto");
 
 async function getExtensionVersion()
@@ -60,6 +61,16 @@ async function setProjects(projects)
     dbItem[projectsDb.name] = projects;
     return setLocalStorageData(dbItem);
   }
+}
+
+async function resetPrefs() {
+  const dbItem = {};
+  dbItem[prefsDb.name] = {
+    hidePowerfulActionWarning: false,
+    lastSelectedActionId: null,
+    lastSelectedProjectId: null,
+  };
+  return setLocalStorageData(dbItem);
 }
 
 async function setCustomActions(customActions)
@@ -504,14 +515,8 @@ async function resetCbaObject()
     cba.instructArray;
     cba.defInstructArray;
     cba.playingTabId = null;
-    cba.instruction;
-    cba.selectedProjectId;
     cba.lastEvType;
-    cba.currentTab;
     cba.projectRepeat = 1;
-    cba.lastSelectedProjectId = null;
-    cba.lastSelectedActionId = null;
-    cba.selectedProjObj = null;
     return cba;
   });
 }
@@ -609,7 +614,7 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTableItemsLength, cbaTableGetItem, cbaTableSelectRow,
                   getCbaListRowHandle, triggerDrop, triggerDragStart,
                   getCbaTableRowHandle, getNotificationMsg, resetCbaObject,
-                  getCurrentWindowUrl, getElementAttribute,
+                  resetPrefs, getCurrentWindowUrl, getElementAttribute,
                   setCustomActions, getFunctionFromStorage,
                   getExtensionVersion, isDisplayNone, cbaTableUnselectRow,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,

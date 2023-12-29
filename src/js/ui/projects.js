@@ -25,9 +25,32 @@ const {NO_PROJ_SELECTED, NO_PROJ_GROUP_SELECTED, NO_ACTION_SELECTED,
 const projectsDb = require("../db/projects");
 const prefs = require("../db/prefs");
 const ActionInputs = require("./ActionInputs");
+const {sendRpcMessage, addRpcListener, removeRpcListener} = require("../rpc/client");
 
+/**
+ * @typedef {import("../rpc/types").RpcHandler} RpcHandler
+ */
+/**
+ * @typedef {object} PayloadDef
+ * @property {import("../db/projects").Action[]} actions - Actions to be executed.
+ * @property {"project|group"} type - type of the list item item.
+ */
+
+/**
+ * @typedef {(import("cba-components/src/cba-list/cba-list").ListItem|import("cba-components/src/cba-list/cba-list").ListSubItem) & PayloadDef } ItemPayloadDef
+ */
+
+/**
+ * @type {import("cba-components/src/cba-list/cba-list").List}
+ */
 const projectsComp = document.querySelector("#projects cba-list");
+/**
+ * @type {import("cba-components/src/cba-list/cba-list").List}
+ */
 const functions = document.querySelector("#functions");
+/**
+ * @type {import("cba-components/src/cba-table/cba-table").Table}
+ */
 const actionsComp = document.querySelector("#actions");
 
 const playButtonTooltip = document.querySelector("#playButtonTooltip");
@@ -37,7 +60,6 @@ const actionInputs = new ActionInputs({type: "#actionEvType",
                                                 "#actionNewValue"]});
 actionInputs.setTooltip("#actionInfo");
 
-const bg = chrome.extension.getBackgroundPage().cba;
 const notification = new Notification("#notification");
 
 const warningHeading = "bg-inject & cs-inject";
@@ -51,14 +73,16 @@ let renamingItem = null;
 async function loadProjects()
 {
   projectsComp.items = await projectsDb.load();
-  if (bg.lastSelectedProjectId)
-    projectsComp.selectRow(bg.lastSelectedProjectId);
+  const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
+  if (lastSelectedProjectId)
+    projectsComp.selectRow(lastSelectedProjectId);
 
+  /** @type {import("../db/projects").Action} actions */
   const {type, actions} = projectsComp.getSelectedItem();
   if (type === "project")
-    populateActions(actions);
+    await populateActions(actions);
   else
-    populateActions([]);
+    await populateActions([]);
 
   keepHighlightingPlayingAction(true);
 }
@@ -68,12 +92,14 @@ async function loadFunctions()
   functions.items = await customActionsDb.load();
 }
 
-function populateActions(items)
+async function populateActions(items)
 {
+  const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
+  const lastSelectedActionId = await prefs.get("lastSelectedActionId");
   actionsComp.items = items;
   const projectId = projectsComp.getSelectedItem().id;
-  if (bg.lastSelectedActionId && bg.lastSelectedProjectId === projectId)
-    actionsComp.selectRow(bg.lastSelectedActionId, false);
+  if (lastSelectedActionId && lastSelectedProjectId === projectId)
+    actionsComp.selectRow(lastSelectedActionId, false);
   else
     selectFirstAction();
   onActionSelect();
@@ -126,7 +152,7 @@ async function setPlayButtonTooltip()
 async function onProjectSelect()
 {
   const {type, actions, id} = projectsComp.getSelectedItem();
-  bg.lastSelectedProjectId = id;
+  prefs.set("lastSelectedProjectId", id);
   actionInputs.reset();
   await setPlayButtonTooltip();
 
@@ -149,35 +175,35 @@ async function onActionSelect()
   if (!item) {
     return null;
   }
-  bg.lastSelectedActionId = item.id;
+  await prefs.set("lastSelectedActionId", item.id);
   actionInputs.setItem(item);
 }
 
-function updateRecordButtonState() {
+async function updateRecordButtonState() {
+  const cbaState = await getCbaState();
   const recordButton = document.querySelector("#recordButton");
-  if (bg.allowRec)
+  if (cbaState.allowRec)
     recordButton.textContent = "recording...";
   else
     recordButton.textContent = "rec";
 }
 
-function updatePlayButtonState() {
+async function keepHighlightingPlayingAction(isPopupLoad)
+{
+  const cbaState = await getCbaState();
+  // Update play button state
   const playButton = document.querySelector("#playButton");
-  if (bg.paused)
+  if (cbaState.paused)
     playButton.textContent = "resume";
   else
     playButton.textContent = "play";
-}
 
-function keepHighlightingPlayingAction(isPopupLoad)
-{
-  updatePlayButtonState();
-  if(bg.allowPlay || bg.paused)
+  if(cbaState.allowPlay || cbaState.paused)
   {
-    projectsComp.selectRow(bg.playingProjectId);
-    if (bg.playingActionIndex >= 0)
+    projectsComp.selectRow(cbaState.playingProjectId);
+    if (cbaState.playingActionIndex >= 0)
     {
-      const {id} = actionsComp.items[bg.playingActionIndex];
+      const {id} = actionsComp.items[cbaState.playingActionIndex];
       actionsComp.selectRow(id);
     }
     setTimeout(keepHighlightingPlayingAction, 100);
@@ -186,6 +212,35 @@ function keepHighlightingPlayingAction(isPopupLoad)
   {
     selectFirstAction();
   }
+}
+/**
+ * @returns {Promise<import("../background/CBA").State | null>}
+ */
+function getCbaState() {
+  return new Promise((resolve) => {
+    const uuid = uuidv4();
+    const onTimeout = () => {
+      removeRpcListener(handler);
+      resolve(null);
+    }
+    /** @type {RpcHandler} */
+    const handler = (state) => {
+      if (state.msgType === "GetStateResponse" && state.id === uuid) {
+        removeRpcListener(handler);
+        resolve(state.state);
+      }
+      clearTimeout(onTimeout);
+    };
+    setTimeout(onTimeout, 1000);
+    addRpcListener(handler);
+    sendRpcMessage({msgType: "GetState", id: uuid});
+  });
+}
+
+function uuidv4() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
 }
 
 function saveProjectsState()
@@ -363,7 +418,7 @@ async function onAction(action)
       const {type, id} = selectedProject;
       if (type === "project") {
         const parentItem = projectsComp._findItem("id", id, true);
-        bg.recordButtonClick(parentItem.id, id);
+        sendRpcMessage({msgType: "RecordProject", groupId: parentItem.id, projectId: id});
       }
       else {
         return notification.error(SELECT_PROJ_NOT_GROUP);
@@ -373,19 +428,22 @@ async function onAction(action)
     }
     case "stop": {
       notification.clean();
-      bg.stopButtonClick();
+      sendRpcMessage({msgType: "StopProject"});
       updateRecordButtonState();
       break;
     }
     case "play": {
+      /** @type {ItemPayloadDef}  */
       const selectedProject = projectsComp.getSelectedItem();
       if (!selectedProject)
         return notification.error(NO_PROJ_SELECTED);
 
       const {type, actions, id} = selectedProject;
       if (type === "project" && actions) {
-        const repeateValue = document.querySelector("#repeat").value;
-        bg.playButtonClick(actions, repeateValue, id);
+        /** @type {HTMLInputElement} */
+        const inputElem = document.querySelector("#repeat");
+        const repeatTimes = inputElem.value;
+        sendRpcMessage({msgType: "PlayProject", actions, repeatTimes, id});
         keepHighlightingPlayingAction();
       }
       else {

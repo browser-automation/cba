@@ -20,6 +20,8 @@
 /**
  * @typedef {object} Prefs
  * @property {boolean} hidePowerfulActionWarning - Hide tooltip for powerful actions.
+ * @property {string|null} lastSelectedProjectId - The ID of the last selected project.
+ * @property {string|null} lastSelectedActionId - The ID of the last selected action.
  */
 
 const name = "prefs";
@@ -35,7 +37,9 @@ async function init()
   {
     prefs = {
       // Hide tooltip for powerful actions
-      hidePowerfulActionWarning: false
+      hidePowerfulActionWarning: false,
+      lastSelectedActionId: null,
+      lastSelectedProjectId: null,
     }
     return browser.storage.local.set({prefs});
   }
@@ -52,8 +56,9 @@ async function load() {
 
 /**
  * Get preference.
- * @param {keyof Prefs} pref
- * @returns {Promise<Prefs[pref]>}
+ * @template {keyof Prefs} T
+ * @param {T} pref
+ * @returns {Promise<Prefs[T]>}
  */
 async function get(pref)
 {
@@ -79,4 +84,4 @@ async function set(pref, value)
 
 init();
 
-module.exports = {load, get, set};
+module.exports = {load, get, set, name};
