@@ -74,4 +74,12 @@ it("Sending highlight and unHighlight event should outline specific element acco
   equal(await getStyle(query, "outline"), "");
 });
 
+if (process.env.MV3)
+{
+  it("Run MV3 test", async() =>
+  {
+    equal(process.env.MV3, "1");
+  });
+}
+
 module.exports = {pageSetup};

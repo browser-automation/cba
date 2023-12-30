@@ -22,6 +22,7 @@ const argv = require("minimist")(process.argv.slice(2));
 const CopyPlugin = require('copy-webpack-plugin');
 const {minify} = require("csso");
 const {extname} = require("path");
+const webpack = require("webpack");
 
 const transformCss = (content, file) =>
 {
@@ -57,7 +58,12 @@ module.exports =
       { from: "./src/js/jquery*.js", to: "js/jquery-1.7.2.min.js" },
       {from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js",
       to: "js" },
-    ]})
+      { from: `./src/manifest/${process.env.MV3 ? "mv3" : "mv2"}.json`,
+        to: "manifest.json" },
+    ]}),
+    new webpack.EnvironmentPlugin({
+      MV3: process.env.MV3 || 0
+    })
   ]
 };
 
