@@ -1,9 +1,8 @@
 {
   "background": {
-     "scripts": ["js/back.js"],
-     "persistent": false
+     "service_worker": "js/back.js"
   },
-  "browser_action": {
+  "action": {
      "default_icon": "logo.png",
      "default_popup": "popup.html"
   },
@@ -13,17 +12,23 @@
      "matches": [ "https://*/*", "http://*/*" ],
      "run_at": "document_end"
   } ],
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://ssl.google-analytics.com; object-src 'self'",
+  "content_security_policy": {
+   "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "description": "Extension for automating chromium browser, Create project -> Record -> Edit Automation -> Manage -> Play (MV3)",
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "icons": {
      "128": "css/icons/128x128.png",
      "16": "css/icons/16x16.png",
      "48": "css/icons/48x48.png"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Chromium browser automation",
   "options_page": "options.html",
-  "permissions": ["cookies", "http://*/*", "https://*/*", "tabs", "storage"],
+  "permissions": ["cookies", "tabs", "storage", "scripting"],
   "update_url": "https://clients2.google.com/service/update2/crx",
   "version": "9.1.0"
 }
