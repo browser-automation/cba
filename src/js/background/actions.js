@@ -18,13 +18,14 @@
  */
 
 const readyFunctions = require("./bg_function");
+const {setBadgeText} = require("./utils");
 
 async function playProject() {
   if(cba.allowPlay == 0 ) {
     return;
   }
   else if(cba.instructArray.length) {
-    browser.browserAction.setBadgeText({"text":"play"});
+    setBadgeText("play");
     const [instruction] = cba.instructArray.splice(0, 1);
     cba.playingActionIndex = (cba.defInstructArray.length - cba.instructArray.length) - 1;
 
@@ -45,7 +46,7 @@ async function playProject() {
     cba.playingActionIndex = -1;
     cba.playingProjectId = null;
     cba.allowPlay = 0;
-    browser.browserAction.setBadgeText({"text": ""});
+    setBadgeText("");
   }
 }
 
@@ -90,7 +91,7 @@ async function actionExecution(instruction)
     }
     case "pause": {
       cba.pause();
-      browser.browserAction.setBadgeText({"text":"||"});
+      setBadgeText("||");
       break;
     }
     default: {

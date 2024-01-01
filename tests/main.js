@@ -21,9 +21,11 @@ const puppeteer = require("puppeteer");
 const extensionPath = "dist";
 const {tests, server, closeBrowser} = require("./config");
 
+/** @type {import("puppeteer").Browser} */
 let browser;
 /** @type {import("puppeteer").Page} */
 let page;
+/** @type {import("puppeteer").Page | import("puppeteer").WebWorker}*/
 let backgroundPage;
 
 function run()
@@ -41,12 +43,7 @@ function run()
           "--no-sandbox"
         ]});
         page = await browser.newPage();
-        const targets = await browser.targets();
-        const backgroundPageTarget = targets.find((target) =>
-          target.url().startsWith("chrome-extension://") && target.type() === "background_page"
-        );
-
-        backgroundPage = await backgroundPageTarget.page();
+        backgroundPage = await waitForBackgroundPage();
         const [,, extensionID] = backgroundPage.url().split('/');
 
         await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36");
@@ -64,6 +61,59 @@ function run()
       })
     });
   }
+}
+
+/**
+ * Retries function until it returns truthy value or timeout is reached.
+ * @template T
+ * @param {function(any): T} fn - Function to execute.
+ * @param {number} timeout  - Timeout in milliseconds.
+ * @param {number} interval - Interval in milliseconds.
+ * @returns {Promise<T>}
+ */
+function retryUntilTruthy(fn, timeout = 5000, interval = 100)
+{
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    const intervalId = setInterval(async () => {
+      let res; 
+      try {
+        res = await fn();
+      }
+      catch (e) {
+        res = false;
+      }
+      if (res)
+      {
+        clearInterval(intervalId);
+        resolve(res);
+      }
+      else if (Date.now() - startTime > timeout)
+      {
+        clearInterval(intervalId);
+        reject(Error("Timeout"));
+      }
+    }, interval);
+  });
+}
+
+/**
+ * Waits for background page to load.
+ */
+async function waitForBackgroundPage()
+{
+  return retryUntilTruthy(async() => {
+    const targets = await browser.targets();
+    const backgroundPageTarget = targets.find((target) => {
+      return target.url().startsWith("chrome-extension://") && target.type() === "background_page" || target.type() === "service_worker"
+      }
+    );
+    const bgPage = await backgroundPageTarget.page() || await backgroundPageTarget.worker();
+    if (!bgPage) {
+      throw new Error("Background page not found");
+    }
+    return bgPage;
+  })
 }
 
 async function navigateTo(path)

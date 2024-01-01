@@ -24,7 +24,7 @@ require("./ui/tabs");
 
 async function setVersion()
 {
-  const {version} = await browser.app.getDetails();
+  const {version} = await browser.runtime.getManifest();
   document.querySelector("#version").textContent = `v. ${version}`;
 }
 
