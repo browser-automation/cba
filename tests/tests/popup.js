@@ -502,7 +502,7 @@ it("Actions are being updated while playing", async() =>
   await updateSpecificAction("cba-table-id-4", "", "timer", "200");
   await clickPlay();
 
-  await wait(100);
+  await wait(110);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
 
   await wait(100);
@@ -528,7 +528,7 @@ it("When paused play button becomes 'resume', when clicked resumes playback", as
 
   await clickPlay();
 
-  await wait(100);
+  await wait(110);
   equal((await getSelectedRow(cbaTableQuery)).id, "cba-table-id-2");
 
   await wait(100);

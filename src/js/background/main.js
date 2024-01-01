@@ -21,12 +21,15 @@
 /** @global */
 globalThis.browser = require("webextension-polyfill");
 
-require("../analytics");
+if (!process.env.MV3) {
+  require("../analytics");
+}
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
 const customActionsDb = require("../db/customActions");
 const {addRpcListener, sendRpcMessageResponse} = require("../rpc/host");
+const {setBadgeText} = require("./utils");
 
 /** @global */
 globalThis.cba = new CBA();
@@ -128,7 +131,7 @@ async function storeCurrentUrl() {
 async function recordButtonClick(groupId, projectId) {
   cba.record(groupId, projectId);
   await storeCurrentUrl();
-  browser.browserAction.setBadgeText({"text": "rec"});
+  setBadgeText("rec");
 }
 
 /*
@@ -136,7 +139,7 @@ async function recordButtonClick(groupId, projectId) {
  */
 function stopButtonClick() {
   cba.stop();
-  browser.browserAction.setBadgeText({"text": ""});
+  setBadgeText("");
 }
 
 /*

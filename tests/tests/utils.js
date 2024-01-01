@@ -25,7 +25,7 @@ const crypto = require("crypto");
 
 async function getExtensionVersion()
 {
-  const details = await backgroundPage().evaluate(() => browser.app.getDetails());
+  const details = await backgroundPage().evaluate(() => browser.runtime.getManifest());
   return details.version;
 }
 
@@ -491,12 +491,12 @@ async function getActiveElementId()
 
 async function getBackgroundGlobalVar(name)
 {
-  return backgroundPage().evaluate((name) => window[name] , name);
+  return backgroundPage().evaluate((name) => globalThis[name] , name);
 }
 
 async function resetBackgroundGlobalVar(name)
 {
-  return backgroundPage().evaluate((name) => delete window[name] , name);
+  return backgroundPage().evaluate((name) => delete globalThis[name] , name);
 }
 
 async function resetClipboardValue()
@@ -523,11 +523,19 @@ async function resetCbaObject()
 
 async function getBadgeText()
 {
-  return backgroundPage().evaluate(() => {
-    return new Promise((response) => {
-      chrome.browserAction.getBadgeText({}, response);
-    })
-  });
+  if (process.env.MV3) {
+    return backgroundPage().evaluate(() => {
+      return new Promise((response) => {
+        chrome.action.getBadgeText({}, response);
+      })
+    });
+  } else {
+    return backgroundPage().evaluate(() => {
+      return new Promise((response) => {
+        chrome.browserAction.getBadgeText({}, response);
+      })
+    });
+  }
 }
 
 // Usage: await setListeners("#id", ["mousedown", "click"], (e) => {});
@@ -575,6 +583,11 @@ async function wait(milliseconds = 200)
   return page().waitForTimeout(milliseconds);
 }
 
+async function sleep(milliseconds = 200)
+{
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 async function getPageUrl()
 {
   return page().url();
@@ -589,18 +602,17 @@ async function focusAndType(query, text)
 async function sendCurrentTabRequest(request)
 {
   return backgroundPage().evaluate((request) => {
-    return new Promise((resp) =>
+    return new Promise(async (resp) =>
     {
-      chrome.tabs.getSelected(null , async (tab) => {
-        await browser.tabs.sendMessage(tab.id, request);
-        resp();
-      });
+      const [tab] = await browser.tabs.query({active: true, currentWindow: true});
+      await browser.tabs.sendMessage(tab.id, request);
+      resp();
     });
   }, request);
 }
 
 module.exports = {playTestProject, getBackgroundGlobalVar,
-                  resetBackgroundGlobalVar, wait, startTestRecording,
+                  resetBackgroundGlobalVar, wait, sleep, startTestRecording,
                   stopTestRecording, getTestProjectActions, getProjectActions,
                   getTextContent, getInnerHTML, getValue, setValue, changeValue,
                   isDisabled, isChecked, addCookie, getCookie,
