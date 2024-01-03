@@ -18,6 +18,7 @@
  */
 
 const tests = [
+  {file:"play.js", name: "Testing actions"},
   {file:"record.js", name: "Testing recording"},
   {file:"generic.js", name: "Running generic Tests"},
   {file:"popup.js", name: "Testing popup"},
@@ -25,11 +26,6 @@ const tests = [
   {file:"import-export.js", name: "Testing Import and Export in options page"},
   {file:"functions.js", name: "Testing functions tab in options page"},
 ];
-
-if (!process.env.MV3) {
-  //TODO: Fix this test for MV3.
-  tests.push({file:"play.js", name: "Testing actions"});
-}
 
 const server = "http://127.0.0.1:3001";
 const closeBrowser = true;

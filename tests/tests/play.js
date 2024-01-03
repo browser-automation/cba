@@ -60,6 +60,8 @@ const pageSetup = {
   path: server
 }
 
+const itIfMV2 = !process.env.MV3 ? it : it.skip;
+
 beforeEach(async () =>
 {
   const pageUrl = await getPageUrl();
@@ -90,7 +92,7 @@ it("Inject function runs specified script in the web page", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
-it("cs-inject function runs specified script in content script", async() =>
+itIfMV2("cs-inject function runs specified script in content script", async() =>
 {
   const newText = "CS injected text";
   const evType = "cs-inject";
@@ -99,7 +101,7 @@ it("cs-inject function runs specified script in content script", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
-it("cs-inject action executes script with async(await) code before moving to the next action", async() =>
+itIfMV2("cs-inject action executes script with async(await) code before moving to the next action", async() =>
 {
   const evType = "cs-inject";
   const valuePromise = "Promise action has been played";
@@ -119,7 +121,7 @@ it("cs-inject action executes script with async(await) code before moving to the
   equal(await getTextContent("#changeContent"), valuePromise+valueSync);
 });
 
-it("Jquery is accessible through cs-inject", async() =>
+itIfMV2("Jquery is accessible through cs-inject", async() =>
 {
   const newText = "Jquery in CS injected text";
   const query = "#changeContent";
@@ -128,7 +130,7 @@ it("Jquery is accessible through cs-inject", async() =>
   equal(await getTextContent(query), newText);
 });
 
-it("bg-inject function runs specified script in background page", async() =>
+itIfMV2("bg-inject function runs specified script in background page", async() =>
 {
   const value = "BG injected text";
   const data = `window["${bgGlobalVarName}"] = "${value}";`;
@@ -138,7 +140,7 @@ it("bg-inject function runs specified script in background page", async() =>
   equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
 });
 
-it("bg-inject action executes script with async(await) code before moving to the next action", async() =>
+itIfMV2("bg-inject action executes script with async(await) code before moving to the next action", async() =>
 {
   const evType = "bg-inject";
 
@@ -181,7 +183,7 @@ it("bg-function should execute predefined function and play next action when/if 
   equal(await getTextContent(query), injectText);
 });
 
-it("bg-function saveToClipboard should save JSON data into the clipboard", async() =>
+itIfMV2("bg-function saveToClipboard should save JSON data into the clipboard", async() =>
 {
   const clipboardObject = `{"key1": "value1", "key2": "value2"}`;
   const data = `
@@ -378,7 +380,7 @@ it("Pause action pauses the workflow until the project is played again and set '
   equal(await getBadgeText(), "");
 });
 
-it("Clipboard set in inject should be accessible in cs-inject and bg-inject", async() =>
+itIfMV2("Clipboard set in inject should be accessible in cs-inject and bg-inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
@@ -392,7 +394,7 @@ it("Clipboard set in inject should be accessible in cs-inject and bg-inject", as
   equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
 });
 
-it("Clipboard set in cs-inject should be accessible in inject and bg-inject", async() =>
+itIfMV2("Clipboard set in cs-inject should be accessible in inject and bg-inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
@@ -463,7 +465,7 @@ it("Repeat option should keep repeating actions in the project", async() =>
   equal(await getValue("#cba-num"), "5");
 });
 
-it("sendBgInstruction variable and sendInstruction() method can be used in bg-inject to stop and continue next action invocation", async() =>
+itIfMV2("sendBgInstruction variable and sendInstruction() method can be used in bg-inject to stop and continue next action invocation", async() =>
 {
   const firstActionText = "first-action-text";
   const secondActionText = "second-action-text";
@@ -481,7 +483,7 @@ it("sendBgInstruction variable and sendInstruction() method can be used in bg-in
   equal(await getBackgroundGlobalVar(bgGlobalVarName), secondActionText);
 });
 
-it("actionToPlay can be used in bg-inject to Jump to another action", async() =>
+itIfMV2("actionToPlay can be used in bg-inject to Jump to another action", async() =>
 {
   const query = "#changeContent";
   const firstInjectedText = "First Injected Text"; 

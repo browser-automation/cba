@@ -20,7 +20,7 @@
 // Keep types in [sync with Wiki](https://github.com/browser-automation/cba/wiki/Storage-%7C-projects).
 
 /**
- * @typedef {"Inject"|"inject-cs"|"bg-inject"|"bg-function"|"change"|"check"|"click"|"click-update"|"update"|"timer"|"redirect"|"copy-html"|"copy"|"pause"} ActionType
+ * @typedef {"inject"|"cs-inject"|"bg-inject"|"bg-function"|"change"|"check"|"click"|"click-update"|"update"|"timer"|"redirect"|"copy-html"|"copy"|"pause"} ActionType
  */
 
 /**

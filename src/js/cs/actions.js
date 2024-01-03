@@ -77,6 +77,7 @@ async function executeAction(recordRow, request)
       break;
     }
     case "inject": {
+      // TODO: Remove when moved to MV3 is complete.
       const clipboardId = "grabClipboardHere";
       const script = document.createElement('script');
       script.setAttribute("type", "application/javascript");
