@@ -50,6 +50,10 @@ async function playProject() {
   }
 }
 
+/**
+ * Execute action.
+ * @param {import("../db/projects").Action} instruction 
+ */
 async function actionExecution(instruction)
 {
   const {type, inputs} = instruction;
@@ -87,6 +91,46 @@ async function actionExecution(instruction)
           sendInstruction = resolve;
         });
       }
+      break;
+    }
+    case "inject": {
+      if (!process.env.MV3) {
+        await messageContentScript(instruction, cba.clipboard);
+        break;
+      }
+      const playingTabId = await cba.getPlayingTabId();
+      if (!playingTabId) {
+        throw new Error("No playing tab");
+      }
+      await browser.scripting.executeScript({
+        target: {tabId: playingTabId},
+        func: (clipboard, input1) => {
+          const clipboardId = "grabClipboardHere";
+          const script = document.createElement('script');
+          script.setAttribute("type", "application/javascript");
+          script.textContent = `
+            var clipboard=${JSON.stringify(clipboard)};
+            ${input1};
+            var newdiv = document.createElement('div');
+            if(document.getElementById('${clipboardId}')!= null) {
+              document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
+            }
+            else {
+              newdiv.setAttribute('id', '${clipboardId}');
+              newdiv.textContent = JSON.stringify(clipboard);
+              document.body.appendChild(newdiv);
+            }
+            document.getElementById('${clipboardId}').style.display = 'none';`;
+          document.documentElement.appendChild(script); // run the script
+          document.documentElement.removeChild(script); // clean up
+          const injectedClipboard = document.querySelector(`#${clipboardId}`);
+          if(injectedClipboard) {
+            clipboard = JSON.parse(injectedClipboard.textContent);
+          }
+        },
+        args: [cba.clipboard, input1],
+        world: "MAIN"
+      });
       break;
     }
     case "pause": {
