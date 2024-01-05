@@ -20,6 +20,7 @@
 /**
  * @typedef State
  * @property {boolean} allowRec - Whether recording is allowed.
+ * @property {{[key: string]: any} | null} clipboard - The clipboard.
  * @property {number} allowPlay - Whether playing is allowed.
  * @property {number} paused - Whether playing is paused.
  * @property {string | null} playingProjectId - The ID of the project being played.
@@ -38,6 +39,8 @@
 class CBA {
   allowRec = false;
   allowPlay = 0;
+  /** @type {State["clipboard"]} */
+  clipboard = null;
   paused = 0;
   /** @type {State["playingProjectId"]} */
   playingProjectId = null;
@@ -121,6 +124,7 @@ class CBA {
     return {
       allowPlay: this.allowPlay,
       allowRec: this.allowRec,
+      clipboard: this.clipboard,
       paused: this.paused,
       playingProjectId: this.playingProjectId,
       playingActionIndex: this.playingActionIndex,

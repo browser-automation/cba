@@ -494,6 +494,10 @@ async function getBackgroundGlobalVar(name)
   return backgroundPage().evaluate((name) => globalThis[name] , name);
 }
 
+async function getCbaState() {
+  return backgroundPage().evaluate(() => globalThis.cba.getState());
+}
+
 async function resetBackgroundGlobalVar(name)
 {
   return backgroundPage().evaluate((name) => delete globalThis[name] , name);
@@ -632,4 +636,4 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,
                   cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
                   cbaTooltipClickAction, cbaListItemsByText,
-                  cbaListhoverRowInfo, stopPropagation};
+                  cbaListhoverRowInfo, stopPropagation, getCbaState};
