@@ -22,14 +22,13 @@ const path = require("path");
 const equal = assert.strictEqual;
 const notEqual = assert.notStrictEqual;
 const deepEqual = assert.deepStrictEqual;
-const notDeepEqual = assert.notDeepStrictEqual;
 const ok = assert.ok;
 const notOk = (value) => ok(!value);
-const {playTestProject, addTestAction, getTextContent, getInnerHTML, getValue,
+const {playTestProject, getTextContent, getInnerHTML, getValue,
        isChecked, getActiveElementId, getPageUrl, getBackgroundGlobalVar,
        resetBackgroundGlobalVar, addCookie, getCookie, wait,
        getBadgeText, setListeners, getSelectedValue, resetClipboardValue,
-       isElementExist} = require("./utils");
+       isElementExist, getCbaState} = require("./utils");
 const {setTestPage, navigateTo} = require("../main");
 const {server} = require("../config");
 
@@ -183,7 +182,7 @@ it("bg-function should execute predefined function and play next action when/if 
   equal(await getTextContent(query), injectText);
 });
 
-itIfMV2("bg-function saveToClipboard should save JSON data into the clipboard", async() =>
+it("bg-function saveToClipboard should save JSON data into the clipboard", async() =>
 {
   const clipboardObject = `{"key1": "value1", "key2": "value2"}`;
   const data = `
@@ -191,10 +190,9 @@ itIfMV2("bg-function saveToClipboard should save JSON data into the clipboard", 
 <$attr=${clipboardObject}>
   `;
   const action1 = createAction(data, "bg-function", "");
-  const action2 = createAction(`window["${bgGlobalVarName}"] = clipboard;`, "bg-inject", "");
-  await playTestProject([action1, action2]);
+  await playTestProject([action1]);
   await wait();
-  deepEqual(await getBackgroundGlobalVar(bgGlobalVarName), JSON.parse(clipboardObject));
+  deepEqual((await getCbaState()).clipboard, JSON.parse(clipboardObject));
 });
 
 it("bg-function reloadCurrentTab(without attributes test) should reload current tab", async() =>
