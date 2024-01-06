@@ -19,6 +19,7 @@
 
 const readyFunctions = require("./bg_function");
 const {setBadgeText} = require("./utils");
+let creating;
 
 async function playProject() {
   if(cba.allowPlay == 0 ) {
@@ -78,19 +79,49 @@ async function actionExecution(instruction)
       break;
     }
     case "bg-inject": {
-      // eslint-disable-next-line no-unused-vars
-      let sendInstruction = () => "";
-      // eslint-disable-next-line no-unused-vars
-      const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
-      let sendBgInstruction = true;
-      const clipboard = cba.clipboard;
-      await eval(`(async () => {${input1}})()`);
-      cba.clipboard = clipboard;
-      if(!sendBgInstruction) {
-        return new Promise((resolve) => {
-          sendInstruction = resolve;
-        });
+      if (process.env.MV3) {
+        console.log("STEP1");
+        await setupOffscreenDocument("off_screen.html");
+        console.log("STEP2");
+
+      } else {
+        // eslint-disable-next-line no-unused-vars
+        let sendInstruction = () => "";
+        // eslint-disable-next-line no-unused-vars
+        const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
+        let sendBgInstruction = true;
+        const clipboard = cba.clipboard;
+        await eval(`(async () => {${input1}})()`);
+        cba.clipboard = clipboard;
+        if(!sendBgInstruction) {
+          return new Promise((resolve) => {
+            sendInstruction = resolve;
+          });
+        }
       }
+      break;
+    }
+    case "cs-inject": {
+      if (!process.env.MV3) {
+        await messageContentScript(instruction, cba.clipboard);
+        break;
+      }
+      console.log("STEP1");
+      const playingTabId = await cba.getPlayingTabId();
+      console.log("STEP2");
+      if (!playingTabId) {
+        throw new Error("No playing tab");
+      }
+      console.log("STEP3");
+      const exec = async (rest) => {
+        const options = {target: {tabId: playingTabId}, world: "ISOLATED",  ...rest};
+        console.log("STEP3.1", options);
+        return browser.scripting.executeScript({});
+      };
+      console.log("STEP4", input1);
+      // await exec({func: input1});
+      await exec({func: () => eval("console.log('test')")});
+      console.log("STEP5");
       break;
     }
     case "inject": {
@@ -209,6 +240,38 @@ async function waitForUpdate()
     };
     browser.tabs.onUpdated.addListener(onUpdate);
   }).then(() => browser.tabs.onUpdated.removeListener(onUpdate));
+}
+
+async function setupOffscreenDocument(path) {
+  // Check all windows controlled by the service worker to see if one 
+  // of them is the offscreen document with the given path
+  const offscreenUrl = chrome.runtime.getURL(path);
+  const existingContexts = await chrome.runtime.getContexts({
+    contextTypes: ['OFFSCREEN_DOCUMENT'],
+    documentUrls: [offscreenUrl]
+  });
+
+  if (existingContexts.length > 0) {
+    return;
+  }
+
+  // create offscreen document
+  if (creating) {
+    await creating;
+  } else {
+    console.log("STEP1-1");
+    creating = chrome.offscreen.createDocument({
+      url: path,
+      reasons: ['DOM_PARSER'],
+      justification: 'reason for needing the document',
+    }).catch((e) => {
+      console.error(e);
+    });
+    console.log("STEP1-2");
+    await creating;
+    console.log("STEP1-3");
+    creating = null;
+  }
 }
 
 module.exports = {playProject};

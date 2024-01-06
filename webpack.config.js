@@ -38,6 +38,7 @@ module.exports =
   entry: {
     "cs": "./src/js/cs/main.js",
     "back": "./src/js/background/main.js",
+    "off_screen": "./src/js/off_screen.js",
     "popup": "./src/js/popup.js",
     "options": "./src/js/options.js"
   },
