@@ -62,17 +62,29 @@ actionInputs.setTooltip("#actionInfo");
 
 const notification = new Notification("#notification");
 
-const warningHeading = "bg-inject & cs-inject";
-const warningText = "Current project contains some powerful action types, before running please ensure you trust those.";
-const warningLink = "https://chrome-automation.com/powerful-actions";
-const warningLinkText = "Learn more";
-const warningActionText = "Hide message";
+const warnings = {
+  powerFullActions: {
+      heading: "bg-inject & cs-inject",
+      text: "Current project contains some powerful action types, before running please ensure you trust those.",
+      link: "https://chrome-automation.com/powerful-actions",
+      linkText: "Learn more",
+      actionText: "Hide message"
+  },
+  bgActionsMv3: {
+    text: "Current project contains bg-inject action, which we can not support since Manifest v3, please replace it with another action.",
+    link: "https://chrome-automation.com/mv3",
+    linkText: "Learn more",
+  }
+};
 
 let renamingItem = null;
 
 async function loadProjects()
 {
-  projectsComp.items = await projectsDb.load();
+  projectsComp.items = (await projectsDb.load()).map((groups) => {
+    groups.subItems = groups.subItems.map(setAlertsToProjects);
+    return groups;
+  });
   const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
   if (lastSelectedProjectId)
     projectsComp.selectRow(lastSelectedProjectId);
@@ -87,6 +99,44 @@ async function loadProjects()
   keepHighlightingPlayingAction(true);
 }
 
+/**
+ * @param {import("../db/projects").Project} project
+ * @returns {import("cba-components/src/cba-list/cba-list").ListItem}
+ */
+function setAlertsToProjects(project) {
+  const hasBgInject = project.actions.some((action) => action.type === "bg-inject");
+  /** @type {import("cba-components/src/cba-list/cba-list").ListItem} */
+  const listItem = {...project};
+  if (hasBgInject) {
+    listItem.info = {
+      type: "error",
+      description: warnings["bgActionsMv3"].text,
+      link: warnings["bgActionsMv3"].link,
+      linkText: warnings["bgActionsMv3"].linkText
+    }
+  }
+  return listItem
+}
+
+/**
+ * @param {import("../db/projects").Project["actions"]} actions
+ * @returns {import("cba-components/src/cba-table/cba-table").TableItem[]}
+ */
+function setAlertsToActions(actions) {
+  return actions.map((action) => {
+    if (action.type === "bg-inject")
+    {
+      return  {...action, alert: {
+        text: warnings["bgActionsMv3"].text,
+        type: "error"
+      }}
+    }
+    else {
+      return {...action};
+    }
+  });
+}
+
 async function loadFunctions()
 {
   functions.items = await customActionsDb.load();
@@ -96,7 +146,7 @@ async function populateActions(items)
 {
   const lastSelectedProjectId = await prefs.get("lastSelectedProjectId");
   const lastSelectedActionId = await prefs.get("lastSelectedActionId");
-  actionsComp.items = items;
+  actionsComp.items = setAlertsToActions(items);
   const projectId = projectsComp.getSelectedItem().id;
   if (lastSelectedActionId && lastSelectedProjectId === projectId)
     actionsComp.selectRow(lastSelectedActionId, false);
@@ -117,11 +167,11 @@ function projectHasAction(id, types)
 
 async function initPlayButtonTooltip()
 {
-  const text = warningText;
-  const link = warningLink;
-  const linkText = warningLinkText;
-  const heading = warningHeading;
-  const actionText = warningActionText;
+  const text = warnings["powerFullActions"].text;
+  const link = warnings["powerFullActions"].link;
+  const linkText = warnings["powerFullActions"].linkText;
+  const heading = warnings["powerFullActions"].heading;
+  const actionText = warnings["powerFullActions"].actionText;
   const action = hideWarningMessage;
   playButtonTooltip.setData({heading, text, link, linkText, actionText,
                              action});

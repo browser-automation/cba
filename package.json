@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/Manvel/cba#readme",
   "dependencies": {
-    "cba-components": "^1.1.1",
+    "cba-components": "^1.2.6",
     "copy-webpack-plugin": "^11.0.0",
     "csso": "^5.0.5",
     "puppeteer": "^21.6.1",
