@@ -157,7 +157,7 @@ async function cbaListhoverRowInfo(cbaListQuery, id)
 {
   const rowHandel = await getCbaListRowHandle(cbaListQuery, id);
   await rowHandel.hover();
-  const handle = await rowHandel.$(".hasInfo");
+  const handle = await rowHandel.$(".info");
   return handle.hover();
 }
 
