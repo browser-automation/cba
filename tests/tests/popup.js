@@ -308,7 +308,7 @@ it("'Save' button updates selected action with the data from action input fields
   await addFourEmptyActions()
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
-  const type = "bg-inject";
+  const type = "inject";
   const input1 = "testAction1";
   const input2 = "testValue1";
   await setValue(inputEventQuery, type);
@@ -329,7 +329,7 @@ it("Selecting action populates input deselecting clears", async() =>
   await addFourEmptyActions();
   await cbaTableSelectRow(cbaTableQuery, "cba-table-id-2");
 
-  const type = "bg-inject";
+  const type = "inject";
   const input1 = "testAction1";
   const input2 = "testValue1";
 
@@ -408,7 +408,6 @@ it("Changing action selectbox disables fields accordingly", async() =>
   const disableState = {
     "inject": [false, true],
     "cs-inject": [false, true],
-    "bg-inject": [false, true],
     "bg-function": [false, true],
     "change": [false, false],
     "check": [false, true],

@@ -118,11 +118,14 @@ class ActionInputs {
     }
 
     setTooltipInfo() {
-      const {link, description, name} = actionTypes.filter(({name}) => name === this._type)[0];
-      const heading = name;
-      const text = description;
-      const linkText = "Learn more";
-      this.tooltip.setData({heading, text, link, linkText});
+      const action = actionTypes.filter(({name}) => name === this._type)[0];
+      if (action) {
+        const {link, description, name} = action;
+        const heading = name;
+        const text = description;
+        const linkText = "Learn more";
+        this.tooltip.setData({heading, text, link, linkText});
+      }
     }
 
     reset() {
