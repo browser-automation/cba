@@ -60,8 +60,6 @@ const pageSetup = {
   path: server
 }
 
-const itIfMV2 = !process.env.MV3 ? it : it.skip;
-
 beforeEach(async () =>
 {
   const pageUrl = await getPageUrl();
@@ -105,7 +103,7 @@ it("Executing project with bg-inject skips the bg-inject execution", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
-itIfMV2("cs-inject function runs specified script in content script", async() =>
+it("cs-inject function runs specified script in content script", async() =>
 {
   const newText = "CS injected text";
   const evType = "cs-inject";
@@ -114,7 +112,10 @@ itIfMV2("cs-inject function runs specified script in content script", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
-itIfMV2("cs-inject action executes script with async(await) code before moving to the next action", async() =>
+/*
+Can't support unless https://github.com/w3c/webextensions/pull/540 is implemented
+by the browsers.
+it("cs-inject action executes script with async(await) code before moving to the next action", async() =>
 {
   const evType = "cs-inject";
   const valuePromise = "Promise action has been played";
@@ -134,7 +135,7 @@ itIfMV2("cs-inject action executes script with async(await) code before moving t
   equal(await getTextContent("#changeContent"), valuePromise+valueSync);
 });
 
-itIfMV2("Jquery is accessible through cs-inject", async() =>
+it("Jquery is accessible through cs-inject", async() =>
 {
   const newText = "Jquery in CS injected text";
   const query = "#changeContent";
@@ -142,6 +143,7 @@ itIfMV2("Jquery is accessible through cs-inject", async() =>
   await playTestProject([action]);
   equal(await getTextContent(query), newText);
 });
+*/
 
 it("bg-function should execute predefined function and play next action when/if defined in function", async() =>
 {
@@ -376,7 +378,7 @@ it("Pause action pauses the workflow until the project is played again and set '
   equal(await getBadgeText(), "");
 });
 
-itIfMV2("Clipboard set in inject should be accessible in cs-inject", async() =>
+it("Clipboard set in inject should be accessible in cs-inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
@@ -387,7 +389,7 @@ itIfMV2("Clipboard set in inject should be accessible in cs-inject", async() =>
   equal(await getTextContent("#changeContent"), clipboardValue);
 });
 
-itIfMV2("Clipboard set in cs-inject should be accessible in inject", async() =>
+it("Clipboard set in cs-inject should be accessible in inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
