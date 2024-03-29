@@ -17,6 +17,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+
+function actionToPlay(actionIndex) {
+  const index = parseInt(actionIndex);
+  cba.instructArray = cba.defInstructArray.slice(index);
+}
+
 async function removeCookie(pattern) {
   const cookies = await browser.cookies.getAll({});
   for (const cookie of cookies) {
@@ -84,7 +90,7 @@ async function request(url, type, data = "", contentType, resolveJson = true)
   return response;
 }
 
-module.exports = {removeCookie, saveToClipboard,
+module.exports = {actionToPlay, removeCookie, saveToClipboard,
                   panelCreation, windowCreation,
                   removeCurrentWindow, reloadCurrentTab,
                   requestService};

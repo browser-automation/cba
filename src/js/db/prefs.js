@@ -22,6 +22,7 @@
  * @property {boolean} hidePowerfulActionWarning - Hide tooltip for powerful actions.
  * @property {string|null} lastSelectedProjectId - The ID of the last selected project.
  * @property {string|null} lastSelectedActionId - The ID of the last selected action.
+ * @property {number} migrationVersion - number of the migration.
  */
 
 const name = "prefs";
@@ -74,7 +75,7 @@ async function get(pref)
 async function set(pref, value)
 {
   const prefs = await load();
-  if (prefs && pref in prefs)
+  if (prefs)
   {
     prefs[pref] = value;
     return browser.storage.local.set({prefs});

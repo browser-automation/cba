@@ -34,6 +34,7 @@
  * @property {Action} data - Action.
  * @property {CustomActionInfo} info - More information.
  * @property {string} text - Name.
+ * @property {number} [migrationVersion] - Migration version.
  */
 
 const name = "customActions";
@@ -60,6 +61,17 @@ function saveState(items) {
  * @type {CustomAction[]}
  */
 const predefined = [
+  {
+    data: {
+      type: "bg-function",
+      inputs: ['<$function=actionToPlay>\n<$attr=number>', "Jump to another action while executing the project."]
+    },
+    info: {
+      description: "Jump to another action while executing the project."
+    },
+    text: "Action to play",
+    migrationVersion: 1
+  },
   {
     data: {
       type: "timer",

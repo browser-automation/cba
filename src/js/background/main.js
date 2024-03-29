@@ -27,9 +27,11 @@ if (!process.env.MV3) {
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
+const prefs = require("../db/prefs");
 const customActionsDb = require("../db/customActions");
 const {addRpcListener, sendRpcMessageResponse} = require("../rpc/host");
 const {setBadgeText} = require("./utils");
+const latestMigrationVersion = 1;
 
 /** @global */
 globalThis.cba = new CBA();
@@ -96,7 +98,22 @@ async function isFirstLoad() {
     const dbItem = {};
     dbItem[customActionsDb.name] = customActionsDb.predefined;
     await browser.storage.local.set(dbItem);
+    prefs.set("migrationVersion", latestMigrationVersion);
+  } else {
+    const migrationVersion = await prefs.get("migrationVersion");
+    if (!migrationVersion) {
+      // This is first migration, followups needs to be compared against number.
+      addNewFunctions();
+      prefs.set("migrationVersion", latestMigrationVersion);
+    }
   }
+}
+
+async function addNewFunctions() {
+  const customActions = await customActionsDb.load();
+  const firstMigrationItems = customActionsDb.predefined.filter((item) => item.migrationVersion && item.migrationVersion == 1);
+  customActions.push(...firstMigrationItems);
+  customActionsDb.saveState(customActions);
 }
 
 isFirstLoad();
