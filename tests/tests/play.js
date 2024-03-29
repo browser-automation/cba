@@ -92,6 +92,19 @@ it("Inject function runs specified script in the web page", async() =>
   equal(await getTextContent("#changeContent"), newText);
 });
 
+it("Executing project with bg-inject skips the bg-inject execution", async() =>
+{
+  const value = "BG injected text";
+  const data = `window["${bgGlobalVarName}"] = "${value}";`;
+  const evType = "bg-inject";
+  const action = createAction(data, evType, "");
+  const newText = "Injected text";
+  const injectAction = createAction(setTextContentScript("#changeContent", newText), "inject", "");
+  await playTestProject([action, injectAction]);
+  notOk(await getBackgroundGlobalVar(bgGlobalVarName));
+  equal(await getTextContent("#changeContent"), newText);
+});
+
 itIfMV2("cs-inject function runs specified script in content script", async() =>
 {
   const newText = "CS injected text";
@@ -128,40 +141,6 @@ itIfMV2("Jquery is accessible through cs-inject", async() =>
   const action = createAction(`$("${query}").text("${newText}")`, "cs-inject", "");
   await playTestProject([action]);
   equal(await getTextContent(query), newText);
-});
-
-itIfMV2("bg-inject function runs specified script in background page", async() =>
-{
-  const value = "BG injected text";
-  const data = `window["${bgGlobalVarName}"] = "${value}";`;
-  const evType = "bg-inject";
-  const action = createAction(data, evType, "");
-  await playTestProject([action]);
-  equal(await getBackgroundGlobalVar(bgGlobalVarName), value);
-});
-
-itIfMV2("bg-inject action executes script with async(await) code before moving to the next action", async() =>
-{
-  const evType = "bg-inject";
-
-  const valuePromise = "Promise action has been played";
-  const dataPromise = `
-    window["${bgGlobalVarName}"] = [];
-    await new Promise(r => setTimeout(()=>
-    {
-      window["${bgGlobalVarName}"].push("${valuePromise}");
-      r();
-    }, 50));
-  `;
-  const actionPromise = createAction(dataPromise, evType, "");
-
-  const valueSync = "Sync action has been played after async one";
-  const dataSync = `window["${bgGlobalVarName}"].push("${valueSync}");`;
-  const actionSync = createAction(dataSync, evType, "");
-  await playTestProject([actionPromise, actionSync]);
-
-  const backgroundGlobalVar = await getBackgroundGlobalVar(bgGlobalVarName);
-  deepEqual(await backgroundGlobalVar, [valuePromise, valueSync]);
 });
 
 it("bg-function should execute predefined function and play next action when/if defined in function", async() =>
@@ -397,59 +376,26 @@ it("Pause action pauses the workflow until the project is played again and set '
   equal(await getBadgeText(), "");
 });
 
-itIfMV2("Clipboard set in inject should be accessible in cs-inject and bg-inject", async() =>
+itIfMV2("Clipboard set in inject should be accessible in cs-inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
-  const bgGlobalVarName = "cba-bg-test";
   const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "inject", "");
   const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "cs-inject", "");
-  const action3 = createAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
-  await playTestProject([action1, action2, action3]);
+  await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
-  equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
 });
 
-itIfMV2("Clipboard set in cs-inject should be accessible in inject and bg-inject", async() =>
+itIfMV2("Clipboard set in cs-inject should be accessible in inject", async() =>
 {
   const clipboardValue = "cba-test-value";
   const clipboardName = "cba-test";
-  const bgGlobalVarName = "cba-bg-test";
   const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "cs-inject", "");
   const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
-  const action3 = createAction(`window["${bgGlobalVarName}"] = clipboard["${clipboardName}"];`, "bg-inject", "");
-  await playTestProject([action1, action2, action3]);
-  await wait();
-  equal(await getTextContent("#changeContent"), clipboardValue);
-  equal(await getBackgroundGlobalVar(bgGlobalVarName), clipboardValue);
-});
-
-it("Clipboard set in bg-inject should be accessible in inject", async() =>
-{
-  const clipboardValue = "cba-test-value";
-  const clipboardName = "cba-test";
-  const action1 = createAction(`clipboard["${clipboardName}"] = "${clipboardValue}";`, "bg-inject", "");
-  const action2 = createAction(setContentFromClipboardScript("#changeContent", clipboardName) , "inject", "");
   await playTestProject([action1, action2]);
   await wait();
   equal(await getTextContent("#changeContent"), clipboardValue);
-});
-
-it("clipboard[...] set as bg-function attribute should be passed along the function call", async() =>
-{
-  await addCookie("https://www.example1.com/", "cba", "1");
-  await addCookie("https://www.example2.com/", "cba", "1");
-  ok(await getCookie("https://www.example1.com/", "cba"));
-  ok(await getCookie("https://www.example2.com/", "cba"));
-  const clipboardKey = "clip-key";
-  const clipboardValue = "example1";
-  const action1 = createAction(`clipboard["${clipboardKey}"] = "${clipboardValue}";`, "bg-inject", "");
-  const action2 = createAction(`<$function=removeCookie> <$attr=clipboard["${clipboardKey}"]>`, "bg-function", "");
-  await playTestProject([action1, action2]);
-  await wait();
-  notOk(await getCookie("https://www.example1.com/", "cba"));
-  ok(await getCookie("https://www.example2.com/", "cba"));
 });
 
 it("<$unique=> placeholder should generate random number with the specified characters length", async() =>
@@ -480,41 +426,6 @@ it("Repeat option should keep repeating actions in the project", async() =>
   await playTestProject([action], 4);
   await wait();
   equal(await getValue("#cba-num"), "5");
-});
-
-itIfMV2("sendBgInstruction variable and sendInstruction() method can be used in bg-inject to stop and continue next action invocation", async() =>
-{
-  const firstActionText = "first-action-text";
-  const secondActionText = "second-action-text";
-  const bgGlobalVarName = "cba-control-instructions";
-  const code = `
-  sendBgInstruction = false;
-  setTimeout(() => {
-    window["${bgGlobalVarName}"] = "${firstActionText}";
-    sendInstruction();
-  }, 100);`;
-  const action1 = createAction(code, "bg-inject", "");
-  const action2 = createAction(`window["${bgGlobalVarName}"] = "${secondActionText}";`, "bg-inject");
-  await playTestProject([action1, action2]);
-  await wait(200);
-  equal(await getBackgroundGlobalVar(bgGlobalVarName), secondActionText);
-});
-
-itIfMV2("actionToPlay can be used in bg-inject to Jump to another action", async() =>
-{
-  const query = "#changeContent";
-  const firstInjectedText = "First Injected Text"; 
-  const secondInjectedText = "Second Injected Text"; 
-  const jumpToAction = 3;
-  const lastActionText = "Last action has been played";
-  const action1 = createAction(setTextContentScript(query, firstInjectedText), "inject");
-  const action2 = createAction(`actionToPlay(${jumpToAction});`, "bg-inject");
-  const action3 = createAction(setTextContentScript(query, secondInjectedText), "inject");
-  const action4 = createAction(`window["${bgGlobalVarName}"] = "${lastActionText}";`, "bg-inject", "");
-  await playTestProject([action1, action2, action3, action4]);
-  await wait();
-  equal(await getTextContent(query), firstInjectedText);
-  equal(await getBackgroundGlobalVar(bgGlobalVarName), lastActionText);
 });
 
 function gotoRedirectPageScript()

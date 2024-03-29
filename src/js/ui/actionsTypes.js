@@ -30,11 +30,6 @@ const actionTypes = [
     link: `${website}/inject-cs`
   },
   {
-    name: "bg-inject",
-    description: "Inject script into backroung page of the extension.",
-    link: `${website}/bg-inject`
-  },
-  {
     name: "bg-function",
     description: "Predefined scripts that are executed in the context of the background page.",
     link: `${website}/bg-function`

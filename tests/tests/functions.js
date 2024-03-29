@@ -85,7 +85,6 @@ it("Changing action selectbox disables fields accordingly", async() =>
   const disableState = {
     "inject": [false, true],
     "cs-inject": [false, true],
-    "bg-inject": [false, true],
     "bg-function": [false, true],
     "change": [false, false],
     "check": [false, true],
