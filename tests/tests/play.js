@@ -37,6 +37,7 @@ const bgGlobalVarName = "cba-test";
 const pageSetup = {
   body: `
     <div id="changeContent">Change me</div>
+    <div id="changeContent2">Change me2</div>
     <div id="cba-change">
       <input id="cba-textbox" type="text" />
       <select id="cba-selectbox">
@@ -206,6 +207,24 @@ it("bg-function reloadCurrentTab(without attributes test) should reload current 
   await wait();
   notOk(await isElementExist("#changeContent"));
   equal(await getTextContent(query), newText);
+});
+
+it("bg-function actionToPlay should jump to another action", async() =>
+{
+  const query = "#changeContent";
+  const query2 = "#changeContent2";
+  const firstInjectedText = "First Injected Text";
+  const secondInjectedText = "Second Injected Text";
+  const jumpToAction = 3;
+  const lastActionText = "Last action has been played";
+  const action1 = createAction(setTextContentScript(query, firstInjectedText), "inject");
+  const action2 = createAction(`<$function=actionToPlay>\n<$attr=${jumpToAction}>`, "bg-function");
+  const action3 = createAction(setTextContentScript(query, secondInjectedText), "inject");
+  const action4 = createAction(setTextContentScript(query2, lastActionText), "inject");
+  await playTestProject([action1, action2, action3, action4]);
+  await wait();
+  equal(await getTextContent(query), firstInjectedText);
+  equal(await getTextContent(query2), lastActionText);
 });
 
 it("Change action updates value of a textbox, focuses and fires a change event", async() =>

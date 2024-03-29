@@ -372,7 +372,7 @@ it("Selecting action populates input deselecting clears", async() =>
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
 {
   await addFourEmptyActions();
-  const handle = await getCbaListRowHandle(cbaFunctionsQuery, "cba-list-id-1");
+  const handle = await getCbaListRowHandle(cbaFunctionsQuery, "cba-list-id-2");
 
   const actionTableItemIsTimer = async(index) =>
   {
