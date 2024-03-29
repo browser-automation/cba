@@ -78,19 +78,7 @@ async function actionExecution(instruction)
       break;
     }
     case "bg-inject": {
-      // eslint-disable-next-line no-unused-vars
-      let sendInstruction = () => "";
-      // eslint-disable-next-line no-unused-vars
-      const actionToPlay = (actionInd) => cba.instructArray = cba.defInstructArray.slice(actionInd);
-      let sendBgInstruction = true;
-      const clipboard = cba.clipboard;
-      await eval(`(async () => {${input1}})()`);
-      cba.clipboard = clipboard;
-      if(!sendBgInstruction) {
-        return new Promise((resolve) => {
-          sendInstruction = resolve;
-        });
-      }
+      // bg-inject is not supported in MV3.
       break;
     }
     case "inject": {
