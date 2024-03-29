@@ -81,6 +81,7 @@ async function actionExecution(instruction)
       // bg-inject is not supported in MV3.
       break;
     }
+    case "cs-inject":
     case "inject": {
       if (!process.env.MV3) {
         await messageContentScript(instruction, cba.clipboard);
@@ -111,14 +112,27 @@ async function actionExecution(instruction)
             document.getElementById('${clipboardId}').style.display = 'none';`;
           document.documentElement.appendChild(script); // run the script
           document.documentElement.removeChild(script); // clean up
-          const injectedClipboard = document.querySelector(`#${clipboardId}`);
-          if(injectedClipboard) {
-            clipboard = JSON.parse(injectedClipboard.textContent);
-          }
         },
         args: [cba.clipboard, input1],
         world: "MAIN"
       });
+
+      // Retrieve clipboard value
+      const [clipboard] = await browser.scripting.executeScript({
+        target: {tabId: playingTabId},
+        func: () => {
+          const clipboardId = "grabClipboardHere";
+          const injectedClipboard = document.querySelector(`#${clipboardId}`);
+          if(injectedClipboard) {
+            return JSON.parse(injectedClipboard.textContent);
+          }
+          return {};
+        },
+        world: "MAIN"
+      });
+      if (clipboard && clipboard.result) {
+        cba.clipboard = clipboard.result;
+      }
       break;
     }
     case "pause": {
