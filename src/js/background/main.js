@@ -21,9 +21,8 @@
 /** @global */
 globalThis.browser = require("webextension-polyfill");
 
-if (!process.env.MV3) {
-  require("../analytics");
-}
+// see: https://github.com/browser-automation/cba/issues/127
+// require("../analytics");
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");

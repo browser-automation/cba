@@ -17,9 +17,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-const {_gaq} = require("./analytics");
+// see: https://github.com/browser-automation/cba/issues/127
+// const {_gaq} = require("./analytics");
 require("./ui/projects");
 
+/*
+see: https://github.com/browser-automation/cba/issues/127
 function trackButtonClick(e) {
    _gaq.push(['_trackEvent', e.target.id, 'clicked']);
 }
@@ -32,6 +35,7 @@ function analytAllButtons() {
 }
 
 analytAllButtons();
+*/
 
 const params = (new URL(window.location)).searchParams;
 if (params.has("options")) {

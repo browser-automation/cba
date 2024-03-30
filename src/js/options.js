@@ -17,7 +17,8 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-require("./analytics");
+// see: https://github.com/browser-automation/cba/issues/127
+// require("../analytics");
 require("./ui/import-export");
 require("./ui/functions");
 require("./ui/tabs");

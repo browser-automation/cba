@@ -83,10 +83,6 @@ async function actionExecution(instruction)
     }
     case "cs-inject":
     case "inject": {
-      if (!process.env.MV3) {
-        await messageContentScript(instruction, cba.clipboard);
-        break;
-      }
       const playingTabId = await cba.getPlayingTabId();
       if (!playingTabId) {
         throw new Error("No playing tab");
