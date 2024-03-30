@@ -72,7 +72,12 @@ const warnings = {
   },
   bgActionsMv3: {
     text: "Current project contains bg-inject action, which we can not support since Manifest v3, please replace it with another action.",
-    link: "https://chrome-automation.com/mv3",
+    link: "https://chrome-automation.com/mv3#bg-inject",
+    linkText: "Learn more",
+  },
+  csActionsMv3: {
+    text: "Current project contains cs-inject action, cs-inject current acts very similar to inject action since migration to Manifest v3.",
+    link: "https://chrome-automation.com/mv3#cs-inject",
     linkText: "Learn more",
   }
 };
@@ -105,8 +110,17 @@ async function loadProjects()
  */
 function setAlertsToProjects(project) {
   const hasBgInject = project.actions.some((action) => action.type === "bg-inject");
+  const hasCsInject = project.actions.some((action) => action.type === "cs-inject");
   /** @type {import("cba-components/src/cba-list/cba-list").ListItem} */
   const listItem = {...project};
+  if (hasCsInject) {
+    listItem.info = {
+      type: "warning",
+      description: warnings["csActionsMv3"].text,
+      link: warnings["csActionsMv3"].link,
+      linkText: warnings["csActionsMv3"].linkText
+    }
+  }
   if (hasBgInject) {
     listItem.info = {
       type: "error",
@@ -129,6 +143,12 @@ function setAlertsToActions(actions) {
       return  {...action, alert: {
         text: warnings["bgActionsMv3"].text,
         type: "error"
+      }}
+    } else if (action.type === "cs-inject")
+    {
+      return  {...action, alert: {
+        text: warnings["csActionsMv3"].text,
+        type: "warning"
       }}
     }
     else {

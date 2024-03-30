@@ -33,7 +33,8 @@ const {wait, setProjects, cbaListHasTextCount, cbaListItemExpand,
        getCurrentWindowUrl, getBadgeText, isDisplayNone, cbaTableUnselectRow,
        cbaTooltipGetHeader, cbaTooltipGetParagraph, cbaTooltipGetLink,
        hoverElement, cbaListGetTooltipText, cbaListItemsByText,
-       cbaListhoverRowInfo, cbaTooltipClickAction} = require("./utils");
+       cbaListhoverRowInfo, cbaTooltipClickAction, cbaListHasError, cbaListHasWarning,
+       cbaTableHasError, cbaTableHasWarning} = require("./utils");
 const {page} = require("../main");
 const {NO_ACTION_SELECTED, NO_PROJ_SELECTED,
        NO_PROJ_GROUP_SELECTED, SELECT_PROJ_NOT_GROUP,
@@ -653,6 +654,74 @@ it("Selecting a project that has 'bg-inject' or 'cs-inject' shows powerful actio
 
   await cbaListItemSelect(cbaListQuery, "project1", "group");
   ok(await isDisabled(playButtonTooltipQuery));
+});
+
+it("Project with bg-inject render warning both in project table and actions table", async() =>
+{
+  const projects = [{
+    id: "group",
+    text: "group",
+    type: "group",
+    expanded: true,
+    subItems: [
+      {
+        id: "project",
+        text: "project",
+        type: "project",
+        actions: [
+          {
+            type: "bg-inject", 
+            inputs: ["alert('Hello from CBA!')", ""]
+          },
+          {
+            type: "cs-inject",
+            inputs: ["alert('Hello from page contexts')", ""]
+          }
+        ]
+      }
+    ]
+  }];
+
+  await setProjects(projects);
+  ok(await cbaListHasError(cbaListQuery, "project"));
+
+  cbaTooltipGetParagraph(cbaListQuery);
+
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  ok(await cbaTableHasError(cbaTableQuery, "cba-table-id-1"));
+  ok(await cbaTableHasWarning(cbaTableQuery, "cba-table-id-2"));
+
+  await cbaListhoverRowInfo(cbaListQuery, "project");
+  ok((await cbaListGetTooltipText(cbaListQuery)).includes("bg-inject"));
+});
+
+it("Project with cs-inject render warning both in project table and actions table", async() =>
+{
+  const projects = [{
+    id: "group",
+    text: "group",
+    type: "group",
+    expanded: true,
+    subItems: [
+      {
+        id: "project",
+        text: "project",
+        type: "project",
+        actions: [
+          {
+            type: "cs-inject", 
+            inputs: ["alert('Hello from page contexts')", ""]
+          },
+        ]
+      }
+    ]
+  }];
+
+  await setProjects(projects);
+  ok(await cbaListHasWarning(cbaListQuery, "project"));
+
+  await cbaListItemSelect(cbaListQuery, "project", "group");
+  ok(await cbaTableHasWarning(cbaTableQuery, "cba-table-id-1"));
 });
 
 it("Functions cba-list items contain tooltip with description about each of them", async() =>
