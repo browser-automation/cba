@@ -527,19 +527,11 @@ async function resetCbaObject()
 
 async function getBadgeText()
 {
-  if (process.env.MV3) {
-    return backgroundPage().evaluate(() => {
-      return new Promise((response) => {
-        chrome.action.getBadgeText({}, response);
-      })
-    });
-  } else {
-    return backgroundPage().evaluate(() => {
-      return new Promise((response) => {
-        chrome.browserAction.getBadgeText({}, response);
-      })
-    });
-  }
+  return backgroundPage().evaluate(() => {
+    return new Promise((response) => {
+      chrome.action.getBadgeText({}, response);
+    })
+  });
 }
 
 // Usage: await setListeners("#id", ["mousedown", "click"], (e) => {});

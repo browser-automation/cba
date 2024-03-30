@@ -18,8 +18,5 @@
  */
 
 export function setBadgeText(text) {
-  if (process.env.MV3) { 
-    return browser.action.setBadgeText({text});
-  }
-  return browser.browserAction.setBadgeText({text});
+  return browser.action.setBadgeText({text});
 }

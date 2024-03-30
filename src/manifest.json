@@ -31,4 +31,4 @@
   "permissions": ["cookies", "tabs", "storage", "scripting"],
   "update_url": "https://clients2.google.com/service/update2/crx",
   "version": "9.1.0"
-}
+} 
