@@ -17,27 +17,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-// see: https://github.com/browser-automation/cba/issues/127
-// const {_gaq} = require("./analytics");
+import Analytics from "./analytics";
 require("./ui/projects");
-
-/*
-see: https://github.com/browser-automation/cba/issues/127
-function trackButtonClick(e) {
-   _gaq.push(['_trackEvent', e.target.id, 'clicked']);
-}
-
-function analytAllButtons() {
-  var buttons = document.querySelectorAll('cba-button');
-  for (var i = 0; i < buttons.length; i++) {
-    buttons[i].addEventListener('click', trackButtonClick);
-  }
-}
-
-analytAllButtons();
-*/
 
 const params = (new URL(window.location)).searchParams;
 if (params.has("options")) {
   document.body.classList.add("options");
 }
+
+Analytics.firePageViewEvent("Popup", "popup.js");

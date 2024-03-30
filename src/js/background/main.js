@@ -21,8 +21,7 @@
 /** @global */
 globalThis.browser = require("webextension-polyfill");
 
-// see: https://github.com/browser-automation/cba/issues/127
-// require("../analytics");
+import Analytics from "../analytics";
 const {CBA} = require("./CBA");
 const {playProject} = require("./actions");
 const projectsDb = require("../db/projects");
@@ -170,3 +169,5 @@ async function playButtonClick(actions, repeatVal, currProjectId) {
   }
   await playProject();
 }
+
+Analytics.firePageViewEvent("Service worker", "back.js");

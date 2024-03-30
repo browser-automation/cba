@@ -17,8 +17,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-// see: https://github.com/browser-automation/cba/issues/127
-// require("../analytics");
+import Analytics from "./analytics";
 require("./ui/import-export");
 require("./ui/functions");
 require("./ui/tabs");
@@ -30,3 +29,5 @@ async function setVersion()
 }
 
 setVersion();
+
+Analytics.firePageViewEvent("Options", "options.js");
