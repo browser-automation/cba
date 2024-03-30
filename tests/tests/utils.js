@@ -161,6 +161,21 @@ async function cbaListhoverRowInfo(cbaListQuery, id)
   return handle.hover();
 }
 
+async function cbaListHasError(cbaListQuery, id)
+{
+  const rowHandel = await getCbaListRowHandle(cbaListQuery, id);
+  const handle = await rowHandel.$(".info.error");
+  return !!handle;
+}
+
+async function cbaListHasWarning(cbaListQuery, id)
+{
+  const rowHandel = await getCbaListRowHandle(cbaListQuery, id);
+  await rowHandel.hover();
+  const handle = await rowHandel.$(".info.warning");
+  return !!handle;
+}
+
 async function cbaListItemsByText(query, text, parentText)
 {
   return page().evaluate(async(query, text, parentText) => {
@@ -233,6 +248,21 @@ async function cbaTableUnselectRow(query, id)
     delete item.selected;
     return table.updateRow(item, id);
   }, await page().$(query), id);
+}
+
+async function cbaTableHasError(query, id)
+{
+  const rowHandel = await getCbaTableRowHandle(query, id);
+  
+  const hasError = await rowHandel.evaluate((row) => row.classList.contains("error"));
+  return !!hasError;
+}
+
+async function cbaTableHasWarning(query, id)
+{
+  const rowHandel = await getCbaTableRowHandle(query, id);
+  const hasError = await rowHandel.evaluate((row) => row.classList.contains("warning"));
+  return !!hasError;
 }
 
 async function getShadowRoot(query)
@@ -628,4 +658,6 @@ module.exports = {playTestProject, getBackgroundGlobalVar,
                   cbaTooltipGetHeader, cbaTooltipGetParagraph,
                   cbaTooltipGetLink, hoverElement, cbaListGetTooltipText,
                   cbaTooltipClickAction, cbaListItemsByText,
-                  cbaListhoverRowInfo, stopPropagation, getCbaState};
+                  cbaListhoverRowInfo, stopPropagation, getCbaState,
+                  cbaListHasError, cbaListHasWarning, cbaTableHasError,
+                  cbaTableHasWarning};
