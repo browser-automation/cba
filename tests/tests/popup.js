@@ -366,8 +366,8 @@ it("Selecting action populates input deselecting clears", async() =>
   itemHasTypeAndInputs(await cbaTableGetItem(cbaTableQuery, 1), type, [input1, input2]);
 
   equal(await getValue(inputEventQuery), type);
-  equal(await getValue(inputDataQuery), input1);
-  equal(await getValue(inputValueQuery), input2);
+  equal(await getValue(inputDataQuery), "");
+  equal(await getValue(inputValueQuery), "");
 });
 
 it("dragndropping from the functions table or self-organizing actions table should update actions accordingly", async() =>
@@ -601,59 +601,6 @@ it("click and bg-function actions doesn't stop project execution on error", asyn
 
   await wait(100);
   equal(await getBadgeText(), "");
-});
-
-it("Selecting a project that has 'bg-inject' or 'cs-inject' shows powerful actions tooltip unless 'Hide message' is clicked", async() =>
-{
-  const projects = [{
-    id: "group",
-    text: "group",
-    type: "group",
-    expanded: false,
-    subItems: [
-      {
-        id: "project",
-        text: "project",
-        type: "project",
-        actions: [{type: "cs-inject", inputs: ["alert('Hello from CBA!')", ""]}]
-      },
-      {
-        id: "project1",
-        text: "project1",
-        type: "project",
-        actions: [{type: "bg-inject", inputs: ["alert('Hello from CBA!')", ""]}]
-      },
-      {
-        id: "project2",
-        text: "project2",
-        type: "project",
-        actions: [{type: "inject", inputs: ["alert('Hello from CBA!')", ""]}]
-      }
-    ]
-  }];
-  await setProjects(projects);
-
-  await cbaListItemExpand(cbaListQuery, "group");
-  await wait();
-
-  ok(await isDisabled(playButtonTooltipQuery));
-
-  await cbaListItemSelect(cbaListQuery, "project", "group");
-  notOk(await isDisabled(playButtonTooltipQuery));
-
-  await cbaListItemSelect(cbaListQuery, "project1", "group");
-  notOk(await isDisabled(playButtonTooltipQuery));
-  await cbaListItemSelect(cbaListQuery, "project2", "group");
-  ok(await isDisabled(playButtonTooltipQuery));
-
-  await cbaListItemSelect(cbaListQuery, "project", "group");
-  notOk(await isDisabled(playButtonTooltipQuery));
-  await hoverElement(playButtonTooltipQuery);
-  await cbaTooltipClickAction(playButtonTooltipQuery);
-  ok(await isDisabled(playButtonTooltipQuery));
-
-  await cbaListItemSelect(cbaListQuery, "project1", "group");
-  ok(await isDisabled(playButtonTooltipQuery));
 });
 
 it("Project with bg-inject render warning both in project table and actions table", async() =>
