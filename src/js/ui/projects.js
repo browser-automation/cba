@@ -175,16 +175,6 @@ async function populateActions(items)
   onActionSelect();
 }
 
-function projectHasAction(id, types)
-{
-  const project = projectsComp.getItem(id);
-  if (project.type !== "project" || !project.actions)
-    return false;
-
-  const filterTypes = (action) => types.indexOf(action.type) >= 0;
-  return project.actions.filter(filterTypes).length > 0;
-}
-
 async function initPlayButtonTooltip()
 {
   const text = warnings["powerFullActions"].text;
@@ -206,17 +196,8 @@ async function hideWarningMessage()
 
 async function setPlayButtonTooltip()
 {
-  const {id} = await projectsComp.getSelectedItem();
-  if (await prefs.get("hidePowerfulActionWarning") == true)
-  {
-    playButtonTooltip.disable();
-  }
-  else if (projectHasAction(id, ["bg-inject", "cs-inject"])) {
-    playButtonTooltip.enable();
-  }
-  else {
-    playButtonTooltip.disable();
-  }
+  // Disabling since MV3 as we no more have "Powerful" actions.
+  playButtonTooltip.disable();
 }
 
 async function onProjectSelect()
