@@ -23,10 +23,16 @@ const CopyPlugin = require('copy-webpack-plugin');
 const {minify} = require("csso");
 const {extname} = require("path");
 
+/**
+ * @param {Buffer} content 
+ * @param {string} file 
+ */
 const transformCss = (content, file) =>
 {
-  if (argv.prod && extname(file) === ".css")
-    return minify(content).css;
+  if (process.env.PROD && extname(file) === ".css") {
+    const res = minify(content.toString());
+    return res.css;
+  }
   else
     return content;
 }
@@ -68,7 +74,7 @@ if (argv.watch)
   module.exports.watch = true;
 }
 
-if (argv.prod)
+if (process.env.PROD)
 {
   module.exports.mode = "production";
   module.exports.optimization.minimize = true;
