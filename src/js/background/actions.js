@@ -87,47 +87,77 @@ async function actionExecution(instruction)
       if (!playingTabId) {
         throw new Error("No playing tab");
       }
-      await browser.scripting.executeScript({
-        target: {tabId: playingTabId},
-        func: (clipboard, input1) => {
-          const clipboardId = "grabClipboardHere";
-          const script = document.createElement('script');
-          script.setAttribute("type", "application/javascript");
-          script.textContent = `
-            var clipboard=${JSON.stringify(clipboard)};
-            ${input1};
-            var newdiv = document.createElement('div');
-            if(document.getElementById('${clipboardId}')!= null) {
-              document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
-            }
-            else {
-              newdiv.setAttribute('id', '${clipboardId}');
-              newdiv.textContent = JSON.stringify(clipboard);
-              document.body.appendChild(newdiv);
-            }
-            document.getElementById('${clipboardId}').style.display = 'none';`;
-          document.documentElement.appendChild(script); // run the script
-          document.documentElement.removeChild(script); // clean up
-        },
-        args: [cba.clipboard, input1],
-        world: "MAIN"
-      });
 
-      // Retrieve clipboard value
-      const [clipboard] = await browser.scripting.executeScript({
-        target: {tabId: playingTabId},
-        func: () => {
-          const clipboardId = "grabClipboardHere";
-          const injectedClipboard = document.querySelector(`#${clipboardId}`);
-          if(injectedClipboard) {
-            return JSON.parse(injectedClipboard.textContent);
-          }
-          return {};
-        },
-        world: "MAIN"
-      });
-      if (clipboard && clipboard.result) {
-        cba.clipboard = clipboard.result;
+      try {
+        // Page has Jquery
+        const hasJquery = (await browser.scripting.executeScript({
+          target: {tabId: playingTabId},
+          func: () => {
+            return typeof jQuery !== "undefined";
+          },
+          world: "MAIN"
+        }))[0].result;
+  
+        if (!hasJquery) {
+          // Load Jquery
+          await browser.scripting.executeScript({
+            target: {tabId: playingTabId},
+            files: ["js/jquery-1.7.2.min.js"],
+            world: "MAIN"
+          });
+        }
+      } catch(e) {
+        // If for some reason we can not load JQuery we will continue without it. 
+        console.error(e);
+      }
+
+      try {
+        // Execute the script
+        await browser.scripting.executeScript({
+          target: {tabId: playingTabId},
+          func: (clipboard, input1) => {
+            const clipboardId = "grabClipboardHere";
+            const script = document.createElement('script');
+            script.setAttribute("type", "application/javascript");
+            script.textContent = `
+              var clipboard=${JSON.stringify(clipboard)};
+              ${input1};
+              var newdiv = document.createElement('div');
+              if(document.getElementById('${clipboardId}')!= null) {
+                document.getElementById('${clipboardId}').textContent = JSON.stringify(clipboard);
+              }
+              else {
+                newdiv.setAttribute('id', '${clipboardId}');
+                newdiv.textContent = JSON.stringify(clipboard);
+                document.body.appendChild(newdiv);
+              }
+              document.getElementById('${clipboardId}').style.display = 'none';`;
+            document.documentElement.appendChild(script); // run the script
+            document.documentElement.removeChild(script); // clean up
+          },
+          args: [cba.clipboard, input1],
+          world: "MAIN"
+        });
+
+        // Retrieve clipboard value
+        const [clipboard] = await browser.scripting.executeScript({
+          target: {tabId: playingTabId},
+          func: () => {
+            const clipboardId = "grabClipboardHere";
+            const injectedClipboard = document.querySelector(`#${clipboardId}`);
+            if(injectedClipboard) {
+              return JSON.parse(injectedClipboard.textContent);
+            }
+            return {};
+          },
+          world: "MAIN"
+        });
+        if (clipboard && clipboard.result) {
+          cba.clipboard = clipboard.result;
+        }
+      } catch(e) {
+        // If for some reason we can not inject the script we will continue without it. 
+        console.error(e);
       }
       break;
     }

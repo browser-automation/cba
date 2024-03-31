@@ -134,6 +134,7 @@ it("cs-inject action executes script with async(await) code before moving to the
   await playTestProject([actionPromise, actionSync]);
   equal(await getTextContent("#changeContent"), valuePromise+valueSync);
 });
+*/
 
 it("Jquery is accessible through cs-inject", async() =>
 {
@@ -143,7 +144,6 @@ it("Jquery is accessible through cs-inject", async() =>
   await playTestProject([action]);
   equal(await getTextContent(query), newText);
 });
-*/
 
 it("bg-function should execute predefined function and play next action when/if defined in function", async() =>
 {
