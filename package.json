@@ -12,7 +12,7 @@
     "build": "npm run clean && npm run build:webpack:prod && cd dist/;zip -r ../cba.zip .;cd ..",
     "build:webpack": "npm run clean && npm run import:components && webpack --config webpack.config.js",
     "build:webpack:watch": "npm run clean && npm run import:components && webpack --config webpack.config.js --watch",
-    "build:webpack:prod": "npm run clean && npm run import:components && webpack --config webpack.config.js --prod",
+    "build:webpack:prod": "npm run clean && npm run import:components && PROD=1 webpack --config webpack.config.js",
     "clean": "rm -r dist || true"
   },
   "repository": {
