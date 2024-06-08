@@ -251,7 +251,10 @@ async function keepHighlightingPlayingAction(isPopupLoad)
 
   if(cbaState.allowPlay || cbaState.paused)
   {
-    projectsComp.selectRow(cbaState.playingProjectId);
+    const selectedItem = projectsComp.getSelectedItem();
+    if (selectedItem && selectedItem.id !== cbaState.playingProjectId) {
+      projectsComp.selectRow(cbaState.playingProjectId);
+    }
     if (cbaState.playingActionIndex >= 0)
     {
       const {id} = actionsComp.items[cbaState.playingActionIndex];
