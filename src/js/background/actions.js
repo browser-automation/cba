@@ -26,6 +26,10 @@ async function playProject() {
   }
   else if(cba.instructArray.length) {
     setBadgeText("play");
+    const playingTabId = await cba.getPlayingTabId();
+    if (playingTabId) {
+      void browser.tabs.sendMessage(playingTabId, {action: "startKeepAlive"});
+    }
     const [instruction] = cba.instructArray.splice(0, 1);
     cba.playingActionIndex = (cba.defInstructArray.length - cba.instructArray.length) - 1;
 

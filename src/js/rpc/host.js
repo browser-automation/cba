@@ -31,6 +31,9 @@
 const listeners = [];
 
 browser.runtime.onConnect.addListener((port) => {
+  if (port.name === "keepAlive") {
+    return;
+  }
   if (port.name !== "rpcPort") throw new Error("Unknown port.");
   port.onMessage.addListener(async(/** @type {RpcMessages} */ msg) => {
     for (const listener of listeners) {

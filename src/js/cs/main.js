@@ -20,6 +20,10 @@
 
 require("./record");
 require("./actions");
+const {sendRpcMessage, addRpcListener, removeRpcListener} = require("../rpc/client");
+/**
+ * @typedef {import("../rpc/types").RpcHandler} RpcHandler
+ */
 
 browser.runtime.onMessage.addListener((request) => {
   if(request.action == "highlight") {
@@ -27,6 +31,9 @@ browser.runtime.onMessage.addListener((request) => {
   }
   else if(request.action == "unHighlight") {
     return setHighlight(request.selector, false);
+  }
+  else if (request.action == "startKeepAlive") {
+    keepAlive();
   }
 });
 
@@ -39,3 +46,65 @@ function setHighlight(query, highlight = true)
     target.style["outline-width"] = highlight ? "1px" : "";
   }
 }
+
+/**
+ * @returns {Promise<import("../background/CBA").State | null>}
+ */
+function getCbaState() {
+  return new Promise((resolve) => {
+    const uuid = uuidv4();
+    const onTimeout = () => {
+      removeRpcListener(handler);
+      resolve(null);
+    }
+    /** @type {RpcHandler} */
+    const handler = (state) => {
+      if (state.msgType === "GetStateResponse" && state.id === uuid) {
+        removeRpcListener(handler);
+        resolve(state.state);
+      }
+      clearTimeout(onTimeout);
+    };
+    setTimeout(onTimeout, 1000);
+    addRpcListener(handler);
+    sendRpcMessage({msgType: "GetState", id: uuid});
+  });
+}
+
+function uuidv4() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
+/**
+ * While a CBA project is being executed Service worker should be kept alive. It
+ * has been observed that service worker is being killed by the browser on
+ * `click-update` and `update` actions, breaking our user workflow which
+ * involves project with repeating run and relying on page update triggered by
+ * the user .
+ */
+let keepAlivePort;
+let postTimer;
+async function keepAlive() {
+  const state = await getCbaState();
+  if (state === null) {
+    return;
+  }
+  // If project is playing or paused, keep service worker alive.
+  if (state && (state.allowPlay || state.paused)) {
+    keepAlivePort = chrome.runtime.connect({name: 'keepAlive'});
+    postTimer = window.setTimeout(keepAlive, 15000);
+  } else {
+    if (keepAlivePort) {
+      keepAlivePort.disconnect();
+      keepAlivePort = null;
+    }
+    if (postTimer) {
+      window.clearTimeout(postTimer);
+      postTimer = null;
+    }
+  }
+}
+
+keepAlive();
