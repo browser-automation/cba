@@ -550,8 +550,8 @@ it("Setting repeate should repeate the project, specified amount of times", asyn
 {
   await setValue("#repeat", 2);
   await addEmptyActions(3);
-  await updateSpecificAction("cba-table-id-1", "", "timer", "100");
-  await updateSpecificAction("cba-table-id-2", "", "timer", "100");
+  await updateSpecificAction("cba-table-id-1", "", "timer", "90");
+  await updateSpecificAction("cba-table-id-2", "", "timer", "90");
   await updateSpecificAction("cba-table-id-3", "", "timer", "100");
 
   await clickPlay();
